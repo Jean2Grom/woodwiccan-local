@@ -1,0 +1,26 @@
+{
+    "name": "ww-user",
+    "class": "WW\\Cauldron\\UserCauldron",
+    "composition": [
+        {
+            "mandatory": true,
+            "name": "last-name",
+            "type": "string"
+        },
+        {
+            "mandatory": true,
+            "name": "first-name",
+            "type": "string"
+        },
+        {
+            "mandatory": true,
+            "name" : "user__connexion",
+            "type": "integer"
+        }, 
+        {
+            "mandatory": true,
+            "name" : "profiles",
+            "type": "ww-profiles-array"
+        }
+    ]
+}

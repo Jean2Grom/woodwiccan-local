@@ -1,0 +1,22 @@
+{
+    "name": "select",
+    "composition": [
+        {
+            "mandatory": true,
+            "name": "name",
+            "type": "string"
+        },
+        {
+            "mandatory": true,
+            "name" : "options",
+            "type": "folder",
+            "require": {
+                "min": 1,
+                "accept": [
+                    "option",
+                    "optgroup"
+                ]
+            }
+        }
+    ]
+}

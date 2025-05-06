@@ -1,0 +1,14 @@
+{
+    "name": "cauldron-link",
+    "composition": [
+        {
+            "mandatory": true,
+            "name": "id",
+            "type": "integer"
+        },
+        {
+            "name": "label",
+            "type": "string"
+        }
+    ]
+}

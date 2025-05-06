@@ -1,0 +1,19 @@
+{
+    "name": "ww-file",
+    "class": "WW\\Cauldron\\FileCauldron",
+    "require": {
+        "max": "0"
+    },
+    "composition": [
+        {
+            "mandatory": true,
+            "name": "storage-path",
+            "type": "string"
+        },
+        {
+            "mandatory": true,
+            "name": "filename",
+            "type": "string"
+        }
+    ]
+}

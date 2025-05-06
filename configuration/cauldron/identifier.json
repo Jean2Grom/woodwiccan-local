@@ -1,0 +1,15 @@
+{
+    "name": "identifier",
+    "composition": [
+        {
+            "mandatory": true,
+            "name": "table",
+            "type": "string"
+        },
+        {
+            "mandatory": true,
+            "name": "identifier",
+            "type": "integer"
+        }
+    ]
+}

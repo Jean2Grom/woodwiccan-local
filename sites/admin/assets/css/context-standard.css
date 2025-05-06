@@ -1,0 +1,104 @@
+nav {
+    display: none;
+    height: 100%;
+    position: fixed;
+    z-index: 7;
+    background-color: #cccccc;
+    overflow-x: hidden;
+    padding-top: 15px;
+}
+    nav a.side-nav-toggler {
+        position: absolute;
+        right: 10px;
+        top: 10px;
+        margin: 0;
+    }
+    nav a {
+        font-size: 1em;
+        display: block;
+        margin: 20px;
+    }
+
+main, footer {
+    padding: 20px;
+}
+main {
+    padding-bottom: 0;
+}
+.breadcrumb__label {
+    margin: 0 0 1vh 0;
+}
+.breadcrumb {
+    font-size: 0.8em;
+    margin-bottom: 2vh;
+}
+fieldset {
+    border-radius: 5px;
+    margin-bottom: 10px;
+    padding: 8px;
+}
+.tabs {
+    margin-top: 15px;
+    display: flex;
+}
+    .tabs__item {
+        border-top: 1px solid #ccc;
+        border-left: 1px solid #ccc;
+        border-right: 1px solid #ccc;
+        border-bottom: 1px solid #ccc;
+        padding: 8px 16px;
+        margin-right: 5px;
+        cursor: pointer;
+        background-color: #f3f3f3;
+    }
+        .tabs__item.selected {
+            border-bottom: 1px solid #FFF;
+            background-color: #FFF;
+            color: #ff9900;
+        }
+.tabs-target {
+    border: 1px solid #ccc;
+    margin-top: -1px;
+    box-shadow: 5px 5px 5px #ccc;
+    background-color: #FFF;
+    padding: 2vw;
+
+}
+    .tabs-target__item {
+        display: none;
+    }
+        .tabs-target__item.selected {
+            display: block;
+        }
+
+@media screen and (min-device-width: 480px) {
+}
+@media screen and (min-device-width: 768px) {
+    nav {
+        display: block;
+        width: 125px;
+        padding-top: 0;
+    }
+        nav a {
+            display: block;
+            margin-top: 20px;
+            margin-left: 20px;
+        }
+        nav a.side-nav-toggler {
+            display: none;
+        }
+    main, footer {
+        margin-left: 125px;
+        padding: 20px;
+    }
+}
+@media screen and (min-device-width: 1024px) {
+    .breadcrumb {
+        font-size: 1em;
+        margin-bottom: 2vh;
+    }
+    .tabs-target {
+        padding: 16px;
+    }
+
+}

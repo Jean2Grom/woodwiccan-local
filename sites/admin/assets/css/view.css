@@ -1,0 +1,75 @@
+.view__witch-menu-info {
+    margin: 2vw 0 8vw;
+}
+    .view__witch-menu-info h2 {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        margin-bottom: 1.5vw;
+    }
+    .view__witch-menu-info button {
+        font-size: 0.7em;
+        margin-left: 1vw;
+    }
+.box.edit__witch-menu-info {
+    border: 0;
+    box-shadow: none;
+    padding: 0;
+    margin-bottom: 4vw;
+}
+#witch-name {
+    line-height: 1.2em;
+    font-size: 1.5em;
+    font-weight: bold;
+}
+.hover-hide,
+*:hover > .hover-show {
+    display: block !important;
+}
+.hover-show,
+*:hover > .hover-hide {
+    display: none !important;
+}
+.url-input {
+    display: flex;
+    align-items: center;
+    margin-top: 4px;
+}
+    .url-input-prefix {
+        margin-right: 4px;
+    }
+#witch-add-new-cauldron {
+    display: flex;
+    justify-content: end;
+}
+@media screen and (min-device-width: 480px) {
+    .view__witch-menu-info {
+        margin: 1.5vw 0;
+    }
+        .view__witch-menu-info h2 {
+            margin-bottom: 1vw;
+        }
+        
+}
+@media screen and (min-device-width: 768px) {
+    .view__witch-menu-info {
+        margin: 1.2vw 0;
+    }
+        .view__witch-menu-info h2 {
+            margin-bottom: 0.8vw;
+        }
+    .box.edit__witch-menu-info {
+        max-width: 720px;
+    }
+.box.view__witch-info, 
+.box.create__witch{ 
+    width: 350px;
+}
+    
+        
+}
+@media screen and (min-device-width: 1024px) {
+
+    
+}
+    

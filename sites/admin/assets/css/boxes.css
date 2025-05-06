@@ -1,0 +1,138 @@
+.content__data {
+    cursor: pointer;
+    margin-bottom: 5px;
+}
+.content__data-edit {
+    display: none;
+    margin-bottom: 5px;
+}
+    #witch__data {
+        width: 100%;
+        resize: none;
+    }
+.box {
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    margin: 0 1.5vw 2vw 0;
+    padding: 0.7em;
+    box-shadow: 5px 5px 5px #ccc;
+}
+    .box h2 {
+        font-size: 1.1em;
+        margin-top: 5px;
+    }
+    .box h3 {
+        margin-bottom: 10px;
+    }
+    .box__actions {
+        margin-top: 20px;
+        text-align: right;
+    }
+    .box .bottom-label {
+        margin-top: 2vh;
+        margin-bottom: 1vh;
+    }
+    .box table {
+        width: 100%;
+    }
+    .box table.vertical {
+        width: auto;
+    }
+    .box table.vertical tr td:first-child {
+        min-width: 100px;
+    }
+    .box table .full{
+        display: none;
+    }
+    .box table th {
+        background-color: #eee;
+        padding: 3px;
+    }
+    .box table td {
+        padding: 5px 10px;
+    }
+        .box table td a em {
+            font-size: 0.9em;        
+        }
+        .box table td .text-center {
+            display: flex;
+            justify-content: center;
+        }
+        .box table td.icons-container {
+            display: flex;
+            justify-content: space-around;
+            
+        }
+        .box table td input {
+            width: 60px;
+        }
+    .box table td.label {
+        min-width: 100px;
+        background-color: #eee;
+        font-weight: bold;
+        text-align: center;
+        padding: 5px;        
+    }
+    .box label {
+        margin-top: 1em;
+        font-weight: bold;
+        text-align: left;
+        display: flex;
+        justify-content: space-between;
+    }
+    .box label em {
+        font-weight: normal;
+        font-size: 0.9em;
+        text-align: right;
+    }    
+    .box input, 
+    .box textarea {
+        border: 1px solid;
+        width: 100%;
+        width: -moz-available;          /* WebKit-based browsers will ignore this. */
+        width: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */
+        width: fill-available;
+    }
+    .box input {
+        padding: 0 0.2em;
+    }    
+    .box textarea {
+        height: 5em;
+        resize: none;
+        padding: 0.5em;
+    }
+    .box input[type=checkbox], 
+    .box input[type=radio] {
+        width: auto;
+        cursor: pointer;
+    } 
+    
+    h3.box-info {
+        display: flex;
+        align-items: center;
+        line-height: 24px;
+    }
+        h3.box-info img {
+            height: 1.17em;
+            margin-right: 0.3em;
+            max-width: 2em;
+        }
+@media screen and (min-device-width: 480px) {
+    
+}
+@media screen and (min-device-width: 768px) {
+    .box table .full {
+        display: table-cell;
+    }
+    
+}
+@media screen and (min-device-width: 1024px) {
+    
+    
+.box-container {
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+}
+    
+}

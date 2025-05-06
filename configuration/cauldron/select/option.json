@@ -1,0 +1,14 @@
+{
+    "name": "option",
+    "composition": [
+        {
+            "mandatory": true,
+            "name": "value",
+            "type": "string"
+        },
+        {
+            "name": "label",
+            "type": "string"
+        }
+    ]
+}

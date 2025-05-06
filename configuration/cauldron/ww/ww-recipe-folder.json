@@ -1,0 +1,11 @@
+{
+    "name": "ww-recipe-folder",
+    "require": {
+        "refuse": [
+            "ww-archives-folder",
+            "ww-drafts-folder",
+            "ww-site-folder",
+            "ww-recipe-folder"
+        ]
+    }
+}

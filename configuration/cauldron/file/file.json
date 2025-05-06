@@ -1,0 +1,15 @@
+{
+    "name": "file",
+    "composition": [
+        {
+            "mandatory": true,
+            "name": "filename",
+            "type": "string"
+        },
+        {
+            "mandatory": true,
+            "name": "file",
+            "type": "ww-file"
+        }
+    ]
+}

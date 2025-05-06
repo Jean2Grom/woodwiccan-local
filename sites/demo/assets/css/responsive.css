@@ -1,0 +1,168 @@
+@charset "UTF-8";
+/* CSS Document */
+
+@media screen and (max-width: 800px) {
+	img, table, td, blockquote, code, pre, textarea, input, iframe, object, embed, video {
+    max-width: 100%;
+}
+html,
+body {
+  overflow-x: hidden;
+}
+
+body {
+	min-width: 320px;
+	text-align: center;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: 300;
+	color: #424242;
+	font-size: 87,5%;
+}
+
+.socialbar {
+	text-align: right;	
+	
+}
+
+.content_socialbar {
+  font-size: 75%; 
+  padding-right: 5%;
+  padding-top: 1%;
+  padding-bottom: 1%;
+}
+
+.menu {
+	background-color: #FFFFFF;
+	height: 14%;  
+	padding-left: 5%;
+  	padding-right: 5%;	
+}
+
+#download {
+	display: none;
+}
+
+#download a, #download a:visited {
+	display: none;
+}
+
+#download a:hover, #download a:focus, #download a:active {
+	display: none;
+}
+
+.content_menu ul {
+    padding-left: 0;
+}
+
+.content_menu li {
+	text-align: left;
+	display: block;
+}
+
+#bouton a, #bouton a:visited {
+	font-size: 100%;
+	line-height: 200%;
+
+	
+}
+
+#bouton a:hover, #bouton a:focus, #bouton a:active {
+	font-size: 100%;
+}
+
+
+#footer_content {
+	padding-left: 5%;
+  	padding-right: 5%;
+
+}
+
+#signature {
+	float: left;
+	font-size: 75%;
+}
+
+#copyright {
+	float: right;
+	font-size: 75%;
+
+}
+
+#bloc1 {
+	padding-left: 5%;
+	padding-right: 5%;
+}
+
+#intro_bloc1 {
+	text-align: justify;
+	padding-top: 5%;
+	font-weight: 400;
+}
+
+.colone1 {
+	width: 100%;
+	float: none;
+	text-align: justify;
+	padding-bottom: 5%;
+}
+
+.colone2 {
+	width: 100%;
+	float: none;
+	text-align: justify;
+	padding-left: 0px;
+	padding-bottom: 5%;
+}
+.colone3 {
+	width: 100%;
+	float: none;
+	text-align: justify;
+	padding-bottom: 5%;
+	
+}
+
+#bouton_techno a, #bouton_techno a:visited {
+	font-size: 100%;
+	width: 50%;
+
+}
+
+#bouton_techno a:hover, a:focus, a:active {
+	font-size: 100%;
+
+}
+
+#bloc2 {
+	padding-left: 5%;
+	padding-right: 5%;
+}
+
+#intro_bloc2 {
+	text-align: justify;
+	padding-top: 5%;
+	font-weight: 400;
+}
+
+.bouton_doc a, .bouton_doc a:visited {
+	font-size: 100%;
+	width: 50%;
+
+}
+
+.bouton_doc  a:hover, .bouton_doc a:focus, .bouton_doc a:active {
+	font-size: 100%;
+
+}
+
+form#contact label {
+	text-align: left;
+}
+
+form#contact li input#envoyer {
+    margin-left: 0;
+}
+
+form#contact li input, form#contact li textarea {
+    width: 200px;
+}
+}

@@ -1,0 +1,114 @@
+.arborescence-menu-container {
+    margin-top: 15px;
+    border: 1px solid #ccc;
+    border-radius: 15px;
+    padding: 10px;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    white-space: nowrap; 
+    min-height: 200px;
+}
+    .arborescence-level {
+        border-right: 1px dotted #ccc;
+        padding-right: 10px;
+        margin-right: 15px;
+        display: inline-block;
+        vertical-align: top;
+    }
+        .targeted-witch {
+            border: 2px dashed #424242 !important;
+            box-shadow: 4px 4px 2px #ccc;
+        }
+
+        .arborescence-level__position {
+            height: 12px;
+            margin-bottom: 8px;
+            border-radius: 5px;
+
+            /*border: 2px dotted;
+            box-shadow: 4px 4px 2px #ccc;*/
+            border: none;
+            background-color: #f0f0f0;
+        }
+        .arborescence-level__position.targeted-witch {
+            height: 20px;
+        }
+        .arborescence-level__witch {
+            background-color: #F3F3F3;
+            margin-bottom: 8px;
+            border-radius: 5px;
+            padding-top: 3px;
+            padding-bottom: 3px;
+            padding-left: 10px;
+        }
+            .arborescence-level__witch.draggable {
+                cursor: grab;
+            }
+                .arborescence-level__witch.draggable:active {
+                    cursor: grabbing;
+                }
+
+            .arborescence-level__witch.selected {
+                background-color: #ccc;
+            }
+            .arborescence-level__witch.current {
+                font-weight: bold;
+                border: 1px solid #424242;
+            }
+            .arborescence-level__witch:hover{
+                box-shadow: 5px 5px 5px #ccc;
+            }
+            .arborescence-level__witch__daughters-display {
+                float: right;
+                cursor: pointer;
+                width: 58px;
+                text-align: right;
+                padding-right: 5px;
+                padding-top: 1px;
+            }
+                .arborescence-level__witch__daughters-display:hover {
+                    color: #ff9900;
+                }
+            /*
+            .arborescence-level__witch.selected .arborescence-level__witch__daughters-display {
+                color: #ff9900;
+            }
+                .arborescence-level__witch.selected .arborescence-level__witch__daughters-display:hover {
+                    color: inherit;
+                }
+            */
+            .arborescence-level__witch__name {
+                cursor: pointer;
+                font-weight: normal;
+                margin: 0 8px;
+            }
+                .arborescence-level__witch__name:hover {
+                    color: #ff9900;
+                }
+            .arborescence-level__witch__website {
+                font-style: italic;
+                font-weight: bold;
+                font-size: 0.9em;
+                margin-left: 5px;
+                margin-right: 5px;
+            }
+.arborescence-menu-context-menu {
+    position: absolute;
+    z-index: 10;
+    background-color: #F3F3F3;
+    border: 1px solid #ccc;
+    box-shadow: 5px 5px 5px #ccc;
+}
+    .arborescence-menu-context-menu li {
+        padding: 4px 10px;
+    }
+        .arborescence-menu-context-menu li:hover {
+            background-color: #ccc;
+        }
+        .arborescence-menu-context-menu li a {
+            display: flex;
+            justify-content: space-between;
+        }
+            .arborescence-menu-context-menu li a i {
+                margin-right: 8px;
+            }

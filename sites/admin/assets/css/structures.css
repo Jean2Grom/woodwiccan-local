@@ -1,0 +1,39 @@
+    .structures-content__list {
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        margin: 15px 15px 5px 0;
+        padding: 10px;
+        box-shadow: 5px 5px 5px #ccc;
+    }
+        .structures-content__list h2 {
+            font-size: 1.1em;
+            margin-top: 5px;
+        }
+            .structures-content__list table {
+                border-collapse: collapse;
+                margin-bottom: 10px;
+            }
+            .structures-content__list table th {
+                min-width: 100px;
+                background-color: #ddd;
+                padding: 5px 10px;
+            }
+            .structures-content__list table tbody tr:hover {
+                background-color: #eee;
+            }
+            .structures-content__list table td {
+                padding: 4px 10px;
+                text-align: center;
+            }
+            .structures-content__list table td:first-child {
+                text-align: left;
+            }
+            .structures-content__list table tr td:last-child {
+                text-align: right;
+            }
+            .structures-content__list table input {
+                width: 60px;
+            }
+    #witch__add-content {
+        margin-top: 15px;
+    }

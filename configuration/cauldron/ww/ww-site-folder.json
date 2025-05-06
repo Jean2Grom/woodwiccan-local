@@ -1,0 +1,8 @@
+{
+    "name": "ww-site-folder",
+    "require": {
+        "accept": [
+            "ww-recipe-folder"
+        ]
+    }
+}

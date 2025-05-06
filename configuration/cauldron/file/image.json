@@ -1,0 +1,19 @@
+{
+    "name": "image",
+    "composition": [
+        {
+            "mandatory": true,
+            "name": "name",
+            "type": "string"
+        },
+        {
+            "mandatory": true,
+            "name": "file",
+            "type": "ww-file"
+        },
+        {
+            "name": "caption",
+            "type": "string"
+        }
+    ]
+}

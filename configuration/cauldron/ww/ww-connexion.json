@@ -1,0 +1,21 @@
+{
+    "name": "ww-connexion",
+    "class": "WW\\Cauldron\\ConnexionCauldron",
+    "composition": [
+        {
+            "mandatory": true,
+            "name": "email",
+            "type": "string"
+        },
+        {
+            "mandatory": true,
+            "name": "login",
+            "type": "string"
+        },
+        {
+            "mandatory": true,
+            "name": "pass_hash",
+            "type": "string"
+        }
+    ]
+}

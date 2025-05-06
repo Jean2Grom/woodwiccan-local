@@ -1,0 +1,21 @@
+{
+    "name": "optgroup",
+    "composition": [
+        {
+            "mandatory": true,
+            "name": "label",
+            "type": "string"
+        },
+        {
+            "mandatory": true,
+            "name" : "options",
+            "type": "folder",
+            "require": {
+                "min": 1,
+                "accept": [
+                    "option"
+                ]
+            }
+        }
+    ]
+}

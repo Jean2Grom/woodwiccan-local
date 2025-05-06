@@ -1,0 +1,161 @@
+h2 {
+    font-size: 1.3em;
+    font-style: italic;
+    font-weight: normal;
+    margin-bottom: 20px;
+}
+.fieldsets-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+fieldset {
+    width: -moz-available;
+    width: -webkit-fill-available;
+    width: fill-available;
+    border-radius: 5px;
+    margin-bottom: 16px;
+    margin-right: 15px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    box-shadow: 5px 5px 5px #ccc;
+}
+    fieldset legend {
+        font-weight: bold;
+    }
+    fieldset input[type=text],
+    fieldset input[type=email],
+    fieldset input[type=password],
+    fieldset textarea,
+    fieldset select {
+        width: -moz-available; 
+        width: -webkit-fill-available;
+        width: fill-available;
+    }
+    fieldset button {
+        box-shadow: none;
+        border-radius: 0;
+    }
+textarea {
+    width: 350px;
+    height: 100px;
+    resize: none;
+}
+label{
+    font-weight: bold;
+    font-style: normal;
+}
+span.span-input-toggle {
+    cursor: pointer;
+}
+input.span-input-toggle {
+    display: none;
+}
+fieldset:first-of-type > *:first-child > a.up-fieldset {
+    display: none;
+}
+ fieldset:last-of-type > *:first-child > a.down-fieldset {
+    display: none;
+}
+fieldset.cauldron {
+    background-color: #eee;
+}
+fieldset.ingredient {
+    background-color: #fff;
+}
+fieldset > .fieldsets-container {
+    margin-left: 24px;
+}
+    fieldset > .fieldsets-container > fieldset.cauldron {
+        box-shadow: none;
+        border: 1px solid #444;
+        border-radius: 0;
+    }
+        fieldset > .fieldsets-container > fieldset.cauldron .cauldron-add-actions .add-form {
+            box-shadow: none;
+            border: 1px solid #444;
+            border-radius: 0;
+        }
+fieldset.cauldron.integration-0 {
+    background-color: #ddd;
+}
+fieldset.cauldron.integration-1 {
+    background-color: #ccc;
+}
+fieldset.cauldron.integration-2 {
+    background-color: #bbb;
+}
+fieldset.cauldron.integration-3 {
+    background-color: #aaa;
+}
+
+.cauldron-add-actions {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    justify-items: initial;
+    width: 100%;
+}
+.cauldron-add-actions .add-form {
+    display: none;
+    width: auto;
+    padding: 16px;
+    flex-direction: column;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    box-shadow: 5px 5px 5px #ccc;
+}
+    .cauldron-add-actions .add-form h4 {
+        margin-bottom: 8px;
+        display: flex;
+        justify-content: space-between;
+    }
+    .cauldron-add-actions .add-form input {
+        margin-top: 8px;
+    }
+    .cauldron-add-actions .add-form button {
+        box-shadow: inherit;
+        border-radius: inherit;
+        margin: 8px auto 4px;
+    }
+    .cauldron-add-actions .add-form button.disabled {
+        cursor: not-allowed;
+        opacity: 0.75;
+        font-style: italic;
+    }
+.cauldron-add-actions .show-form {
+    border-radius: 24px;
+}
+
+#edit-action {
+    margin-bottom: 24px;
+}
+.file-display, 
+.image-display, 
+.file-input, 
+.file-input > .switch-file-input-type {
+    margin-bottom: 8px;
+}
+.file-input > .switch-file-input-type > .selected {
+    cursor: initial;
+    color: #ff9900;
+}
+
+.remove-image,
+.remove-file {
+    margin-left: 8px;
+    font-size: 18px;
+}
+.remove-image span {
+    font-style: italic;
+}
+.image-edit-container .file-input,
+.image-display {
+    margin-top: 8px;
+}
+.image-display img {
+    box-shadow: 5px 5px 5px #ccc;
+    border: 1px solid;
+}

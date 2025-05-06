@@ -1,0 +1,20 @@
+{
+    "name": "selection",
+    "composition": [
+        {
+            "mandatory": true,
+            "name" : "selected-from",
+            "type": "cauldron-link"
+        },
+        {
+            "mandatory": true,
+            "name" : "selected-options",
+            "type": "folder",
+            "require": {
+                "accept":[
+                    "cauldron-link"
+                ]
+            }
+        }
+    ]
+}
