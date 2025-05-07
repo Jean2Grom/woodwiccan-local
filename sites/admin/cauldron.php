@@ -88,7 +88,13 @@ switch( Tools::filterAction(
                 'level'     =>  'success',
                 'message'   =>  "Draft Updated"
             ]);
-        }        
+        }
+        foreach( $cauldron->draft()->errors() as $error ){
+            $this->ww->user->addAlert([
+                'level'     =>  'warning',
+                'message'   =>  $error
+            ]);
+        }
     break;
     
     case 'delete':

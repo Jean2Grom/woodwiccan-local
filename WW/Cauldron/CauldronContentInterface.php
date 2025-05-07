@@ -12,4 +12,5 @@ interface CauldronContentInterface
     public function exist(): bool;
     public function isIngredient(): bool;
     public function isCauldron(): bool;
+    public function validate(): bool;
 }

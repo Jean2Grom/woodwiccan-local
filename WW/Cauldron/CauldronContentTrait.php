@@ -74,4 +74,8 @@ trait CauldronContentTrait
     function isCauldron(): bool {
         return !$this->isIngredient();
     }
+
+    function validate(): bool {
+        return true;
+    }
 }

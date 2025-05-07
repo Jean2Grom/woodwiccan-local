@@ -74,6 +74,8 @@ class Cauldron implements CauldronContentInterface
 
     protected $content;
 
+    public ?array $errors       = null;
+
     public ?self $target        = null;
     public ?self $draft         = null;
 
@@ -344,6 +346,8 @@ class Cauldron implements CauldronContentInterface
 
     function save( bool $transactionMode=true ): bool
     {
+        $this->validate();
+
         if( !$transactionMode ){
             return $this->saveAction();
         }
@@ -369,11 +373,6 @@ class Cauldron implements CauldronContentInterface
 
     protected function saveAction(): bool
     {
-        if( !$this->validate() )
-        {
-            $this->ww->log->error("Not a valid content, can't save ".$this->name);
-            return false;
-        }
 
         $this->position();
 
@@ -417,14 +416,15 @@ class Cauldron implements CauldronContentInterface
                 continue;
             }
 
-            $result = $result && $child->save( false );
+            $result = $result && $child->saveAction( false );
         }
 
         return $result;
     }
 
-    function validate()
+    function validate(): bool
     {
+        $this->errors   = [];
         $composition    = $this->recipe()->composition ?? [];
 
         $contentQtt     = 0;
@@ -445,8 +445,19 @@ class Cauldron implements CauldronContentInterface
                 $contentQtt++;
                 if( !$this->recipe()->isAllowed($content->type) )
                 {
-                    $this->ww->log->error( "type error: ".$content->type." is not allowed for ".$this->recipe );
-                    return false;
+                    $error          = "type error: ".$content->type." is not allowed for ".$this->recipe;
+                    $this->errors[] = $error;
+                    $this->ww->log->error( $error );
+                }
+            }
+
+            if( !$content->validate() )
+            {
+                foreach( $content->errors as $contentError )
+                {
+                    $error          = " -> content ".$content->name." error: ".$contentError;
+                    $this->errors[] = $error;
+                    $this->ww->log->error( $error );    
                 }
             }
         }
@@ -454,8 +465,9 @@ class Cauldron implements CauldronContentInterface
         foreach( $composition as $unmatchedElement ){
             if( $unmatchedElement['mandatory'] ?? null )
             {
-                $this->ww->log->error( "cauldron error: missing ".$unmatchedElement['name']." content for ".$this->recipe );
-                return false;
+                $error          = "cauldron error: missing ".$unmatchedElement['name']." content for ".$this->recipe;
+                $this->errors[] = $error;
+                $this->ww->log->error( $error );
             }
         }
 
@@ -463,16 +475,27 @@ class Cauldron implements CauldronContentInterface
         $max        = $this->recipe()->require['max'] ?? -1;
         if( $min && $contentQtt < $min )
         {
-            $this->ww->log->error( "cauldron error: not enough contents for ".$this->recipe );
-            return false;
+            $error          = "cauldron error: not enough contents for ".$this->recipe;
+            $this->errors[] = $error;
+            $this->ww->log->error( $error );
         }
         elseif( $max > -1 && $contentQtt > $max )
         {
-            $this->ww->log->error( "cauldron error: too many contents for ".$this->recipe );
-            return false;
+            $error          = "cauldron error: too many contents for ".$this->recipe;
+            $this->errors[] = $error;
+            $this->ww->log->error( $error );
         }
 
-        return true;
+        return count($this->errors) === 0;
+    }
+
+    function errors(): array
+    {
+        if( is_null($this->errors) ){
+            $this->validate();
+        }
+
+        return $this->errors;
     }
 
     function purge(): bool 
@@ -799,6 +822,12 @@ class Cauldron implements CauldronContentInterface
 
     function publish( bool $transactionMode=true ): bool
     {
+        if( !$this->validate() )
+        {
+            $this->ww->log->error("Not a valid content, can't publish ".$this->name);
+            return false;
+        }
+
         if( !$transactionMode ){
             return $this->publishAction();
         }
