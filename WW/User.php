@@ -119,10 +119,12 @@ class User
             $this->name     = $this->ww->configuration->read('system', 'publicUser') ?? "Public";
             $publicProfile  = $this->ww->configuration->read('system', 'publicUserProfile') ?? 'public';
             
-            $getPublicProfileData = DataAccess::getPublicProfileData( $ww, $publicProfile );
+            //$getProfilePolicies = DataAccess::getProfilePolicies( $ww, $publicProfile );
+            //$this->profiles = $getProfilePolicies['profiles'];
+            //$this->policies = $getProfilePolicies['policies'];
 
-            $this->profiles = $getPublicProfileData['profiles'];
-            $this->policies = $getPublicProfileData['policies'];
+            $this->profiles = [ $publicProfile ];
+            $this->policies = DataAccess::getProfilePolicies( $ww, $publicProfile );
             
             $this->session->write(
                 'user', 
@@ -202,10 +204,12 @@ class User
         $this->name     = $this->ww->configuration->read('system', 'publicUser') ?? "Public";
         $publicProfile  = $this->ww->configuration->read('system', 'publicUserProfile') ?? 'public';
         
-        $getPublicProfileData = DataAccess::getPublicProfileData( $this->ww, $publicProfile );
-        
-        $this->profiles = $getPublicProfileData['profiles'];
-        $this->policies = $getPublicProfileData['policies'];
+        // $getProfilePolicies = DataAccess::getProfilePolicies( $this->ww, $publicProfile );
+        // $this->profiles = $getProfilePolicies['profiles'];
+        // $this->policies = $getProfilePolicies['policies'];
+
+        $this->profiles = [ $publicProfile ];
+        $this->policies = DataAccess::getProfilePolicies( $this->ww, $publicProfile );
         
         $this->session->write(
             'user', 

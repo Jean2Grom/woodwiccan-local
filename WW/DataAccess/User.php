@@ -159,8 +159,14 @@ class User
     }
     
     
-    static function getPublicProfileData(  WoodWiccan $ww, string $profile, ?string $site=null )
+    static function getProfilePolicies(  WoodWiccan $ww, string $profile, ?string $site=null )
     {
+        $policies = $ww->cache->read( 'profile', $profile );
+
+        if( $policies ){
+            return $policies;
+        }
+
         $query = "";
         $query  .=  "SELECT `user__profile`.`id` AS `profile_id` ";
         $query  .=  ", `user__profile`.`name` AS `profile_name` ";
@@ -192,7 +198,7 @@ class User
             'site'      => $site ?? $ww->website->site,
         ]);
         
-        $profiles   = [];
+        // $profiles   = [];
         $policies   = [];
         foreach( $result as $row )
         {
@@ -202,9 +208,9 @@ class User
                 continue;
             }
             
-            if( empty($profiles[ $row['profile_id'] ]) ){
-                $profiles[ $row['profile_id'] ] = $row['profile_name'];
-            }
+            // if( empty($profiles[ $row['profile_id'] ]) ){
+            //     $profiles[ $row['profile_id'] ] = $row['profile_name'];
+            // }
             
             if( empty($policies[ $row['policy_id'] ]) )
             {
@@ -229,10 +235,14 @@ class User
             }
         }
         
-        return [ 
-            'profiles' => $profiles, 
-            'policies' => $policies 
-        ];
+        $ww->cache->create( 'profile', $profile, $policies );
+
+        // return [ 
+        //     'profiles' => $profiles, 
+        //     'policies' => $policies 
+        // ];
+
+        return $policies;
     }
     
     
