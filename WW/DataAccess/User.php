@@ -198,7 +198,6 @@ class User
             'site'      => $site ?? $ww->website->site,
         ]);
         
-        // $profiles   = [];
         $policies   = [];
         foreach( $result as $row )
         {
@@ -207,11 +206,7 @@ class User
             ){
                 continue;
             }
-            
-            // if( empty($profiles[ $row['profile_id'] ]) ){
-            //     $profiles[ $row['profile_id'] ] = $row['profile_name'];
-            // }
-            
+
             if( empty($policies[ $row['policy_id'] ]) )
             {
                 $position = false;
@@ -236,11 +231,6 @@ class User
         }
         
         $ww->cache->create( 'profile', $profile, $policies );
-
-        // return [ 
-        //     'profiles' => $profiles, 
-        //     'policies' => $policies 
-        // ];
 
         return $policies;
     }

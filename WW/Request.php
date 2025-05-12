@@ -117,6 +117,18 @@ class Request
         
         return $this->website;
     }
+
+    function getUser()
+    {
+        $user = new User( $this->ww );
+
+        if( $this->param('action') === 'login' ){
+
+        }
+
+        return $user;
+    }
+
     
     function getFullUrl( string $urlPath='', ?array $urlParams=null, ?Website $website=null )
     {

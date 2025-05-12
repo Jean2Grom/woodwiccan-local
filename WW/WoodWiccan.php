@@ -107,10 +107,12 @@ class WoodWiccan
             $this->cauldronDepth    = CauldronDataAccess::getDepth( $this );
             $this->request          = new Request( $this );
             $this->website          = $this->request->getWebsite();
-            $this->debug->addEnableCondition($this->website->debug);
+            //$this->user             = new User( $this );
+            $this->user             = $this->request->getUser();
+            $this->debug->addEnableCondition( $this->website->debug );
             
             $this->cairn    = $this->website->getCairn();
-            $this->user     = new User( $this );
+            //$this->user     = new User( $this );
             
             $this->cairn->summon();
         }
