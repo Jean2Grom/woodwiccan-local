@@ -1,8 +1,9 @@
 <?php
 namespace WW;
 
-use WW\Handler\User as Handler;
-use WW\DataAccess\User as DataAccess;
+use WW\Handler\UserHandler as Handler;
+use WW\DataAccess\UserDataAccess as DataAccess;
+use WW\Handler\UserHandler;
 
 /**
  * Class handeling User information and security access policies
@@ -36,7 +37,7 @@ class User
     {
         $this->ww           = $ww;
         $this->session      = new Session($this->ww);
-                
+        
         // Get last connexion 
         $sessionData = $this->session->read('user');
         if( $sessionData )
@@ -44,18 +45,18 @@ class User
             $this->id               = $sessionData['ID']? (int) $sessionData['ID']: null;
             $this->name             = $sessionData['name'] ?? array_values($this->profiles)[0] ?? '';
             $this->profiles         = $sessionData['profiles'];
-            $this->policies         = $sessionData['policies'];
+            $this->policies         = Handler::listPolicies( $this->profiles );
+
             $this->connexionData    = $sessionData['connexionData'] ?? false;
             $this->connexion        = (bool) ($this->id);
         }
         else // No user log in, get default user (="public user") from configuration
         {
-//            Handler::
-            $this->name     = $this->ww->configuration->read('system', 'publicUser') ?? "Public";
-            $publicProfile  = $this->ww->configuration->read('system', 'publicUserProfile') ?? 'public';
-            
-            $this->profiles = [ $publicProfile ];
-            $this->policies = DataAccess::getProfilePolicies( $this->ww, $publicProfile );
+            $publicProfile  = Handler::getPublicProfile( $this->ww );
+
+            $this->name     = $publicProfile['name'];
+            $this->profiles = $publicProfile['profiles'];
+            $this->policies = $publicProfile['policies'];
         }
 
         // if( empty($this->policies) )
@@ -67,46 +68,27 @@ class User
         // }
     }
     
-    
-    function connectTo( string $login )
+    function init( array $loginData ): bool
     {
-        $userConnexionData = DataAccess::getUserLoginData( $this->ww, $login );
-        
-        if( count($userConnexionData) == 0 )
-        {
-            $this->loginMessages[] = "Unknown username";
-            $this->ww->debug->dump('Login failed : unknown username');
+        $this->loginMessages =  $loginData['errors'] ?? [];
+
+        if( !$loginData['data'] ){
             return false;
         }
-        elseif( count($userConnexionData) > 1 ) 
-        {
-            $this->loginMessages[] = "Problem whith this username: multiple match ";
-            $this->loginMessages[] = "Please contact administrator";
-            $this->ww->log->error('Login failed : multiple username match');
-            
-            return false;
-        }
-        
-        $connexionData = array_values($userConnexionData)[0];
-        
+
         $this->connexion        = true;
-        $this->profiles         = $connexionData['profiles'];
-        $this->id               = $connexionData['id'];
-        $this->name             = $connexionData['name'];
-        $this->connexionData    = $connexionData;
+        $this->connexionData    = $loginData['data'];
+
+        $this->id               = $this->connexionData['id'];
+        $this->name             = $this->connexionData['name'];
+        $this->profiles         = $this->connexionData['profiles'];
         
-        foreach( $connexionData['profiles'] as $profileData ){
-            foreach( $profileData['policies'] as $policyId => $policyData ){
-                if( empty($this->policies[ $policyId ]) ){
-                    $this->policies[ $policyId ] = $policyData;
-                }
-            }
-        }
+        $this->policies         = Handler::listPolicies( $this->profiles );
         
         $this->session->write(
             'user', 
             [
-                'ID'   => $this->id,
+                'ID'            => $this->id,
                 'name'          => $this->name,
                 'profiles'      => $this->profiles,
                 'policies'      => $this->policies,
@@ -117,27 +99,17 @@ class User
         return true;
     }
     
-    function disconnect()
+    
+    function disconnect(): self
     {
-        $this->session->destroy();
+        $this->session->unset();
         $this->connexion = false;
         
-        $this->name     = $this->ww->configuration->read('system', 'publicUser') ?? "Public";
-        $publicProfile  = $this->ww->configuration->read('system', 'publicUserProfile') ?? 'public';
+        $publicProfile  = Handler::getPublicProfile( $this->ww );
         
-        $this->profiles = [ $publicProfile ];
-        $this->policies = DataAccess::getProfilePolicies( $this->ww, $publicProfile );
-        
-        // $this->session->write(
-        //     'user', 
-        //     [
-        //         'name'          => $this->name,
-        //         'profiles'      => $this->profiles,
-        //         'policies'      => $this->policies,
-        //         'ID'   => false,
-        //         'connexionData' => false,
-        //     ]
-        // );            
+        $this->name     = $publicProfile['name'];
+        $this->profiles = $publicProfile['profiles'];
+        $this->policies = $publicProfile['policies'];
         
         return $this;
     }
@@ -163,7 +135,7 @@ class User
         return $this;
     }
 
-    function addAlert( array $newAlert ) {
+    function addAlert( array $newAlert ){
         return $this->addAlerts([ $newAlert ]);
     }
     
@@ -171,14 +143,14 @@ class User
         return $this->session->read( $varname );
     }
     
-    function setSessionData( string $varname, mixed $varvalue )
+    function setSessionData( string $varname, mixed $varvalue ): self
     {
         $this->session->write( $varname, $varvalue );
         
         return $this;
     }
     
-    function addToSessionData( string $varname, mixed $varvalue )
+    function addToSessionData( string $varname, mixed $varvalue ): self
     {
         $this->session->pushTo( $varname, $varvalue );
         

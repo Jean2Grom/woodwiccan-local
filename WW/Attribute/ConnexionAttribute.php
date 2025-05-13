@@ -2,7 +2,7 @@
 namespace WW\Attribute;
 
 use WW\Craft;
-use WW\DataAccess\User;
+use WW\DataAccess\UserDataAccess;
 
 /**
  * Class to handle Connexion Attributes
@@ -132,10 +132,10 @@ class ConnexionAttribute extends \WW\Attribute
         ];
         
         if( !empty($this->values['id']) ){
-            return User::updateConnexion( $this->ww, $this->values['id'], $this->values, $craftAttributeData );
+            return UserDataAccess::updateConnexion( $this->ww, $this->values['id'], $this->values, $craftAttributeData );
         }
         
-        $this->values['id'] = User::insertConnexion( $this->ww, $this->values, $craftAttributeData );
+        $this->values['id'] = UserDataAccess::insertConnexion( $this->ww, $this->values, $craftAttributeData );
         
         return 1;            
     }
@@ -175,7 +175,7 @@ class ConnexionAttribute extends \WW\Attribute
         {
             $contentKeyId = $this->craft->structure->type == Craft::TYPES[0]? $this->craft->id: ($this->craft->content_key ?? null);
             
-            $checkEmailLoginValidity = User::checkEmailLoginValidity($this->ww, $this->login, $this->email, $contentKeyId);
+            $checkEmailLoginValidity = UserDataAccess::checkEmailLoginValidity($this->ww, $this->login, $this->email, $contentKeyId);
             
             $this->ww->dump($checkEmailLoginValidity);
             

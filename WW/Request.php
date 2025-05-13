@@ -1,6 +1,7 @@
 <?php
 namespace WW;
 
+use WW\Handler\UserHandler;
 use WW\Website;
 
 /** 
@@ -123,7 +124,11 @@ class Request
         $user = new User( $this->ww );
 
         if( $this->param('action') === 'login' ){
-
+            $user->init( UserHandler::login( 
+                $this->ww,
+                $this->param('username'), 
+                $this->param('password')                 
+            ) );
         }
 
         return $user;

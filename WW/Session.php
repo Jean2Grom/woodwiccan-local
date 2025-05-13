@@ -8,7 +8,8 @@ namespace WW;
  */
 class Session 
 {
-    public $namespace;
+    public string   $namespace;
+    public bool     $active = false;
     
     /** 
      * WoodWiccan container class to allow whole access to Kernel
@@ -16,28 +17,45 @@ class Session
      */
     public WoodWiccan $ww;
     
-    function __construct( WoodWiccan $ww, string $namespace="" )
+    function __construct( WoodWiccan $ww, ?string $namespace=null )
     {
         $this->ww           = $ww;
+        $this->namespace    = $namespace ?? $this->ww->website->name;
         
+        if( filter_input(INPUT_COOKIE, 'PHPSESSID') )
+        {
+            // if( session_status() !== PHP_SESSION_ACTIVE ){
+            //     session_start();
+            // }
+            
+            // if( empty($_SESSION[ $this->namespace ]) ){
+            //     $_SESSION[ $this->namespace ] = [];
+            // }
+
+            self::init( $this->namespace );
+            $this->active = true;
+        }
+    }
+    
+    private static function init( $namespace ): void
+    {
         if( session_status() !== PHP_SESSION_ACTIVE ){
             session_start();
         }
         
-        if( !empty($namespace) ){
-            $this->namespace = $namespace;
+        if( empty($_SESSION[ $namespace ]) ){
+            $_SESSION[ $namespace ] = [];
         }
-        else {
-            $this->namespace = $this->ww->website->name;
-        }
-        
-        if( empty($_SESSION[ $this->namespace ]) ){
-            $_SESSION[ $this->namespace ] = [];
-        }
+
+        return;
     }
-    
+
     function write( string $name, mixed $value ): self
-    {        
+    {
+        if( !$this->active ){
+            self::init( $this->namespace );
+        }
+
         if( is_object($value) )
         {
             $value = serialize($value);
@@ -54,6 +72,10 @@ class Session
     
     function read( string $name ): mixed
     {
+        if( !$this->active ){
+            return false;
+        }
+
         $value      = $_SESSION[ $this->namespace ][ $name ] ?? false;
         $objectHash = $_SESSION[ $this->namespace ][ 'wwObjectsHashArray' ][ $name ] ?? false;
         
@@ -66,28 +88,51 @@ class Session
     
     function delete( string $name ): self
     {
-        $_SESSION[ $this->namespace ][ 'wwObjectsHashArray' ][ $name ]    = null;
-        $_SESSION[ $this->namespace ][ $name ]                            = null;
+        if( $this->active )
+        {
+            $_SESSION[ $this->namespace ][ 'wwObjectsHashArray' ][ $name ]    = null;
+            $_SESSION[ $this->namespace ][ $name ]                            = null;
+        }
         
         return $this;
     }
     
-    function destroy(): self
+    function unset(): self
     {
-        $_SESSION[ $this->namespace ] = null;
+        if( $this->active ){
+            $_SESSION[ $this->namespace ] = null;
+        }
         
         return $this;
     }
     
     function kill(): self
     {
-        session_unset();
+        if( $this->active ){
+            session_unset();
+        }
         
         return $this;
     }
     
-    function resetAll(): self
+    function destroy(): self
     {
+        if( !$this->active ){
+            return $this;
+        }
+
+        if( ini_get("session.use_cookies") ) 
+        {
+            $params = session_get_cookie_params();
+            setcookie(
+                session_name(), 
+                '', 
+                time() - 42000,
+                $params["path"], $params["domain"],
+                $params["secure"], $params["httponly"]
+            );
+        }
+
         session_destroy();
         
         return $this;
@@ -95,6 +140,10 @@ class Session
     
     function pushTo( string $name, mixed $value ): self
     {
+        if( !$this->active ){
+            self::init( $this->namespace );
+        }
+
         $array = $_SESSION[ $this->namespace ][ $name ] ?? [];
         
         if( !is_array($array) ){
@@ -110,6 +159,10 @@ class Session
     
     function mergeTo( string $name, array $value ): self
     {
+        if( !$this->active ){
+            self::init( $this->namespace );
+        }
+
         $array = $_SESSION[ $this->namespace ][ $name ] ?? [];
         
         if( !is_array($array) ){
@@ -123,6 +176,10 @@ class Session
 
     function removeFrom( string $name, mixed $value ): self
     {
+        if( !$this->active ){
+            self::init( $this->namespace );
+        }
+
         $array = $_SESSION[ $this->namespace ][ $name ] ?? [];
         
         if( !is_array($array) ){

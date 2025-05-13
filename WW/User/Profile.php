@@ -2,7 +2,7 @@
 namespace WW\User;
 
 use WW\WoodWiccan;
-use WW\DataAccess\User as UserDA;
+use WW\DataAccess\UserDataAccess as UserDA;
 use WW\Website;
 
 /**
