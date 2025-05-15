@@ -135,13 +135,13 @@ class UserDataAccess
         return $userConnexionData;
     }
     
-    static function getUserWitchFromConnexionData( WoodWiccan $ww, $connexionData ) 
+    static function getUserWitchFromConnexionData( WoodWiccan $ww, array $connexionData ) 
     {
-        $savedConnexionData     = $ww->user->connexionData ?? [];
+        $savedPropertiesData    = $ww->user->properties ?? [];
         $savedConnexionValue    = $ww->user->connexion ?? false;
         
-        $ww->user->connexionData    = $connexionData;
-        $ww->user->connexion        = 1;
+        $ww->user->properties   = $connexionData;
+        $ww->user->connexion    = 1;
         
         $configuration = [
             'target' => [
@@ -152,7 +152,7 @@ class UserDataAccess
         
         $witches        = Summoning::witches($ww, Cairn::prepareConfiguration($ww->website, $configuration) );
         
-        $ww->user->connexionData    = $savedConnexionData;
+        $ww->user->properties       = $savedPropertiesData;
         $ww->user->connexion        = $savedConnexionValue;
         
         return $witches['target'] ?? false;

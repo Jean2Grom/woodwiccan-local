@@ -8,10 +8,12 @@ use WW\Cauldron\Recipe;
 use WW\DataAccess\CauldronDataAccess as DataAccess;
 use WW\Handler\CauldronHandler as Handler;
 use WW\Handler\IngredientHandler;
+use WW\Trait\PropertiesAccessTrait;
 
 class Cauldron implements CauldronContentInterface
 {
     use CauldronContentTrait;
+    use PropertiesAccessTrait;
 
     const FIELDS = [
         "id",
@@ -84,16 +86,6 @@ class Cauldron implements CauldronContentInterface
      * @var WoodWiccan
      */
     public WoodWiccan $ww;
-    
-    /**
-     * Property setting 
-     * @param string $name
-     * @param mixed $value
-     * @return void
-     */
-    public function __set( string $name, mixed $value ): void {
-        $this->properties[ $name ] = $value;
-    }
     
     /**
      * Property reading

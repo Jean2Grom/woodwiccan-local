@@ -53,7 +53,7 @@ class Summoning
         if( !empty($configuration['user']) && !empty($result[0]['user_craft_fk']) ){
             foreach( array_keys($configuration['user']['entries']) as $witchRef ){
                 $conditions[ $witchRef ] = [ 
-                    'craft_table'  => $ww->user->connexionData['craft_table'], 
+                    'craft_table'  => $ww->user->craft_table, 
                     'craft_fk'     => $result[0]['user_craft_fk'], 
                 ];
             }
@@ -231,7 +231,7 @@ class Summoning
         
         $query  .= "FROM ";
         if( $userConnexionJointure ){
-            $query  .= "`".$ww->user->connexionData['craft_table']."` AS `user_craft_table`, ";
+            $query  .= "`".$ww->user->craft_table."` AS `user_craft_table`, ";
         }
         
         $refWitch           = false;
@@ -357,7 +357,7 @@ class Summoning
         
         if( $userConnexionJointure )
         {
-            $parameters[ 'user_craft_table' ]    = $ww->user->connexionData['craft_table'];                
+            $parameters['user_craft_table'] = $ww->user->craft_table;
 
             $condition  =   "( %s.`craft_table` = :user_craft_table ";
             $condition  .=  "AND %s.`craft_fk` = `user_craft_table`.`id` ) ";
@@ -398,7 +398,7 @@ class Summoning
         if( $userConnexionJointure )
         {
             $parameters[ 'user_id' ] = (int) $ww->user->id;
-            $query  .= "AND `user_craft_table`.`".$ww->user->connexionData['craft_column']."` = :user_id ";
+            $query  .= "AND `user_craft_table`.`".$ww->user->craft_column."` = :user_id ";
         }
         
         $userPoliciesConditions = [];

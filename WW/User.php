@@ -2,8 +2,7 @@
 namespace WW;
 
 use WW\Handler\UserHandler as Handler;
-use WW\DataAccess\UserDataAccess as DataAccess;
-use WW\Handler\UserHandler;
+use WW\Trait\PropertiesAccessTrait;
 
 /**
  * Class handeling User information and security access policies
@@ -12,14 +11,17 @@ use WW\Handler\UserHandler;
  */
 class User 
 {
+    use PropertiesAccessTrait;
+
     public ?int $id         = null;
     public string $name     = '';
     public array $profiles  = [];
     public array $policies  = [];
 
-    public $connexion      = false;
-    public $connexionData  = false;
-    public $loginMessages  = [];
+    public $connexion           = false;
+    public ?array $properties   = null;
+
+    public $loginMessages   = [];
     
     /** 
      * PHP Session WW Custom Handler 
@@ -39,17 +41,20 @@ class User
         $this->session      = new Session($this->ww);
         
         // Get last connexion 
-        $sessionData = $this->session->read('user');
-        if( $sessionData )
+        $sessionUser = $this->session->read('user');
+        if( $sessionUser )
         {
-            $this->id               = $sessionData['ID']? (int) $sessionData['ID']: null;
-            $this->name             = $sessionData['name'] ?? array_values($this->profiles)[0] ?? '';
-            $this->profiles         = $sessionData['profiles'];
-            $this->policies         = Handler::listPolicies( $this->profiles );
+            $this->properties   = $sessionUser;
 
-            $this->connexionData    = $sessionData['connexionData'] ?? false;
-            $this->connexion        = (bool) ($this->id);
+            $this->profiles     = $this->properties['profiles'];
+            $this->policies     = Handler::listPolicies( $this->profiles );
+
+            $this->id           = $this->properties['id']? (int) $this->properties['id']: null;
+            $this->name         = $this->properties['name'] ?? array_values($this->profiles)[0] ?? '';
+
+            $this->connexion    = (bool) ($this->id);
         }
+
         else // No user log in, get default user (="public user") from configuration
         {
             $publicProfile  = Handler::getPublicProfile( $this->ww );
@@ -68,6 +73,7 @@ class User
         // }
     }
     
+    
     function init( array $loginData ): bool
     {
         $this->loginMessages =  $loginData['errors'] ?? [];
@@ -77,24 +83,14 @@ class User
         }
 
         $this->connexion        = true;
-        $this->connexionData    = $loginData['data'];
+        $this->properties       = $loginData['data'];
 
-        $this->id               = $this->connexionData['id'];
-        $this->name             = $this->connexionData['name'];
-        $this->profiles         = $this->connexionData['profiles'];
+        $this->id               = $this->properties['id'];
+        $this->name             = $this->properties['name'];
+        $this->profiles         = $this->properties['profiles'];
         
-        $this->policies         = Handler::listPolicies( $this->profiles );
-        
-        $this->session->write(
-            'user', 
-            [
-                'ID'            => $this->id,
-                'name'          => $this->name,
-                'profiles'      => $this->profiles,
-                'policies'      => $this->policies,
-                'connexionData' => $this->connexionData,
-            ]
-        );
+        $this->policies         = Handler::listPolicies( $this->profiles );        
+        $this->session->write( 'user', $this->properties );
         
         return true;
     }

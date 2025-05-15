@@ -6,6 +6,7 @@ use WW\DataAccess\WitchDataAccess as DataAccess;
 use WW\Structure;
 
 use WW\Handler\CauldronHandler;
+use WW\Trait\PropertiesAccessTrait;
 
 /**
  * A witch is an element of global arborescence, that we call matriarcat. 
@@ -19,6 +20,8 @@ use WW\Handler\CauldronHandler;
  */
 class Witch 
 {
+    use PropertiesAccessTrait;
+
     const FIELDS = [
         "id",
         "name",
@@ -73,27 +76,6 @@ class Witch
     public WoodWiccan $ww;
     
     
-    /**
-     * Property setting 
-     * @param string $name
-     * @param mixed $value
-     * @return void
-     */
-    public function __set(string $name, mixed $value): void {
-        $this->properties[$name] = $value;
-    }
-    
-
-    /**
-     * Property reading
-     * @param string $name
-     * @return mixed
-     */
-    public function __get(string $name): mixed {
-        return $this->properties[$name] ?? null;
-    }
-    
-
     /**
      * Name reading
      * @return string
