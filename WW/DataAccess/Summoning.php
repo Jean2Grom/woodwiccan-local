@@ -50,12 +50,17 @@ class Summoning
                 $conditions[ $witchRef ] = [ 'id'  => $typeConfiguration['id'] ];
             }
         }
-        if( !empty($configuration['user']) && !empty($result[0]['user_craft_fk']) ){
+        // if( !empty($configuration['user']) && !empty($result[0]['user_craft_fk']) ){
+        //     foreach( array_keys($configuration['user']['entries']) as $witchRef ){
+        //         $conditions[ $witchRef ] = [ 
+        //             'craft_table'  => $ww->user->craft_table, 
+        //             'craft_fk'     => $result[0]['user_craft_fk'], 
+        //         ];
+        //     }
+        // }
+        if( !empty($configuration['user']) && !empty($result[0]['user_cauldron']) ){
             foreach( array_keys($configuration['user']['entries']) as $witchRef ){
-                $conditions[ $witchRef ] = [ 
-                    'craft_table'  => $ww->user->craft_table, 
-                    'craft_fk'     => $result[0]['user_craft_fk'], 
-                ];
+                $conditions[ $witchRef ] = [ 'cauldron' => $result[0]['user_cauldron'] ];
             }
         }
         
@@ -226,12 +231,14 @@ class Summoning
             $query      .=  $separator."`w`.`level_".$i."` ";
         }
         if( $userConnexionJointure ){
-            $query  .= ", `user_craft_table`.`id` AS `user_craft_fk` ";
+            //$query  .= ", `user_craft_table`.`id` AS `user_craft_fk` ";
+            $query  .= ",  `connexion`.`cauldron_fk` AS `user_cauldron` ";
         }
         
         $query  .= "FROM ";
         if( $userConnexionJointure ){
-            $query  .= "`".$ww->user->craft_table."` AS `user_craft_table`, ";
+            //$query  .= "`".$ww->user->craft_table."` AS `user_craft_table`, ";
+            $query  .= "`ingredient__integer` AS `connexion`, ";
         }
         
         $refWitch           = false;
@@ -357,17 +364,23 @@ class Summoning
         
         if( $userConnexionJointure )
         {
-            $parameters['user_craft_table'] = $ww->user->craft_table;
+            //$parameters['user_craft_table'] = $ww->user->craft_table;
 
-            $condition  =   "( %s.`craft_table` = :user_craft_table ";
-            $condition  .=  "AND %s.`craft_fk` = `user_craft_table`.`id` ) ";
+            //$condition  =   "( %s.`craft_table` = :user_craft_table ";
+            //$condition  .=  "AND %s.`craft_fk` = `user_craft_table`.`id` ) ";
             
-            $query      .=  $separator;
-            $separator  =   "OR ";
-            $query      .=  str_replace(' %s.', ' `w`.', $condition);
+            // $query      .=  $separator;
+            // $separator  =   "OR ";
+            // $query      .=  str_replace(' %s.', ' `w`.', $condition);
+            // if( $leftJoin['user'] ){
+            //     $query      .=  " OR ".str_replace(' %s.', " `user_craft_table`.", $condition);
+            // }            
+
+            $query  .=  $separator;
+            $query  .=  "`w`.`cauldron` = `connexion`.`cauldron_fk` ";
             if( $leftJoin['user'] ){
-                $query      .=  " OR ".str_replace(' %s.', " `user_craft_table`.", $condition);
-            }            
+                $query      .=  " OR `user`.`cauldron` = `connexion`.`cauldron_fk` ";
+            }
         }
         
         $query .=  ") ";
@@ -398,7 +411,9 @@ class Summoning
         if( $userConnexionJointure )
         {
             $parameters[ 'user_id' ] = (int) $ww->user->id;
-            $query  .= "AND `user_craft_table`.`".$ww->user->craft_column."` = :user_id ";
+            //$query  .= "AND `user_craft_table`.`".$ww->user->craft_column."` = :user_id ";
+            $query  .= "AND ( `connexion`.`value` = :user_id ";
+            $query  .= "AND `connexion`.`name` = \"user__connexion\" ) ";
         }
         
         $userPoliciesConditions = [];
@@ -471,6 +486,7 @@ class Summoning
             $query .= ") ";
         }
         
+//        $ww->db->debugQuery($query, $parameters);
         return $ww->db->selectQuery($query, $parameters);
     }
 
@@ -583,6 +599,7 @@ class Summoning
 
     static function cauldrons( WoodWiccan $ww, $configuration )
     {
+$ww->dump($configuration["user"]);        
         $cauldronsConf = [];
         foreach( $configuration as $type => $typeConfiguration )
         {
@@ -630,6 +647,7 @@ class Summoning
                 if( (!isset( $witchConf['craft'] ) || !empty( $witchConf['craft'] )) 
                     && $ww->witch( $refWitch )->hasCauldron()
                 ){
+$ww->debug( $ww->witch( $refWitch )->cauldronId, $refWitch);                    
                     $cauldronsConf[] = $ww->witch( $refWitch )->cauldronId;
                 }
                 
@@ -639,7 +657,7 @@ class Summoning
                         self::getParentsCraftData( $ww->witch($refWitch), $witchConf['parents']['craft'] )
                     );
                 }
-
+ 
                 if( !empty($witchConf['sisters']['craft']) && !empty($witches[ $refWitch ]->sisters) ){
                     foreach( $ww->witch($refWitch)->sisters as $sisterWitch ){
                         $cauldronsConf = array_merge_recursive( 
@@ -657,7 +675,7 @@ class Summoning
                 }
             }
         }
-        
+$ww->dump(array_unique($cauldronsConf));
         return $cauldronsConf? CauldronHandler::fetch($ww, array_unique($cauldronsConf), false): [];
     }
 
