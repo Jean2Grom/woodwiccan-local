@@ -104,7 +104,11 @@
                 }
             },
             "user": {
-                "user": true
+                "user": true,
+                "children": {
+                    "depth": "*",
+                    "craft": "*"
+                }
             }
         },
         "recipes": {
