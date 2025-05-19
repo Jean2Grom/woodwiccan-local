@@ -260,8 +260,10 @@ class Website
                 }
                 
                 $moduleName = substr($moduleName, 0, strripos($moduleName, ".php") );
-                
-                $modulesList[] = $moduleName;
+
+                if( $moduleName ){
+                    $modulesList[] = $moduleName;
+                }
             }
         }
 

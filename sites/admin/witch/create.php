@@ -1,12 +1,9 @@
-<?php 
-/** @var WW\Module $this */
+<?php /** @var WW\Module $this */
+
 namespace WW;
 
 use WW\Handler\CauldronHandler;
 use WW\Handler\WitchHandler;
-//use WW\Cauldron;
-//use WW\Tools;
-//use WW\Website;
 
 if( !$this->witch("target") ){
     $this->ww->user->addAlert([
@@ -46,8 +43,6 @@ $modules = [];
 foreach( $websitesList as $site => $website ){
     $modules[ $site ] = $website->listModules();
 }
-
-$this->ww->dump( $_POST );
 
 switch(Tools::filterAction(
     $this->ww->request->param('action'),
@@ -139,17 +134,21 @@ switch(Tools::filterAction(
                 $this->ww->website->site, 
                 $recipe
             );
-            $newCauldron = CauldronHandler::createFromData($this->ww, [
-                'name'      =>  $params['name'],
-                'recipe'    =>  $recipe,
-                'status'    =>  Cauldron::STATUS_DRAFT,
-            ]);
+            $newCauldron    = $this->ww->configuration
+                                ->recipe( $recipe )
+                                ->factory( $params['name'] );
 
-            if( !$folderCauldron 
-                || !$newCauldron 
-                || !$folderCauldron->addCauldron( $newCauldron ) 
-                || !$newCauldron->save() 
-            ){
+            if( !$folderCauldron || !$newCauldron ){
+                $this->ww->user->addAlert([
+                    'level'     =>  'warning',
+                    'message'   =>  "Warning, Cauldron creation has failed",
+                ]);
+                break;
+            }
+
+            $newCauldron->status = Cauldron::STATUS_DRAFT;
+
+            if( !$folderCauldron->addCauldron( $newCauldron ) || !$newCauldron->save() ){
                 $this->ww->user->addAlert([
                     'level'     =>  'warning',
                     'message'   =>  "Warning, Cauldron creation has failed",
