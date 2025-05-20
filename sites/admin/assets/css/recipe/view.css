@@ -1,0 +1,10 @@
+.global-data, 
+.fieldsets-container {
+    max-width: 700px;
+    margin-top: 10px;
+}
+ul.global-data li,
+.fieldsets-container fieldset li {
+    display: flex;
+    justify-content: space-between;
+}

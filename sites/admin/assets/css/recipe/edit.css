@@ -1,0 +1,58 @@
+
+.restriction-settings {
+    width: 100%;
+}
+.fieldsets-container {
+    max-width: 700px;
+    margin-top: 10px;
+}
+.fieldsets-container fieldset li {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+}
+
+fieldset {
+    border: 1px solid #ccc;
+    box-shadow: 5px 5px 5px #ccc;
+}
+    fieldset > legend {
+        font-weight: bold;
+    }
+    fieldset.right {
+        display: flex;
+        justify-content: end;
+        align-items: center;
+    }
+        fieldset.right button {
+            margin-left: 8px;
+        }
+#name-display,
+#file-display {
+    cursor: pointer;
+}
+
+#name-input,
+#file-input {
+    display: none;
+}
+
+.fieldsets-container > fieldset:first-child a.up-fieldset {
+    display: none;
+}
+.fieldsets-container > fieldset:last-child a.down-fieldset {
+    display: none;
+}
+.new-content-actions {
+    display: flex;
+    justify-content: end;
+}
+.new-content-actions.hidden {
+    display: none;
+}
+#new-content legend {
+    display: none;
+}
+#new-content legend.new-content-form {
+    display: block;
+}

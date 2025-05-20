@@ -14,12 +14,20 @@
         },
         {
             "mandatory": true,
-            "name" : "user__connexion",
+            "name": "user__connexion",
             "type": "integer"
-        }, 
+        },
         {
             "mandatory": true,
-            "name" : "profiles",
+            "name": "connexion",
+            "type": "ww-connexion",
+            "require": {
+                "max": "0"
+            }
+        },
+        {
+            "mandatory": true,
+            "name": "profiles",
             "type": "ww-profiles-array"
         }
     ]

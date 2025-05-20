@@ -1,6 +1,7 @@
 <?php /** @var WW\Module $this */
 
 $this->addCssFile('content-edit.css');
+$this->addCssFile('recipe/view.css');
 $this->addJsFile('triggers.js');
 ?>
 <h1>
@@ -68,16 +69,3 @@ $this->addJsFile('triggers.js');
         Back
     </button>
 </div>
-
-<style>
-    .global-data, 
-    .fieldsets-container {
-        max-width: 700px;
-        margin-top: 10px;
-    }
-    ul.global-data li,
-    .fieldsets-container fieldset li {
-        display: flex;
-        justify-content: space-between;
-    }
-</style>

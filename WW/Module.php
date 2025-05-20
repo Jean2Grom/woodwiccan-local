@@ -197,8 +197,8 @@ class Module
     
     function include( $filename, ?array $params=null ): void
     {
-        foreach( $params ?? [] as $name => $value ){
-            $$name = $value;
+        foreach( $params ?? [] as $includedFunctionParamName => $includedFunctionParamValue ){
+            $$includedFunctionParamName = $includedFunctionParamValue;
         }
 
         include $this->getIncludeViewFile($filename);
