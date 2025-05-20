@@ -535,7 +535,7 @@ class UserDataAccess
     }
     
     
-    static function insertConnexion( WoodWiccan $ww, array $data, array $craftAttributeData )
+    static function insertConnexion( WoodWiccan $ww, array $data, ?array $craftAttributeData=null )
     {
         if( empty($data['login']) || empty($data['email']) ){
             return false;
@@ -545,7 +545,8 @@ class UserDataAccess
             || empty($craftAttributeData['name'])
             || empty($craftAttributeData['type'])
             || empty($craftAttributeData['var']) ){
-            return false;
+            //return false;
+            $craftAttributeData=null;
         }
         
         $userId = $ww->user->id;
@@ -561,10 +562,13 @@ class UserDataAccess
         $params["login"]        = $data['login'];
         $params["pass_hash"]    = $data['pass_hash'] ?? "";
         
-        $params["craft_table"]          = $craftAttributeData['table'];
-        $params["craft_attribute"]      = $craftAttributeData['type'];
-        $params["craft_attribute_var"]  = $craftAttributeData['var'];
-        $params["attribute_name"]       = $craftAttributeData['name'];
+        if( $craftAttributeData )
+        {
+            $params["craft_table"]          = $craftAttributeData['table'];
+            $params["craft_attribute"]      = $craftAttributeData['type'];
+            $params["craft_attribute_var"]  = $craftAttributeData['var'];
+            $params["attribute_name"]       = $craftAttributeData['name'];
+        }
         
         $query = "";
         $query .=   "INSERT INTO `user__connexion` ";
@@ -573,8 +577,12 @@ class UserDataAccess
         if( $userId ){
             $query .=   "`creator`, `modifier`, ";
         }
-        
-        $query .=   "`craft_table`, `craft_attribute`, `craft_attribute_var`, `attribute_name` ) ";
+
+        if( $craftAttributeData ){
+            $query .=   "`craft_table`, `craft_attribute`, `craft_attribute_var`, `attribute_name` ";
+        }
+
+        $query .=   ") ";
         
         $query .=   "VALUES ( :name ";
         $query .=   ", :email ";
@@ -585,10 +593,15 @@ class UserDataAccess
             $query .=   ", :creator, :modifier ";
         }
         
-        $query .=   ", :craft_table ";
-        $query .=   ", :craft_attribute ";
-        $query .=   ", :craft_attribute_var ";
-        $query .=   ", :attribute_name ) ";
+        if( $craftAttributeData )
+        {
+            $query .=   ", :craft_table ";
+            $query .=   ", :craft_attribute ";
+            $query .=   ", :craft_attribute_var ";
+            $query .=   ", :attribute_name ";
+        }
+        
+        $query .=   ") ";
         
         $newConnexionId = $ww->db->insertQuery($query, $params);
         

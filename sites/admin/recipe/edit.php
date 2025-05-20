@@ -26,7 +26,7 @@ if( !$recipe )
     exit();
 }
 
-$recipes     = $this->ww->configuration->recipes();
+$recipes        = $this->ww->configuration->recipes();
 $ingredients    = Ingredient::list();
 
 $possibleTypes = [];

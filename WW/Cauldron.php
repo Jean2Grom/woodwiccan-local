@@ -408,7 +408,7 @@ class Cauldron implements CauldronContentInterface
                 continue;
             }
 
-            $result = $result && $child->saveAction( false );
+            $result = $result && $child->save( false );
         }
 
         return $result;

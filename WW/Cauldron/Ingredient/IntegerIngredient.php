@@ -13,7 +13,6 @@ class IntegerIngredient extends Ingredient
      * @return self
      */
     function init( mixed $value=null ): self {
-        //return $this->set( $value ?? (int) $this->properties[ 'value' ] ?? null );
         return $this->set( $value ?? $this->properties[ 'value' ] ?? null );
     }
 
@@ -24,8 +23,11 @@ class IntegerIngredient extends Ingredient
      */
     public function set( mixed $value ): self
     {
-        if( !is_null($value) && !ctype_digit(strval($value)) ){
-            $this->ww->log->error( "Try to set a non integer value to ".$this->type." ingredient");
+        if( empty($value) ){
+            $this->value = null;
+        }
+        elseif( !ctype_digit(strval($value)) ){
+            $this->ww->log->error("Try to set a non integer value to ".$this->type." ingredient");
         }
         else {
             $this->value = $value;
