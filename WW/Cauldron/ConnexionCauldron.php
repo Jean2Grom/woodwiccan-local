@@ -5,7 +5,7 @@ use WW\Cauldron;
 use WW\DataAccess\CauldronDataAccess as DataAccess;
 use WW\DataAccess\UserDataAccess;
 use WW\Handler\CauldronHandler as Handler;
-use WW\Handler\UserHandler;
+use WW\Handler\IngredientHandler;
 
 class ConnexionCauldron extends Cauldron
 {
@@ -37,47 +37,54 @@ class ConnexionCauldron extends Cauldron
             $passHashInputs,
             $formattedInputs['content']['pass_hash'] ?? []
         );
-$this->ww->dump($formattedInputs);
+//$this->ww->dump($formattedInputs);
         return parent::readInputs( $formattedInputs );
     }
 
-    function create( string $name, ?string $type=null, array $initProperties=[] ): CauldronContentInterface
+    function createX( string $name, ?string $type=null, array $initProperties=[] ): CauldronContentInterface
     {
+$this->ww->debug($this->exist());        
+$this->ww->debug($this);        
 $this->ww->debug($name, "AAAAAA");
 $this->ww->debug($type, "BBBB");
 $this->ww->dump($initProperties, "CCCC");
 
-$this->ww->debug->die( "jean");
-return $this;
+//$this->ww->debug->die( "jean");
+return parent::create($name, $type, $initProperties);
 
-        if( $type && in_array($type, Ingredient::list()) )
-        {
-            $content            = IngredientHandler::factory($type);
-            $content->ww        = $this->ww;
-            $content->name      = !empty($name)? $name: $type;
-
-            $content->init( $initProperties['value'] ?? null );
-        }
-        else 
-        {
-            $recipe     = $this->ww->configuration->recipe( $type ) 
-                            ?? $this->ww->configuration->recipe('folder');
-            $content    = $recipe->factory( !empty($name)? $name: $recipe->name, $initProperties );
-        }
-
-        $content->priority  =  $initProperties['priority'] ?? 0; 
-
-        $this->add( $content );
-
-        return $content;
     }    
 
     protected function saveAction(): bool
     {
-$this->ww->dump($this->properties); 
-        Handler::writeProperties($this); 
+        if( !$this->exist() )
+        {
+            $newConnexion = UserDataAccess::newConnexion(
+                $this->ww, 
+                'login', 
+                'email', 
+                'pass_hash', 
+                $this->name
+            );
 
-$this->ww->dump($this->properties); 
+            $data = [
+                'name' => 'ww-connexion',
+                'priority' => $this->priority,
+            ];
+
+            if( $newConnexion ){
+                $data['value'] = 
+            }
+
+            $ingredient = IngredientHandler::createFromData( $this->parent, 'integer', [] );
+                factory('integer');
+
+
+
+    $this->ww->dump($newConnexion); 
+
+        }
+
+
         return true; 
 
         // $this->position();
