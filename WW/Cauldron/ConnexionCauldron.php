@@ -9,10 +9,17 @@ use WW\Handler\IngredientHandler;
 
 class ConnexionCauldron extends Cauldron
 {
-    
+    function __construct()
+    {
+        $this->data = (object) [
+            'connector' => 'ww-connexion',
+            'table'     => 'user__connexion',
+            'field'     => 'id',
+        ];
+    }
+
     function readInputs( mixed $inputs=null ): self
     {
-//$this->ww->dump($inputs);
         $formattedInputs                                = $inputs;
         $formattedInputs['content']['email']['name']    = 'email';
         $formattedInputs['content']['email']['type']    = 'string';
@@ -37,68 +44,32 @@ class ConnexionCauldron extends Cauldron
             $passHashInputs,
             $formattedInputs['content']['pass_hash'] ?? []
         );
-//$this->ww->dump($formattedInputs);
-        return parent::readInputs( $formattedInputs );
+
+        $connector = $this->content('ww-connexion');
+
+        parent::readInputs( $formattedInputs );
+
+        if( $connector ){
+            $this->addIngredient($connector);
+        }
+
+        return $this;
     }
 
-    function createX( string $name, ?string $type=null, array $initProperties=[] ): CauldronContentInterface
-    {
-$this->ww->debug($this->exist());        
-$this->ww->debug($this);        
-$this->ww->debug($name, "AAAAAA");
-$this->ww->debug($type, "BBBB");
-$this->ww->dump($initProperties, "CCCC");
-
-//$this->ww->debug->die( "jean");
-return parent::create($name, $type, $initProperties);
-
-    }    
 
     protected function saveAction(): bool
     {
-        if( !$this->exist() )
-        {
-            $newConnexion = UserDataAccess::newConnexion(
-                $this->ww, 
-                'login', 
-                'email', 
-                'pass_hash', 
-                $this->name
-            );
-
-            $data = [
-                'name' => 'ww-connexion',
-                'priority' => $this->priority,
-            ];
-
-            if( $newConnexion ){
-                $data['value'] = 
-            }
-
-            $ingredient = IngredientHandler::createFromData( $this->parent, 'integer', [] );
-                factory('integer');
+$this->ww->debug( "saveAction", "CONNEXION" ); 
 
 
+        $this->position();
 
-    $this->ww->dump($newConnexion); 
-
+        if( $this->depth > $this->ww->cauldronDepth ){
+            DataAccess::increaseDepth( $this->ww );
         }
-
-
-        return true; 
-
-        // $this->position();
-
-        // if( $this->depth > $this->ww->cauldronDepth ){
-        //     DataAccess::increaseDepth( $this->ww );
-        // }
         
         if( !$this->exist() )
         {
-            UserDataAccess::insertConnexion($this->ww, [
-                'name' => $this->properties['name']
-            ]);
-
             Handler::writeProperties($this); 
             $result = DataAccess::insert($this); 
             
@@ -117,26 +88,68 @@ return parent::create($name, $type, $initProperties);
         if( $result === false ){
             return false;
         }
-        $result = true;
+
+        //$result = true;
         
         // Deletion of pending deprecated contents
-        $result = $result && $this->purge();
+        //$result = $result && $this->purge();
 
-        // Saving contents
-        foreach( $this->ingredients as $ingredient ){
-            $result = $result && $ingredient->save();
+        $values = [ 'name' => $this->parent?->name ?? $this->name ];
+        foreach( ['login', 'email', 'pass_hash'] as $field ){
+            $values[ $field ] = $this->content( $field )?->value() ?? "";
         }
 
-        foreach( $this->children as $child ) 
+        if( $connexionId = $this->content('ww-connexion')?->value() ){
+            return DataAccess::updateConnectedData(
+                $this->ww, 
+                "user__connexion", 
+                $values, 
+                [ "id" => $connexionId ]
+            );
+        }
+        else 
         {
-            if( !$child->isContent() ){
-                continue;
+            $newConnexion = DataAccess::insertConnectedData(
+                $this->ww, 
+                "user__connexion", 
+                $values
+            );
+
+
+            if( !$newConnexion ){
+                return false;
             }
 
-            $result = $result && $child->saveAction( false );
+            $data = [ 
+                'name'  => 'ww-connexion',
+                'value' => $newConnexion
+            ];
+
+            $ingredient = IngredientHandler::createFromData( $this, 'integer', $data );
+
+            return $ingredient->save();
+        }
+    }
+
+    function init()
+    {
+        if( !$connexionId = $this->content('ww-connexion')?->value() ){
+            return;
         }
 
-        return $result;
+        if( !$data = DataAccess::getConnectedData( 
+                $this->ww, 
+                $connexionId 
+            ) 
+        ){
+            return;
+        }
+
+        $this->create( 'email', 'string', [ 'value' => $data[0]['email'] ] );
+        $this->create( 'login', 'string', [ 'value' => $data[0]['login'] ] );
+        $this->create( 'pass_hash', 'string', [ 'value' => $data[0]['pass_hash'] ] );
+
+        return;
     }
 
 }

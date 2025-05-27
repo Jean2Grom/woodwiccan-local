@@ -365,7 +365,6 @@ class Cauldron implements CauldronContentInterface
 
     protected function saveAction(): bool
     {
-
         $this->position();
 
         if( $this->depth > $this->ww->cauldronDepth ){
@@ -715,6 +714,7 @@ class Cauldron implements CauldronContentInterface
                 }
 
                 if( !$content 
+                    && isset($contents[ $indice ])
                     && $contents[ $indice ]->type === $contentParams['type'])
                 {
                     $content = $contents[ $indice ];
@@ -778,6 +778,8 @@ class Cauldron implements CauldronContentInterface
             $recipe     = $this->ww->configuration->recipe( $type ) 
                             ?? $this->ww->configuration->recipe('folder');
             $content    = $recipe->factory( !empty($name)? $name: $recipe->name, $initProperties );
+
+            $content->init();
         }
 
         $content->priority  =  $initProperties['priority'] ?? 0; 
@@ -987,4 +989,7 @@ class Cauldron implements CauldronContentInterface
         return;
     }
 
+    function init(){
+        return;
+    }
 }

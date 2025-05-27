@@ -364,4 +364,55 @@ class CauldronDataAccess
         return $ww->db->selectQuery( $query );
     }
 
+    static function getConnectedData( WoodWiccan $ww, $id )
+    {
+        $query = "";
+        $query  .= "SELECT * ";
+        $query  .= "FROM `user__connexion` AS `uc` ";
+        $query  .= "WHERE `uc`.`id` = ".$id." ";
+
+        return $ww->db->selectQuery( $query );
+    }
+
+
+    static function insertConnectedData( WoodWiccan $ww, string $table, array $values )
+    {
+        $query = "";
+        $query .=   "INSERT INTO `".$ww->db->escape_string($table)."` ";
+        $query .=   "( `".implode("`, `", array_keys($values))."` ) ";
+        $query .=   "VALUES ( :".implode(" , :", array_keys($values))." ) ";
+        
+        $newConnexionId = $ww->db->insertQuery($query, $values);
+        
+        return $newConnexionId;
+    }
+
+    
+    static function updateConnectedData( WoodWiccan $ww, string $table, array $updates, array $conditions )
+    {
+        $query  = "";
+        $params = [];
+        $query  .=  "UPDATE `".$ww->db->escape_string($table)."` ";
+
+        $separator = "SET ";
+        foreach( $updates as $field => $value )
+        {
+            $key            =   'upt__'.$field;
+            $params[ $key ] =   $value;
+            $query          .=  $separator.'`'.$ww->db->escape_string($field)."` = :".$key." ";
+            $separator      =   ", ";
+        }
+
+        $separator = "WHERE ";
+        foreach( $conditions as $field => $value )
+        {
+            $key            =   'cond__'.$field;
+            $params[ $key ] =   $value;
+            $query          .=  $separator.'`'.$ww->db->escape_string($field)."` = :".$key." ";
+            $separator      =   ", ";
+        }
+        
+        return $ww->db->updateQuery( $query, $params );
+    }
+
 }

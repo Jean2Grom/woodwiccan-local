@@ -126,6 +126,10 @@ class CauldronHandler
                 }
             }
         }
+
+        foreach( $cauldronsList as $cauldron ){ 
+            $cauldron->init();
+        }
         
         return $return;
     }

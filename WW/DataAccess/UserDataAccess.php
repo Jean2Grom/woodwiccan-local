@@ -611,50 +611,6 @@ class UserDataAccess
     }
     
     
-    static function newConnexion( WoodWiccan $ww, string $login, string $email, ?string $passHash=null, ?string $name=null )
-    {
-        if( empty($login) || empty($email) ){
-            return false;
-        }
-        
-        $userId = $ww->user->id ?? null;
-        $params = [];
-        if( $userId )
-        {
-            $params["creator"]  = $userId;
-            $params["modifier"] = $userId;
-        }
-        
-        $params["name"]         = $name ?? $login;
-        $params["email"]        = $email;
-        $params["login"]        = $login;
-        $params["pass_hash"]    = $passHash ?? "";
-        
-        $query = "";
-        $query .=   "INSERT INTO `user__connexion` ";
-        $query .=   "( `name` ";
-        $query .=   ", `email` ";
-        $query .=   ", `login` ";
-        $query .=   ", `pass_hash` ";        
-        if( $userId ){
-            $query .=   ", `creator`, `modifier` ";
-        }
-        $query .=   ") ";
-        
-        $query .=   "VALUES ( :name ";
-        $query .=   ", :email ";
-        $query .=   ", :login ";
-        $query .=   ", :pass_hash ";        
-        if( $userId ){
-            $query .=   ", :creator, :modifier ";
-        }
-        $query .=   ") ";
-        
-        $newConnexionId = $ww->db->insertQuery($query, $params);
-        
-        return $newConnexionId;
-    }
-
     static function updateConnexion( WoodWiccan $ww, int $connexionId, array $data, array $craftAttributeData )
     {
         if( empty($connexionId) || empty($data) ){
