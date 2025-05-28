@@ -377,14 +377,17 @@ class CauldronDataAccess
 
     static function insertConnectedData( WoodWiccan $ww, string $table, array $values )
     {
+        $params = [];
+        foreach( $values as $field => $value ){
+            $params[ $ww->db->escape_string($field) ] = $value;
+        }
+
         $query = "";
         $query .=   "INSERT INTO `".$ww->db->escape_string($table)."` ";
-        $query .=   "( `".implode("`, `", array_keys($values))."` ) ";
-        $query .=   "VALUES ( :".implode(" , :", array_keys($values))." ) ";
+        $query .=   "( `".implode("`, `", array_keys($params))."` ) ";
+        $query .=   "VALUES ( :".implode(" , :", array_keys($params))." ) ";
         
-        $newConnexionId = $ww->db->insertQuery($query, $values);
-        
-        return $newConnexionId;
+        return $ww->db->insertQuery($query, $params);;
     }
 
     
@@ -397,22 +400,44 @@ class CauldronDataAccess
         $separator = "SET ";
         foreach( $updates as $field => $value )
         {
-            $key            =   'upt__'.$field;
+            $escapedField   =   $ww->db->escape_string($field);
+            $key            =   'upt__'.$escapedField;
             $params[ $key ] =   $value;
-            $query          .=  $separator.'`'.$ww->db->escape_string($field)."` = :".$key." ";
+            $query          .=  $separator.'`'.$escapedField."` = :".$key." ";
             $separator      =   ", ";
         }
 
         $separator = "WHERE ";
         foreach( $conditions as $field => $value )
         {
-            $key            =   'cond__'.$field;
+            $escapedField   =   $ww->db->escape_string($field);
+            $key            =   'cond__'.$escapedField;
             $params[ $key ] =   $value;
-            $query          .=  $separator.'`'.$ww->db->escape_string($field)."` = :".$key." ";
+            $query          .=  $separator.'`'.$escapedField."` = :".$key." ";
             $separator      =   ", ";
         }
         
         return $ww->db->updateQuery( $query, $params );
     }
+
+
+    static function deleteConnectedData( WoodWiccan $ww, string $table, array $conditions )
+    {
+        $params             = [];
+        $queryConditions    = [];
+        foreach( $conditions as $field => $value )
+        {
+            $escapedField               = $ww->db->escape_string($field);
+            $params[ $escapedField ]    = $value;
+            $queryConditions[]          = "`".$escapedField."` = :".$escapedField." ";
+        }
+        
+        $query = "";
+        $query .=   "DELETE FROM `".$ww->db->escape_string($table)."` ";
+        $query .=   "WHERE ".implode("AND ", $queryConditions)." ";
+        
+        return $ww->db->deleteQuery($query, $params);;
+    }
+
 
 }

@@ -3,7 +3,6 @@ namespace WW\Cauldron;
 
 use WW\Cauldron;
 use WW\DataAccess\CauldronDataAccess as DataAccess;
-use WW\DataAccess\UserDataAccess;
 use WW\Handler\CauldronHandler as Handler;
 use WW\Handler\IngredientHandler;
 
@@ -130,6 +129,42 @@ $this->ww->debug( "saveAction", "CONNEXION" );
             return $ingredient->save();
         }
     }
+
+
+    protected function deleteAction(): bool
+    {
+        $result = true;
+
+        if( $connector = $this->content('ww-connexion') )
+        {
+            if( $connector->value() ){
+                $result = $result && DataAccess::deleteConnectedData(
+                    $this->ww, 
+                    'user__connexion', 
+                    [ 'id' => $connector->value() ]
+                );
+            }
+
+            $result = $result && $connector->delete();
+        }
+
+        if( $result === false ){
+            return false;
+        }
+
+        // Deletion of pending deprecated contents
+        if( $this->purge() === false ){
+            return false;
+        }
+        
+        if( $this->exist() ){
+            return DataAccess::delete( $this ) !== false;
+        }
+        
+        return true;
+    }
+
+
 
     function init()
     {

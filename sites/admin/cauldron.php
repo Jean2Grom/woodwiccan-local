@@ -67,11 +67,8 @@ switch( Tools::filterAction(
     case 'save-and-return':
         $return = true;
     case 'save':
-        //$saved = $cauldron->draft()->readInputs()->save();
-        $this->ww->debug($cauldron->draft()->readInputs(), "READINPUT");
-        $this->ww->debug($cauldron->draft()->save(), "SAVE");
-        $saved = true;
-
+        $saved = $cauldron->draft()->readInputs()->save();
+        
         if( $saved === false )
         {
             $return = false;
