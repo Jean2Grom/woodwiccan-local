@@ -28,7 +28,7 @@
         {
             "mandatory": true,
             "name": "profiles",
-            "type": "ww-profiles-array"
+            "type": "ww-profiles"
         }
     ]
 }

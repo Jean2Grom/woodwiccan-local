@@ -16,6 +16,9 @@ class UserHandler
         $data   = false;
         $errors = [];
 
+        $user = DataAccess::getUser( $ww, $username );
+        $ww->dump( $user );
+
         $userLoginData  = DataAccess::getUserLoginData( $ww, $username );
         if( count($userLoginData) === 0 )
         {

@@ -364,14 +364,40 @@ class CauldronDataAccess
         return $ww->db->selectQuery( $query );
     }
 
-    static function getConnectedData( WoodWiccan $ww, $id )
+    static function selectConnectedData( WoodWiccan $ww, string $table, array $conditions=[] )
     {
+        $params = [];
+        $lines  = [];
+        foreach( $conditions as $field => $value )
+        {
+            $escapedField = $ww->db->escape_string($field);
+            if( is_array($value) )
+            {
+                $keys = [];
+                foreach( $value as $i => $valueItem )
+                {
+                    $key = $escapedField."_".$i;
+                    $params[ $key ] = $valueItem;
+                    $keys[]         = $key;
+                }
+                $lines[] = " `".$escapedField."` IN ( :".implode(", :", $keys)." ) ";
+            }
+            else 
+            { 
+                $params[ $escapedField ] = $value;
+                $lines[] = "`".$escapedField."` = :".$escapedField." ";
+            }
+        }
+
         $query = "";
         $query  .= "SELECT * ";
-        $query  .= "FROM `user__connexion` AS `uc` ";
-        $query  .= "WHERE `uc`.`id` = ".$id." ";
+        $query  .= "FROM `".$ww->db->escape_string($table)."` ";
 
-        return $ww->db->selectQuery( $query );
+        if( $lines ){
+            $query  .= "WHERE ".implode( ", ", $lines )." ";
+        }
+
+        return $ww->db->selectQuery( $query, $params );
     }
 
 
@@ -389,7 +415,6 @@ class CauldronDataAccess
         
         return $ww->db->insertQuery($query, $params);;
     }
-
     
     static function updateConnectedData( WoodWiccan $ww, string $table, array $updates, array $conditions )
     {

@@ -74,10 +74,7 @@ switch( Tools::filterAction(
         $cauldron = $this->ww->configuration
                             ->recipe( $recipe )
                             ->factory( $this->witch("target")->name );
-$this->ww->debug($cauldron->content('connexion')->contents(), "ALL", 2);
-$this->ww->debug($cauldron->content('connexion')->content('login'));
-$this->ww->debug($cauldron->content('connexion')->parent);
-$this->ww->debug->die('fffff');
+                            
         $cauldron->status = Cauldron::STATUS_DRAFT;
         
         if( !$cauldron 

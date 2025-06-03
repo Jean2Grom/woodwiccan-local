@@ -6,61 +6,89 @@ use WW\DataAccess\CauldronDataAccess as DataAccess;
 use WW\Handler\CauldronHandler as Handler;
 use WW\Handler\IngredientHandler;
 
-class ConnexionCauldron extends Cauldron
+class ProfilesCauldron extends Cauldron
 {
+    public array $profiles = [];
+
     function __construct()
     {
         $this->data = (object) [
-            'connector' => 'ww-connexion',
-            'table'     => 'user__connexion',
+            'connector' => 'ww-profiles',
+            'table'     => 'user__profiles',
             'field'     => 'id',
         ];
     }
 
-    function readInputs( mixed $inputs=null ): self
+    function edit( ?string $filename=null, ?array $params=null )
     {
-        $formattedInputs                                = $inputs;
-        $formattedInputs['content']['email']['name']    = 'email';
-        $formattedInputs['content']['email']['type']    = 'string';
-        $formattedInputs['content']['login']['name']    = 'login';
-        $formattedInputs['content']['login']['type']    = 'string';
+        if( !$this->profiles )
+        {
+            $condition = [];
+            if( $this->ww->website->sitesRestrictions ){
+                $condition = [ 'site' => array_merge($this->ww->website->sitesRestrictions, ['*']) ];
+            }
 
-        $passwordInputs     = $formattedInputs['content']['password'];
-        unset($formattedInputs['content']['password']);
+            $this->profiles = DataAccess::selectConnectedData( 
+                $this->ww, 
+                'user__profile', 
+                $condition
+            );
+        }
 
-        $passHashInputs = [ 
-            'name'  => 'pass_hash', 
-            'type'  => 'string', 
-            'value' => $this->content('pass_hash')?->value() ?? "",
-        ];
-        if( !empty($passwordInputs['value']) 
-            && $passwordInputs['value'] === $passwordInputs['confirm_value'] 
-        ){
-            $passHashInputs['value'] = password_hash($passwordInputs['value'], PASSWORD_DEFAULT);
+        if( !$filename ){
+            $filename = strtolower( $this->type );
         }
         
-        $formattedInputs['content']['pass_hash'] = array_replace_recursive(
-            $passHashInputs,
-            $formattedInputs['content']['pass_hash'] ?? []
-        );
+        $instanciedClass    = (new \ReflectionClass($this))->getName();
+        $file               = $this->ww->website->getFilePath( $instanciedClass::DIR."/edit/".$filename.'.php');
+        
+        if( !$file ){
+            $file = $this->ww->website->getFilePath( $instanciedClass::DIR."/edit/default.php");
+        }
+        
+        if( !$file ){
+            return;
+        }
+        
+        foreach( $params ?? [] as $name => $value ){
+            $$name = $value;
+        }
 
-        $connector = $this->content('ww-connexion');
+        include $file;
+
+        return;
+    }
+
+    function readInputs( mixed $inputs=null ): self
+    {
+        $formattedInputs = $inputs;
+
+        $this->ww->dump($formattedInputs);
+
+        $profileInput = [];
+        foreach( $formattedInputs['content']['user__profile'] as $userProfileID ){
+            $profileInput[] = [
+                'name'  => 'user__profile',
+                'type'  => 'integer',
+                'value' => $userProfileID,
+            ];
+        }
+
+        $formattedInputs['content'] = $profileInput;
+        //$connector = $this->content('ww-connexion');
 
         parent::readInputs( $formattedInputs );
 
-        if( $connector ){
-            $this->addIngredient($connector);
-        }
+        // if( $connector ){
+        //     $this->addIngredient($connector);
+        // }
 
         return $this;
     }
 
-
+/*
     protected function saveAction(): bool
     {
-$this->ww->debug( "saveAction", "CONNEXION" ); 
-
-
         $this->position();
 
         if( $this->depth > $this->ww->cauldronDepth ){
@@ -172,10 +200,9 @@ $this->ww->debug( "saveAction", "CONNEXION" );
             return;
         }
 
-        if( !$data = DataAccess::selectConnectedData( 
+        if( !$data = DataAccess::getConnectedData( 
                 $this->ww, 
-                'user__connexion', 
-                [ 'id' => $connexionId ]
+                $connexionId 
             ) 
         ){
             return;
@@ -187,6 +214,6 @@ $this->ww->debug( "saveAction", "CONNEXION" );
 
         return;
     }
-
+    */
 }
 

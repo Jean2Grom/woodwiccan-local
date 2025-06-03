@@ -1,0 +1,9 @@
+{
+    "name": "ww-profiles",
+    "class": "WW\\Cauldron\\ProfilesCauldron",
+    "require": {
+        "accept": [
+            "integer"
+        ]
+    }
+}

@@ -37,15 +37,15 @@ abstract class Ingredient implements CauldronContentInterface
 
     public array $properties = [];
 
-    public ?int $id;
-    public ?int $cauldronID;
-    public ?string $name;
-    public ?int $priority;
+    public ?int $id         = null;
+    public ?int $cauldronID = null;
+    public ?string $name    = null;
+    public ?int $priority   = null;
 
-    public ?int $creator;
-    public ?\DateTime $created;
-    public ?int $modificator;
-    public ?\DateTime $modified;
+    public ?int $creator        = null;
+    public ?\DateTime $created  = null;
+    public ?int $modificator    = null;
+    public ?\DateTime $modified = null;
 
     /** 
      * Cauldron witch contains this ingredient

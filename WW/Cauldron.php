@@ -44,18 +44,18 @@ class Cauldron implements CauldronContentInterface
 
     public array $properties  = [];
 
-    public ?int $id;
+    public ?int $id         = null;
     public ?int $status     = null;
     public ?int $targetID   = null;
-    public ?string $name;
+    public ?string $name    = null;
 
     /** @var null|string|Recipe */
     public mixed $recipe;
     public array $allowed = [];
 
-    public ?\stdClass $data;
-    public ?int $priority;
-    public ?\DateTime $datetime;
+    public ?\stdClass $data     = null;
+    public ?int $priority       = null;
+    public ?\DateTime $datetime = null;
     
     public int $depth       = 0;
     public ?array $position = null;
@@ -930,7 +930,6 @@ class Cauldron implements CauldronContentInterface
         if( $witchToRemoveKey === false ){
             return false;
         }
-
         unset($this->witches[ $witchToRemoveKey ]);
         
         $witch->removeCauldron();

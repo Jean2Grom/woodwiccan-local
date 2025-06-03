@@ -15,7 +15,37 @@ use WW\Attribute;
  * @author Jean2Grom
  */
 class UserDataAccess
-{    
+{
+    static function getUser( WoodWiccan $ww, string $login )
+    {
+        if( empty($login) ){
+            return [];
+        }
+        
+        $query = "";
+        $query  .=  "SELECT `id` ";
+        $query  .=  ", `name` ";
+        $query  .=  ", `email` ";
+        $query  .=  ", `login` ";
+        $query  .=  ", `pass_hash` ";
+
+        $query  .=  "FROM `user__connexion` ";
+
+        $query  .=  "WHERE `email`= :login ";
+        $query  .=  "OR `login`= :login ";
+        
+        $result = $ww->db->selectQuery($query, [ 'login' => trim($login) ]);
+        
+        $return = [];
+        foreach( $result as $row ){
+            $return[ $row['id'] ] = $row;
+        }
+        
+        return $return;
+    }
+
+
+
     static function getUserLoginData( WoodWiccan $ww, string $login, ?string $site=null  )
     {
         if( empty($login) ){
