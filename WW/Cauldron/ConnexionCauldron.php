@@ -58,9 +58,6 @@ class ConnexionCauldron extends Cauldron
 
     protected function saveAction(): bool
     {
-$this->ww->debug( "saveAction", "CONNEXION" ); 
-
-
         $this->position();
 
         if( $this->depth > $this->ww->cauldronDepth ){
@@ -99,12 +96,12 @@ $this->ww->debug( "saveAction", "CONNEXION" );
         }
 
         if( $connexionId = $this->content('ww-connexion')?->value() ){
-            return DataAccess::updateConnectedData(
+            return (DataAccess::updateConnectedData(
                 $this->ww, 
                 "user__connexion", 
                 $values, 
                 [ "id" => $connexionId ]
-            );
+            ) !== false);
         }
         else 
         {
