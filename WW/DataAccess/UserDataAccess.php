@@ -16,26 +16,100 @@ use WW\Attribute;
  */
 class UserDataAccess
 {
-    static function getUser( WoodWiccan $ww, string $login )
+    static function getUser( WoodWiccan $ww, string $login, ?string $site=null )
     {
         if( empty($login) ){
             return [];
         }
         
         $query = "";
-        $query  .=  "SELECT `id` ";
-        $query  .=  ", `name` ";
-        $query  .=  ", `email` ";
-        $query  .=  ", `login` ";
-        $query  .=  ", `pass_hash` ";
-
-        $query  .=  "FROM `user__connexion` ";
-
-        $query  .=  "WHERE `email`= :login ";
-        $query  .=  "OR `login`= :login ";
+        $query  .=  "SELECT `uc`.`id` ";
+        $query  .=  ", `uc`.`name` ";
+        $query  .=  ", `uc`.`email` ";
+        $query  .=  ", `uc`.`login` ";
+        $query  .=  ", `uc`.`pass_hash` ";
         
-        $result = $ww->db->selectQuery($query, [ 'login' => trim($login) ]);
+        // $query  .=  ", `iiuc`.`cauldron_fk` ";
+        // $query  .=  ", `cc`.`id` AS `cauldron_connexion` ";
+        $query  .=  ", `cu`.`id` AS `cauldron_user` ";
+        // $query  .=  ", `cs`.`id` AS `cauldron_sister` ";
+        //$query  .=  ", `iiup`.`value` AS `user__profile` ";
+
+        $query  .=  ", `upr`.`id` AS `profile_id` ";
+        $query  .=  ", `upr`.`name` AS `profile_name` ";
+        $query  .=  ", `upr`.`site` AS `profile_site` ";
+
+        $query  .=  ", `upo`.`id` AS `policy_id` ";
+        $query  .=  ", `upo`.`module` AS `policy_module` ";
+        $query  .=  ", `upo`.`status` AS `policy_status` ";
+        $query  .=  ", `upo`.`position_ancestors` AS `policy_position_ancestors` ";
+        $query  .=  ", `upo`.`position_included` AS `policy_position_included` ";
+        $query  .=  ", `upo`.`position_descendants` AS `policy_position_descendants` ";
+        $query  .=  ", `upo`.`custom_limitation` AS `policy_custom_limitation` ";
+
+
+        $query  .=  "FROM `user__connexion` AS `uc` ";
+
+        $query  .=  "LEFT JOIN `ingredient__integer` AS `iiuc` ";
+        $query  .=      "ON ( `iiuc`.`name` = \"ww-connexion\" ";
+        $query  .=          "AND `iiuc`.`value` = `uc`.`id` ) ";
+
+        $query  .=  "LEFT JOIN `cauldron` AS `cc` ";
+        $query  .=      "ON `cc`.`id` = `iiuc`.`cauldron_fk` ";
+
+        $query  .=  "LEFT JOIN `cauldron` AS `cu` ";
+        $query  .=      "ON ( ";
+
+        $query  .=      "( ";
+        $query  .=          "(`cc`.`level_2` IS NOT NULL AND `cu`.`level_1` = `cc`.`level_1`) ";
+        $query  .=          "OR (`cc`.`level_2` IS NULL AND `cu`.`level_1` IS NULL ) ";
+        $query  .=      ") ";
+        for( $i=2; $i<$ww->cauldronDepth; $i++ )
+        {
+            $query  .=  "AND ( ";
+            $query  .=      "(`cc`.`level_".($i+1)."` IS NOT NULL AND `cu`.`level_".$i."` = `cc`.`level_".$i."`) ";
+            $query  .=      "OR (`cc`.`level_".($i+1)."` IS NULL AND `cu`.`level_".$i."` IS NULL ) ";
+            $query  .=  ") ";
+        }
+        $query  .=      "AND `cu`.`level_".$ww->cauldronDepth."` IS NULL ) ";
+
+        $query  .=  "LEFT JOIN `cauldron` AS `cs` ";
+        $query  .=      "ON ( ";
+        $query  .=      "`cc`.`id` <> `cs`.`id` ";
+        for( $i=1; $i<$ww->cauldronDepth; $i++ )
+        {
+            $query  .=  "AND ( ";
+            $query  .=      "(`cs`.`level_".($i+1)."` IS NOT NULL AND `cu`.`level_".$i."` = `cs`.`level_".$i."`) ";
+            $query  .=      "OR (`cs`.`level_".($i+1)."` IS NULL AND `cu`.`level_".$i."` IS NULL ) ";
+            $query  .=  ") ";
+        }
+        $query  .=      ") ";
+
+        $query  .=  "LEFT JOIN `ingredient__integer` AS `iiup` ";
+        $query  .=      "ON ( `iiup`.`name` = \"user__profile\" ";
+        $query  .=          "AND `iiup`.`cauldron_fk` = `cs`.`id` ) ";
+
+        $query  .=  "LEFT JOIN `user__profile` AS `upr` ";
+        $query  .=      "ON `upr`.`id` = `iiup`.`value` ";
+
+        $query  .=  "LEFT JOIN `user__policy` AS `upo` ";
+        $query  .=      "ON `upo`.`fk_profile` = `upr`.`id` ";
+
+        // $query  .=  "LEFT JOIN `witch` ";
+        // $query  .=      "ON `witch`.`id` = `upo`.`fk_witch` ";
+
         
+        $query  .=  "WHERE ( `uc`.`email` = :login OR `uc`.`login` = :login ) ";
+        $query  .=  "AND ( `upr`.`site` = :site OR `upr`.`site` = '*' ) ";
+        
+
+// $ww->dump( $ww->cauldronDepth, "cauldronDepth " );
+
+$ww->db->debugQuery($query, [ 'login' => trim($login), 'site'  => $site ?? $ww->website->site, ]);
+
+        $result = $ww->db->selectQuery($query, [ 'login' => trim($login), 'site'  => $site ?? $ww->website->site, ]);
+$ww->dump( $result, "result " );
+
         $return = [];
         foreach( $result as $row ){
             $return[ $row['id'] ] = $row;
@@ -99,6 +173,10 @@ class UserDataAccess
         $query  .=      "OR `profile`.`site` = '*' ";
         $query  .=  ") ";
         
+        // $ww->db->debugQuery($query, [ 
+        //     'login' => trim($login),
+        //     'site'  => $site ?? $ww->website->site,
+        // ]);
         $result = $ww->db->multipleRowsQuery($query, [ 
             'login' => trim($login),
             'site'  => $site ?? $ww->website->site,

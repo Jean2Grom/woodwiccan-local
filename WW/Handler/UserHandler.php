@@ -17,9 +17,11 @@ class UserHandler
         $errors = [];
 
         $user = DataAccess::getUser( $ww, $username );
-        $ww->dump( $user );
+$ww->dump( $user, "getUser : ".$username );
 
         $userLoginData  = DataAccess::getUserLoginData( $ww, $username );
+$ww->dump( $userLoginData, "getUserLoginData : ".$username );
+
         if( count($userLoginData) === 0 )
         {
             $error      = "Unknown username";
