@@ -29,24 +29,23 @@ class UserDataAccess
         $query  .=  ", `uc`.`login` ";
         $query  .=  ", `uc`.`pass_hash` ";
         
-        // $query  .=  ", `iiuc`.`cauldron_fk` ";
-        // $query  .=  ", `cc`.`id` AS `cauldron_connexion` ";
-        $query  .=  ", `cu`.`id` AS `cauldron_user` ";
-        // $query  .=  ", `cs`.`id` AS `cauldron_sister` ";
-        //$query  .=  ", `iiup`.`value` AS `user__profile` ";
+        $query  .=  ", `cu`.`id` AS `cu` ";
 
-        $query  .=  ", `upr`.`id` AS `profile_id` ";
-        $query  .=  ", `upr`.`name` AS `profile_name` ";
-        $query  .=  ", `upr`.`site` AS `profile_site` ";
+        $query  .=  ", `upr`.`id` AS `pr_id` ";
+        $query  .=  ", `upr`.`name` AS `pr_name` ";
+        $query  .=  ", `upr`.`site` AS `pr_site` ";
 
-        $query  .=  ", `upo`.`id` AS `policy_id` ";
-        $query  .=  ", `upo`.`module` AS `policy_module` ";
-        $query  .=  ", `upo`.`status` AS `policy_status` ";
-        $query  .=  ", `upo`.`position_ancestors` AS `policy_position_ancestors` ";
-        $query  .=  ", `upo`.`position_included` AS `policy_position_included` ";
-        $query  .=  ", `upo`.`position_descendants` AS `policy_position_descendants` ";
-        $query  .=  ", `upo`.`custom_limitation` AS `policy_custom_limitation` ";
+        $query  .=  ", `upo`.`id` AS `po_id` ";
+        $query  .=  ", `upo`.`module` AS `po_module` ";
+        $query  .=  ", `upo`.`status` AS `po_status` ";
+        $query  .=  ", `upo`.`position_ancestors` AS `po_pa` ";
+        $query  .=  ", `upo`.`position_included` AS `po_pi` ";
+        $query  .=  ", `upo`.`position_descendants` AS `po_pd` ";
+        $query  .=  ", `upo`.`custom_limitation` AS `po_c` ";
 
+        for( $i=1; $i<=$ww->depth; $i++ ){
+            $query      .=  ", `w`.`level_".$i."` AS `wl".$i."` ";
+        }
 
         $query  .=  "FROM `user__connexion` AS `uc` ";
 
@@ -95,27 +94,85 @@ class UserDataAccess
         $query  .=  "LEFT JOIN `user__policy` AS `upo` ";
         $query  .=      "ON `upo`.`fk_profile` = `upr`.`id` ";
 
-        // $query  .=  "LEFT JOIN `witch` ";
-        // $query  .=      "ON `witch`.`id` = `upo`.`fk_witch` ";
+        $query  .=  "LEFT JOIN `witch` AS `w` ";
+        $query  .=      "ON `w`.`id` = `upo`.`fk_witch` ";
 
-        
         $query  .=  "WHERE ( `uc`.`email` = :login OR `uc`.`login` = :login ) ";
         $query  .=  "AND ( `upr`.`site` = :site OR `upr`.`site` = '*' ) ";
+        $query  .=  "AND `cu`.`status` IS NULL ";
         
+        $result = $ww->db->selectQuery( 
+            $query, 
+            [ 
+                'login' => trim($login), 
+                'site'  => $site ?? $ww->website->site, 
+            ]
+        );
+        
+        $userData = [];
+        foreach( $result as $row )
+        {
+            $userID = $row['id'];
+            if( empty($userData[ $userID ]) )
+            {
+                $userData[ $userID ] = [
+                    'id'            => $userID,
+                    'name'          => $row['name'],
+                    'email'         => $row['email'],
+                    'login'         => $row['login'],
+                    'pass_hash'     => $row['pass_hash'],
+                    'cauldron'      => $row['cu'],
+                    'profiles'      => [],
+                ];
+            }
 
-// $ww->dump( $ww->cauldronDepth, "cauldronDepth " );
+            $profileID = $row['pr_id'];
+            if( empty($userData[ $userID ]['profiles'][ $profileID ]) ){
+                $userData[ $userID ]['profiles'][ $profileID ] = [
+                    'id'        =>  $profileID,
+                    'name'      =>  $row['pr_name'],
+                    'site'      =>  $row['pr_site'],
+                    'policies'  =>  [],
+                ];
+            }
 
-$ww->db->debugQuery($query, [ 'login' => trim($login), 'site'  => $site ?? $ww->website->site, ]);
+            $policyID = $row['po_id'];
+            if( empty($userData[ $userID ]['profiles'][ $profileID ]['policies'][ $policyID ]) )
+            {
+                if( is_null($row ["wl1" ]) ){
+                    $position = false;
+                }
+                else
+                {
+                    $position = [];
+                    for( $i=1; $i<=$ww->depth; $i++ )
+                    {
+                        $key = "wl".$i;
+                        if( !is_null($row[ $key ]) ){
+                            $position[ $i ] = $row[ "wl".$i ];
+                        }
+                        else {
+                            break;
+                        }
+                    }
+                }
 
-        $result = $ww->db->selectQuery($query, [ 'login' => trim($login), 'site'  => $site ?? $ww->website->site, ]);
-$ww->dump( $result, "result " );
-
-        $return = [];
-        foreach( $result as $row ){
-            $return[ $row['id'] ] = $row;
+                $userData[ $userID ]['profiles'][ $profileID ]['policies'][ $policyID ] = [
+                    'id'                =>  $policyID,
+                    'module'            => $row['po_module'],
+                    'status'            => $row['po_status'] ?? '*',
+                    'custom_limitation' => $row['po_c'],
+                    'position'          => $position,
+                    'position_rules'    => [
+                        'ancestors'         => (boolean) $row['po_pa'],
+                        'self'              => (boolean) $row['po_pi'],
+                        'descendants'       => (boolean) $row['po_pd'],
+                    ],
+                ];
+            }
         }
-        
-        return $return;
+
+        return $userData;
     }
 
 
@@ -173,10 +230,6 @@ $ww->dump( $result, "result " );
         $query  .=      "OR `profile`.`site` = '*' ";
         $query  .=  ") ";
         
-        // $ww->db->debugQuery($query, [ 
-        //     'login' => trim($login),
-        //     'site'  => $site ?? $ww->website->site,
-        // ]);
         $result = $ww->db->multipleRowsQuery($query, [ 
             'login' => trim($login),
             'site'  => $site ?? $ww->website->site,

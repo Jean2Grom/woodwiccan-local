@@ -51,9 +51,14 @@ class Summoning
             }
         }
         
-        if( !empty($configuration['user']) && !empty($result[0]['user_cauldron']) ){
+        // if( !empty($configuration['user']) && !empty($result[0]['user_cauldron']) ){
+        //     foreach( array_keys($configuration['user']['entries']) as $witchRef ){
+        //         $conditions[ $witchRef ] = [ 'cauldron' => $result[0]['user_cauldron'] ];
+        //     }
+        // }
+        if( !empty($configuration['user']) ){
             foreach( array_keys($configuration['user']['entries']) as $witchRef ){
-                $conditions[ $witchRef ] = [ 'cauldron' => $result[0]['user_cauldron'] ];
+                $conditions[ $witchRef ] = [ 'cauldron' => $ww->user->cauldron ];
             }
         }
         
@@ -224,12 +229,13 @@ class Summoning
             $query      .=  $separator."`w`.`level_".$i."` ";
         }
         if( $userConnexionJointure ){
-            $query  .= ",  `connexion`.`cauldron_fk` AS `user_cauldron` ";
+            //$query  .= ",  `connexion`.`cauldron_fk` AS `user_cauldron` ";
+            // $query  .= ",  `user`.`cauldron` AS `user_cauldron` ";
         }
         
         $query  .= "FROM ";
         if( $userConnexionJointure ){
-            $query  .= "`ingredient__integer` AS `connexion`, ";
+            //$query  .= "`ingredient__integer` AS `connexion`, ";
         }
         
         $refWitch           = false;
@@ -355,11 +361,15 @@ class Summoning
         
         if( $userConnexionJointure )
         {
-            $query  .=  $separator;
-            $query  .=  "`w`.`cauldron` = `connexion`.`cauldron_fk` ";
-            if( $leftJoin['user'] ){
-                $query      .=  " OR `user`.`cauldron` = `connexion`.`cauldron_fk` ";
-            }
+            $query      .=  $separator;
+            $separator  =   "OR ";
+            $parameters[ 'user_cauldron' ] = (int) $ww->user->cauldron;
+            $query  .= "`w`.`cauldron` = :user_cauldron OR `user`.`cauldron` = :user_cauldron ";
+
+            // $query  .=  "`w`.`cauldron` = `connexion`.`cauldron_fk` ";
+            // if( $leftJoin['user'] ){
+            //     $query      .=  " OR `user`.`cauldron` = `connexion`.`cauldron_fk` ";
+            // }
         }
         
         $query .=  ") ";
@@ -389,9 +399,9 @@ class Summoning
         
         if( $userConnexionJointure )
         {
-            $parameters[ 'user_id' ] = (int) $ww->user->id;
-            $query  .= "AND ( `connexion`.`value` = :user_id ";
-            $query  .= "AND `connexion`.`name` = \"user__connexion\" ) ";
+            // $parameters[ 'user_id' ] = (int) $ww->user->id;
+            // $query  .= "AND ( `connexion`.`value` = :user_id ";
+            // $query  .= "AND `connexion`.`name` = \"user__connexion\" ) ";
         }
         
         $userPoliciesConditions = [];
@@ -456,7 +466,7 @@ class Summoning
             }
             $query .= ") ";
         }
-        
+// $ww->db->debugQuery($query, $parameters);
         return $ww->db->selectQuery($query, $parameters);
     }
 
@@ -558,7 +568,7 @@ class Summoning
         }
         
         $result     = self::witchesRequest($ww, $configuration);
-        
+
         if( $result === false ){
             return false;
         }
