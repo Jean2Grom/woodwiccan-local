@@ -79,9 +79,9 @@ $this->addJsLibFile('jquery-3.6.0.min.js');
                     <?php endforeach; else: ?>
                         <div class="tabs__item selected">
                             <a href="#tab-current">
-                                <?php if( $this->witch()->hasCraft() && $this->witch()->invoke ): ?>
+                                <?php if( $this->witch()->hasCauldron() && $this->witch()->invoke ): ?>
                                     <i  class="fas fa-hat-wizard"></i>
-                                <?php elseif( $this->witch()->hasCraft() ): ?>
+                                <?php elseif( $this->witch()->hasCauldron() ): ?>
                                     <i  class="fas fa-mortar-pestle"></i>
                                 <?php elseif( $this->witch()->invoke ): ?>
                                     <i  class="fas fa-hand-sparkles"></i>

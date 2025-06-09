@@ -51,7 +51,7 @@ $this->addJsFile('root.js');
                                     Module & Contenu
                                 <?php elseif( !empty($daughter->invoke) ): ?>
                                     Module
-                                <?php elseif( $daughter->hasCraft() ): ?>
+                                <?php elseif( $daughter->hasCauldron() ): ?>
                                     Contenu
                                 <?php else: ?>
                                     Répertoire

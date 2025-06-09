@@ -447,44 +447,6 @@ switch( Tools::filterAction(
     break;
 }
 
-// OLD SCHOOL CRAFT PART
-$structuresList = [];
-$craftWitches   = [];
-if( !$this->witch("target")->hasCraft() ){
-    $structuresList = Structure::listStructures( $this->ww );
-}
-else 
-{
-    $craftWitchBuffer = [];
-    foreach( $this->witch("target")->craft()->getWitches() as $key => $craftWitch )
-    {
-        $breadcrumb         = [];
-        $breadcrumbWitch    = $craftWitch->mother();
-        while( !empty($breadcrumbWitch) )
-        {
-            $breadcrumb[] = [
-                "name"  => $breadcrumbWitch->name,
-                "data"  => $breadcrumbWitch->data,
-                "href"  => $this->witch->url([ 'id' => $breadcrumbWitch->id ]),
-            ];
-
-            $breadcrumbWitch = $breadcrumbWitch->mother();
-        }
-        
-        $craftWitchBuffer[ $key ]               = $craftWitch;
-        $craftWitchBuffer[ $key ]->breadcrumb   = array_reverse($breadcrumb);
-    }
-    
-    $craftWitches    = [];
-    $craftWitches[]  = $craftWitchBuffer[ $this->witch("target")->id ];
-    foreach( $craftWitchBuffer as $key => $craftWitch ){
-        if( $key !=  $this->witch("target")->id ){
-            $craftWitches[] = $craftWitch;
-        }
-    }
-}
-// END OLD SCHOOL CRAFT PART
-
 $sites  = $this->ww->website->sitesRestrictions;
 if( !$sites ){
     $sites = array_keys($this->ww->configuration->sites);

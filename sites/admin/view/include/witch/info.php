@@ -33,18 +33,6 @@
             <td class="label">Status</td>
             <td class="value"><?=$witch->status() ?? "" ?></td>
         </tr>
-        <tr>
-            <td class="label">Craft</td>
-            <td class="value">
-                <a class="tabs__item__triggering" href="#tab-craft-part">
-                    <em><?=$witch->getCraftStructure() ?></em>
-                    <?php if( !$witch->hasCraft() ): ?>
-                        <em class="hover-hide">no</em>
-                        <i class="far fa-plus-square hover-show"></i>
-                    <?php endif; ?>
-                </a>
-            </td>
-        </tr>
         <?php if( $witch->hasInvoke() ): ?>
             <tr>
                 <td class="label">URL</td>

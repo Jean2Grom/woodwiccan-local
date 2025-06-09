@@ -12,7 +12,7 @@ use WW\Trait\PropertiesAccessTrait;
  * A witch is an element of global arborescence, that we call matriarcat. 
  * Each witch except root (ID 1) has a mother witch, and can have daughters witch
  * The structure tree of WW is composed of witches, witch represents the elements of it
- * Each Witch car be associated with a craft, a module and an URL to execute, 
+ * Each Witch can be associated with a cauldron, a module and an URL to execute, 
  * a visibility status ... 
  * This class is very essential in the WW management
  *
@@ -32,8 +32,6 @@ class Witch
         "invoke",
         "cauldron",
         "cauldron_priority",
-        "craft_table",
-        "craft_fk",
         "is_main",
         "context",
         "datetime",
@@ -119,16 +117,9 @@ class Witch
         return $this->status;
     }
     
-    /**
-     * Determine if the witch is associated with a craft (ie a content)
-     * @return bool
-     */
-    function hasCraft(): bool {
-        return !empty($this->properties[ 'craft_table' ]) && !empty($this->properties[ 'craft_fk' ]);
-    }
     
     /**
-     * Determine if the witch is associated with a craft (ie a content)
+     * Determine if the witch is associated with a cauldron (ie a content)
      * @return bool
      */
     function hasCauldron(): bool {
@@ -459,35 +450,7 @@ class Witch
         
         return $module->getResult() ?? "";
     }
-    
-
-    /**
-     * Craft witch content, store it in the Cairn (if exists, only read it)
-     * @return mixed
-     */
-    function craft()
-    {
-        if( !$this->hasCraft() ){
-            return false;
-        }
         
-        return $this->ww->cairn->craft( $this->craft_table, $this->craft_fk );
-    }
-    
-    
-    /**
-     * Generate Craft witch structure
-     * @return mixed
-     */
-    function getCraftStructure()
-    {
-        if( !$this->hasCraft() ){
-            return false;
-        }
-        
-        return new Structure( $this->ww, $this->craft_table );
-    }
-    
     
     /**
      * Update Witch
@@ -699,7 +662,7 @@ class Witch
     
     /**
      * Delete witch if it's not the root,
-     * Delete all descendants and their associated craft if this is their only witch association
+     * Delete all descendants and their associated cauldron if this is their only witch association
      * @param bool $fetchDescendants
      * @return bool
      */
@@ -727,9 +690,6 @@ class Witch
             $this->cauldron()->removeWitch( $this );
         }
         
-        if( $this->hasCraft() ){
-            $this->innerRemoveCraft();
-        }
         
         if( $fetchDescendants ){
             $deleteIds[] = $this->id;
@@ -752,80 +712,7 @@ class Witch
         return $this->cauldron()->removeWitch( $this );
     }
     
-    /**
-     * Delete associated craft if this is their only witch association,
-     * if not only remove this association
-     * @return bool
-     */
-    function removeCraft(): bool
-    {
-        if( !$this->hasCraft() ){
-            return false;
-        }
-        
-        $this->innerRemoveCraft();
 
-        return $this->edit(['craft_table' => null, 'craft_fk' => null]);
-    }
-    
-    /**
-     * Craft deletion part whithout self editing
-     */
-    private function innerRemoveCraft()
-    {
-        $countCraftWitch = $this->craft()->countWitches();
-        
-        if( $countCraftWitch == 1 ){
-            $this->craft()->delete();
-        }
-        elseif( $this->properties['is_main'] == 1 && $countCraftWitch > 1  ){
-            foreach( $this->craft()->getWitches() as $id => $craftWitch ){
-                if( $id != $this->id )
-                {
-                    $craftWitch->edit([ 'is_main' => 1 ]);
-                    break;
-                }
-            }
-        }
-
-        return;
-    }
-
-    /**
-     * Add new craft from past structure
-     * @param Structure $structure
-     * @return bool
-     */
-    function addStructure( Structure $structure ): bool
-    {
-        $craftId = $structure->createCraft( $this->name );
-        
-        if( empty($craftId) ){
-            return false;
-        }
-        
-        if( $this->hasCraft() && $this->craft()->countWitches() == 1 ){
-            $this->craft()->delete();
-        }
-        
-        return $this->edit([ 'craft_table' => $structure->table, 'craft_fk' => $craftId, 'is_main' => 1 ]);
-    }
-    
-    /**
-     * Add craft
-     * @param Craft $craft
-     * @return bool
-     */
-    function addCraft( Craft $craft ): bool
-    {
-        if( $this->hasCraft() && $this->craft()->countWitches() == 1 ){
-            $this->craft()->delete();
-        }
-        
-        $this->ww->cairn->setCraft($craft, $craft->structure->table, $craft->id);
-        
-        return $this->edit([ 'craft_table' => $craft->structure->table, 'craft_fk' => $craft->id ]);
-    }
         
     /**
      * Test if witch is a descendant
@@ -998,7 +885,7 @@ class Witch
     }
     
     /**
-     * Craft witch content, store it in the Cairn (if exists, only read it)
+     * Cauldron witch content, store it in the Cairn (if exists, only read it)
      * @return ?Cauldron
      */
     function cauldron(): ?Cauldron

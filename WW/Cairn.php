@@ -2,7 +2,6 @@
 namespace WW;
 
 use WW\DataAccess\Summoning;
-use WW\DataAccess\WitchCrafting;
 
 /**
  * Class that handles witch summoning and modules invocation
@@ -19,10 +18,6 @@ class Cairn
     /** @var Cauldron[] */
     private $cauldrons;
 
-    private $crafts;
-    private $craftsTablesData;
-    private $override;
-    
     public $invokations;
     
     public $configuration;
@@ -47,10 +42,6 @@ class Cairn
         $this->witches      = [];
         $this->cauldrons    = [];
         
-        $this->craftsTablesData = [];
-        $this->crafts   = [];
-        $this->override = [];
-        
         $this->invokations      = [];        
         $this->configuration    = self::prepareConfiguration($this->website, $summoningConfiguration);
     }
@@ -68,7 +59,7 @@ class Cairn
                 $innerCraft = false;
                 if( is_array($init) )
                 {
-                    $innerDepth      = $init['depth'];
+                    $innerDepth = $init['depth'];
                     $innerCraft = $init['craft'];
                 }
 
@@ -267,17 +258,7 @@ class Cairn
     
     function summon()
     {
-        // return $this
-        //         ->addWitches( Summoning::witches($this->ww, $this->configuration) )
-        //         ->addData( WitchCrafting::readCraftData($this->ww, $this->configuration, $this->getWitches() ));
-        
         $this->addWitches( Summoning::witches($this->ww, $this->configuration) );
-
-        //  Craft part
-        $this->addData( 
-            WitchCrafting::readCraftData($this->ww, $this->configuration, $this->getWitches() )
-        );
-
         $this->addCauldrons( Summoning::cauldrons($this->ww, $this->configuration) );
 
         return $this;
@@ -418,86 +399,6 @@ class Cairn
      */
     function getWitches(): array {
         return $this->witches; 
-    }
-    
-    
-
-    // CRAFT / CRAFT DATA methodes
-    function addData( array $craftData ): self
-    {
-        foreach( $craftData as $table => $craftDataItem )
-        {
-            $this->craftsTablesData[ $table ] = $this->craftsTablesData[ $table ] ?? [];
-            
-            foreach( $craftDataItem as $id => $data ){
-                $this->craftsTablesData[ $table ][ $id ] = array_replace($this->craftsTablesData[ $table ][ $id ] ?? [], $data);
-            }
-        }
-        
-        return $this;
-    }
-    
-    function readData( string $table, int $id )
-    {
-        $this->craftsTablesData[ $table ] = $this->craftsTablesData[ $table ] ?? [];
-        
-        return $this->craftsTablesData[ $table ][ $id ] ?? null;
-    }
-    
-    function unsetData( string $table, int $id ): bool
-    {
-        $this->craftsTablesData[ $table ] = $this->craftsTablesData[ $table ] ?? [];
-        
-        if( isset($this->craftsTablesData[ $table ][ $id ]) )
-        {
-            unset($this->craftsTablesData[ $table ][ $id ]);
-            return true;
-        }
-        
-        return false;
-    }
-    
-    function remove( string $table, int $id ): bool
-    {
-        $this->crafts[ $table ] = $this->crafts[ $table ] ?? [];
-        
-        if( isset($this->crafts[ $table ][ $id ]) ){
-            unset($this->crafts[ $table ][ $id ]);
-        }
-        
-        return $this->unsetData($table, $id);
-    }
-    
-    function craft( string $table, int $id ): Craft
-    {
-        $this->override[ $table ] = $this->override[ $table ] ?? [];
-        if( !empty($this->override[ $table ][ $id ]) ){
-            return $this->override[ $table ][ $id ];
-        }
-        
-        $this->crafts[ $table ] = $this->crafts[ $table ] ?? [];
-        
-        if( !isset($this->crafts[ $table ][ $id ]) )
-        {
-            $this->craftsTablesData[ $table ] = $this->craftsTablesData[ $table ] ?? [];
-            
-            if( !isset($this->craftsTablesData[ $table ][ $id ]) ){
-                $this->craftsTablesData[ $table ]   = array_replace($this->craftsTablesData[ $table ], WitchCrafting::craftQueryFromIds( $this->ww, $table, [$id] ));
-            }
-            
-            $this->crafts[ $table ][ $id ] = Craft::factory( $this->ww, (new Structure( $this->ww, $table )), $this->craftsTablesData[$table][$id] );
-        }
-        
-        return $this->crafts[ $table ][ $id ];
-    }
-    
-    
-    function setCraft( Craft $craft, string $table, int $id ): self
-    {
-        $this->override[ $table ]         = $this->override[ $table ] ?? [];
-        $this->override[ $table ][ $id ]  = $craft;
-        
-        return $this;
     }
     
     

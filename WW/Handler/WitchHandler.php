@@ -263,7 +263,6 @@ class WitchHandler
             'name'              => $witch->name,
             'site'              => $witch->site ?? "",
             'description'       => $witch->data,
-'craft'             => $witch->hasCraft(),
             'cauldron'          => $witch->hasCauldron(),
             'invoke'            => $witch->hasInvoke(),
             'daughters'         => $daughters,

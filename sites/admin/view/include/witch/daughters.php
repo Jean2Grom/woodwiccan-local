@@ -44,7 +44,7 @@
                 <thead>
                     <tr>
                         <th>Name</th>
-                        <th class="full">Craft</th>
+                        <th class="full">Cauldron</th>
                         <th class="full">Status</th>
                         <th class="full">Invoke</th>
                         <th>Actions</th>
@@ -62,10 +62,11 @@
                             <td class="full">
                                 <a href="<?=$witch->ww->website->getUrl("view?id=".$daughter->id."#tab-craft-part") ?>"
                                    class="text-center">
-                                    <em><?=$daughter->getCraftStructure() ?></em>
-                                    <?php if( !$daughter->hasCraft() ): ?>
+                                    <?php if( !$daughter->hasCauldron() ): ?>
                                         <em class="hover-hide">no</em>
                                         <i class="far fa-plus-square hover-show"></i>
+                                    <?php else: ?>
+                                        <em><?=$daughter->cauldron()->type ?></em>
                                     <?php endif; ?>
                                 </a>
                             </td>
