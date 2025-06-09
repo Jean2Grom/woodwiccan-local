@@ -8,6 +8,7 @@ use WW\Cauldron\Recipe;
 use WW\DataAccess\CauldronDataAccess as DataAccess;
 use WW\Handler\CauldronHandler as Handler;
 use WW\Handler\IngredientHandler;
+use WW\Handler\WitchHandler;
 use WW\Trait\PropertiesAccessTrait;
 
 class Cauldron implements CauldronContentInterface
@@ -932,7 +933,7 @@ class Cauldron implements CauldronContentInterface
         }
         unset($this->witches[ $witchToRemoveKey ]);
         
-        $witch->removeCauldron();
+        WitchHandler::removeCauldron( $witch );
 
         if( !$this->witches ){
             $this->delete();

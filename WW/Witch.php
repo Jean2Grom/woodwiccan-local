@@ -313,11 +313,11 @@ class Witch
             $moduleName             = $this->properties["invoke"];
             $allowContextSetting    = true;
         }
-        
+
         if( empty($moduleName) ){
             return "";
         }
-        
+
         $module     = new Module( $this, $moduleName );
         $module->setIsRedirection( $isRedirection );
         $module->setAllowContextSetting( $allowContextSetting );
@@ -749,14 +749,7 @@ class Witch
             return false;
         }
         
-        if( !$this->cauldron()->removeWitch( $this ) ){
-            return false;
-        }
-        
-        $this->cauldron     = null;
-        $this->cauldronId   = null;
-        
-        return $this->edit(['cauldron' => null, 'cauldron_priority' => 0]);
+        return $this->cauldron()->removeWitch( $this );
     }
     
     /**

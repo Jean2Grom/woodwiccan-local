@@ -1,6 +1,7 @@
 <?php 
 namespace WW\Handler;
 
+use WW\Cauldron;
 use WW\WoodWiccan;
 use WW\Witch;
 use WW\DataAccess\WitchDataAccess as DataAccess;
@@ -417,5 +418,16 @@ class WitchHandler
         }
         
         return $witches;    
+    }
+
+    static function removeCauldron( Witch $witch )
+    {
+        $witch->cauldron     = null;
+        $witch->cauldronId   = null;
+        
+        return $witch->edit([
+            'cauldron'          => null, 
+            'cauldron_priority' => 0
+        ]);
     }
 }

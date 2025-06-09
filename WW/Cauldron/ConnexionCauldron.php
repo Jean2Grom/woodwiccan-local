@@ -11,7 +11,7 @@ class ConnexionCauldron extends Cauldron
     function __construct()
     {
         $this->data = (object) [
-            'connector' => 'ww-connexion',
+            'connector' => 'user__connexion',
             'table'     => 'user__connexion',
             'field'     => 'id',
         ];
@@ -44,7 +44,7 @@ class ConnexionCauldron extends Cauldron
             $formattedInputs['content']['pass_hash'] ?? []
         );
 
-        $connector = $this->content('ww-connexion');
+        $connector = $this->content('user__connexion');
 
         parent::readInputs( $formattedInputs );
 
@@ -95,7 +95,7 @@ class ConnexionCauldron extends Cauldron
             $values[ $field ] = $this->content( $field )?->value() ?? "";
         }
 
-        if( $connexionId = $this->content('ww-connexion')?->value() ){
+        if( $connexionId = $this->content('user__connexion')?->value() ){
             return (DataAccess::updateConnectedData(
                 $this->ww, 
                 "user__connexion", 
@@ -117,7 +117,7 @@ class ConnexionCauldron extends Cauldron
             }
 
             $data = [ 
-                'name'  => 'ww-connexion',
+                'name'  => 'user__connexion',
                 'value' => $newConnexion
             ];
 
@@ -132,7 +132,7 @@ class ConnexionCauldron extends Cauldron
     {
         $result = true;
 
-        if( $connector = $this->content('ww-connexion') )
+        if( $connector = $this->content('user__connexion') )
         {
             if( $connector->value() ){
                 $result = $result && DataAccess::deleteConnectedData(
@@ -165,7 +165,16 @@ class ConnexionCauldron extends Cauldron
 
     function init()
     {
-        if( !$connexionId = $this->content('ww-connexion')?->value() ){
+        if( !$connexionId = $this->content('user__connexion')?->value() ){
+            return;
+        }
+
+        if( $connexionId === $this->ww->user->id )
+        {
+            $this->create( 'email', 'string', ['value' => $this->ww->user->email] );
+            $this->create( 'login', 'string', ['value' => $this->ww->user->login] );
+            $this->create( 'pass_hash', 'string', ['value' => $this->ww->user->pass_hash] );
+
             return;
         }
 

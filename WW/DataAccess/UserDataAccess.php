@@ -50,7 +50,7 @@ class UserDataAccess
         $query  .=  "FROM `user__connexion` AS `uc` ";
 
         $query  .=  "LEFT JOIN `ingredient__integer` AS `iiuc` ";
-        $query  .=      "ON ( `iiuc`.`name` = \"ww-connexion\" ";
+        $query  .=      "ON ( `iiuc`.`name` = \"user__connexion\" ";
         $query  .=          "AND `iiuc`.`value` = `uc`.`id` ) ";
 
         $query  .=  "LEFT JOIN `cauldron` AS `cc` ";

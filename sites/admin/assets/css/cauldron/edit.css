@@ -156,6 +156,7 @@ fieldset.cauldron.integration-3 {
     margin-top: 8px;
 }
 .image-display img {
+    max-width: 100%;
     box-shadow: 5px 5px 5px #ccc;
     border: 1px solid;
 }
