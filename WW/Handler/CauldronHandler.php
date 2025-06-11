@@ -127,10 +127,6 @@ class CauldronHandler
             }
         }
 
-        foreach( $cauldronsList as $cauldron ){ 
-            $cauldron->init();
-        }
-        
         return $return;
     }
 
@@ -427,69 +423,6 @@ class CauldronHandler
         return $folder;
     }
     
-
-    /**
-     * Create a draft from a cauldron
-     * @var Cauldron $cauldron
-     * @return Cauldron
-     */
-    static function createDraft( Cauldron $cauldron ): Cauldron
-    {
-        self::writeProperties( $cauldron );
-
-        $draftProperties            = $cauldron->properties;
-        $draftProperties['target']  = $cauldron->id;
-        $draftProperties['status']  = Cauldron::STATUS_DRAFT;
-
-        unset( $draftProperties['id'] );
-        
-        $draft          = self::createFromData( $cauldron->ww, $draftProperties );
-        $draft->target  = $cauldron;
-        
-        self::createDraftContent( $cauldron, $draft );
-        
-        return $draft;
-    }
-
-
-    /**
-     * PRIVATE create the draft contents
-     * @var Cauldron $cauldron
-     * @var Cauldron $draft
-     * @return void
-     */
-    static private function createDraftContent( Cauldron $cauldron, Cauldron $draft ): void
-    {
-        foreach( $cauldron->contents() as $content )
-        {
-            // Ingredient case
-            //if( get_class($content) !== get_class($cauldron) )
-            if( is_a($content, Ingredient::class) )
-            {
-                IngredientHandler::writeProperties($content);
-                $draftContentProperties = $content->properties;
-                unset( $draftContentProperties['id'] );
-                unset( $draftContentProperties['cauldron_fk'] );
-
-                IngredientHandler::createFromData( $draft, $content->type, $draftContentProperties );
-            }
-            // Cauldron case            
-            else 
-            {
-                self::writeProperties( $content );
-                $draftContentProperties = $content->properties;
-                unset( $draftContentProperties['id'] );
-                
-                $draftContent = self::createFromData( $cauldron->ww, $draftContentProperties );
-
-                self::setParenthood( $draft, $draftContent );
-                self::createDraftContent( $content, $draftContent );
-            }
-        }
-
-        return;
-    }
-
  
     /**
      * @var WoodWiccan $ww

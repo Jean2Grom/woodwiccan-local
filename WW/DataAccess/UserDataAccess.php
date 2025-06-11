@@ -5,7 +5,6 @@ use WW\WoodWiccan;
 use WW\Witch;
 use WW\Handler\WitchHandler;
 use WW\Cairn;
-use WW\Craft;
 use WW\Attribute;
 
 /**
@@ -21,14 +20,14 @@ class UserDataAccess
         if( empty($login) ){
             return [];
         }
-        
+
         $query = "";
         $query  .=  "SELECT `uc`.`id` ";
         $query  .=  ", `uc`.`name` ";
         $query  .=  ", `uc`.`email` ";
         $query  .=  ", `uc`.`login` ";
         $query  .=  ", `uc`.`pass_hash` ";
-        
+
         $query  .=  ", `cu`.`id` AS `cu` ";
 
         $query  .=  ", `upr`.`id` AS `pr_id` ";
@@ -175,151 +174,7 @@ class UserDataAccess
         return $userData;
     }
 
-
-
-    static function getUserLoginData( WoodWiccan $ww, string $login, ?string $site=null  )
-    {
-        if( empty($login) ){
-            return [];
-        }
         
-        $query = "";
-        $query  .=  "SELECT `user__connexion`.`id` AS `connexion_id` ";
-        $query  .=  ", `user__connexion`.`name` AS `connexion_name` ";
-        $query  .=  ", `user__connexion`.`email` AS `connexion_email` ";
-        $query  .=  ", `user__connexion`.`login` AS `connexion_login` ";
-        $query  .=  ", `user__connexion`.`pass_hash` AS `connexion_pass_hash` ";
-        $query  .=  ", `user__connexion`.`craft_table` AS `connexion_craft_table` ";
-        $query  .=  ", `user__connexion`.`craft_attribute` AS `connexion_craft_attribute` ";
-        $query  .=  ", `user__connexion`.`craft_attribute_var` AS `connexion_craft_attribute_var` ";
-        $query  .=  ", `user__connexion`.`attribute_name` AS `connexion_attribute_name` ";
-        
-        $query  .=  ", `profile`.`id` AS `profile_id` ";
-        $query  .=  ", `profile`.`name` AS `profile_name` ";
-        $query  .=  ", `profile`.`site` AS `profile_site` ";
-        
-        $query  .=  ", `policy`.`id` AS `policy_id` ";
-        $query  .=  ", `policy`.`module` AS `policy_module` ";
-        $query  .=  ", `policy`.`status` AS `policy_status` ";
-        $query  .=  ", `policy`.`position_ancestors` AS `policy_position_ancestors` ";
-        $query  .=  ", `policy`.`position_included` AS `policy_position_included` ";
-        $query  .=  ", `policy`.`position_descendants` AS `policy_position_descendants` ";
-        $query  .=  ", `policy`.`custom_limitation` AS `policy_custom_limitation` ";
-        
-        foreach( Witch::FIELDS as $field ){
-            $query      .=  ", `witch`.`".$field."` ";
-        }
-        for( $i=1; $i<=$ww->depth; $i++ ){
-            $query      .=  ", `witch`.`level_".$i."` ";
-        }
-        
-        $query  .=  "FROM `user__connexion` ";
-        $query  .=  "LEFT JOIN `user__rel__connexion__profile` ";
-        $query  .=      "ON `user__rel__connexion__profile`.`fk_connexion` = `user__connexion`.`id` ";
-        $query  .=  "LEFT JOIN `user__profile` AS `profile` ";
-        $query  .=      "ON `profile`.`id` = `user__rel__connexion__profile`.`fk_profile` ";
-        $query  .=  "LEFT JOIN `user__policy` AS `policy` ";
-        $query  .=      "ON `policy`.`fk_profile` = `profile`.`id` ";
-        $query  .=  "LEFT JOIN `witch` ";
-        $query  .=      "ON `witch`.`id` = `policy`.`fk_witch` ";
-
-        $query  .=  "WHERE ( `email`= :login OR `login`= :login ) ";
-        $query  .=  "AND `user__connexion`.`craft_table` LIKE '".Craft::TYPES[0]."__%' ";
-        
-        $query  .=  "AND ( `profile`.`site` = :site ";
-        $query  .=      "OR `profile`.`site` = '*' ";
-        $query  .=  ") ";
-        
-        $result = $ww->db->multipleRowsQuery($query, [ 
-            'login' => trim($login),
-            'site'  => $site ?? $ww->website->site,
-        ]);
-        
-        $userConnexionData = [];
-        foreach( $result as $row )
-        {
-            $userConnexionId = $row['connexion_id'];
-            if( empty($userConnexionData[ $userConnexionId ]) )
-            {
-                $craftColumn = Attribute::getColumnName(
-                    $row['connexion_craft_attribute'],  
-                    $row['connexion_attribute_name'], 
-                    $row['connexion_craft_attribute_var']
-                );
-                
-                $userConnexionData[ $userConnexionId ] = [
-                    'id'            => $userConnexionId,
-                    'name'          => $row['connexion_name'],
-                    'email'         => $row['connexion_email'],
-                    'login'         => $row['connexion_login'],
-                    'pass_hash'     => $row['connexion_pass_hash'],
-                    'craft_table'  => $row['connexion_craft_table'],
-                    'craft_column' => $craftColumn,
-                    'profiles'      => [],
-                ];
-            }
-
-            $userProfileId = $row['profile_id'];
-            if( empty($userConnexionData[ $userConnexionId ]['profiles'][ $userProfileId ]) ){
-                $userConnexionData[ $userConnexionId ]['profiles'][ $userProfileId ] = [
-                    'id'        =>  $userProfileId,
-                    'name'      =>  $row['profile_name'],
-                    'policies'  =>  [],
-                ];
-            }
-
-            $userPolicyId = $row['policy_id'];
-            if( empty($userConnexionData[ $userConnexionId ]['profiles'][ $userProfileId ]['policies'][ $userPolicyId ]) )
-            {
-                $position = false;
-                if( !empty($row['id']) )
-                {
-                    $positionWitch  = WitchHandler::instanciate($ww, $row);
-                    $position       = $positionWitch->position;
-                }
-
-                $userConnexionData[ $userConnexionId ]['profiles'][ $userProfileId ]['policies'][ $userPolicyId ] = [
-                    'id'                =>  $userPolicyId,
-                    'module'            => $row['policy_module'],
-                    'status'            => $row['policy_status'] ?? '*',
-                    'custom_limitation' => $row['policy_custom_limitation'],
-                    'position'          => $position,
-                    'position_rules'    => [
-                        'ancestors'         => (boolean) $row['policy_position_ancestors'],
-                        'self'              => (boolean) $row['policy_position_included'],
-                        'descendants'       => (boolean) $row['policy_position_descendants'],
-                    ],
-                ];
-            }
-        }
-        
-        return $userConnexionData;
-    }
-    
-    static function getUserWitchFromConnexionData( WoodWiccan $ww, array $connexionData ) 
-    {
-        $savedPropertiesData    = $ww->user->properties ?? [];
-        $savedConnexionValue    = $ww->user->connexion ?? false;
-        
-        $ww->user->properties   = $connexionData;
-        $ww->user->connexion    = 1;
-        
-        $configuration = [
-            'target' => [
-                'user'  => true,
-                'craft' => true,
-            ]
-        ];
-        
-        $witches        = Summoning::witches($ww, Cairn::prepareConfiguration($ww->website, $configuration) );
-        
-        $ww->user->properties       = $savedPropertiesData;
-        $ww->user->connexion        = $savedConnexionValue;
-        
-        return $witches['target'] ?? false;
-    }
-    
-    
     static function getProfilePolicies(  WoodWiccan $ww, string $profile, ?string $site=null )
     {
         $policies = $ww->cache->read( 'profile', $profile );
@@ -420,10 +275,10 @@ class UserDataAccess
         }
         
         $query  .=  "FROM `user__profile` AS `profile` ";
-        $query  .=  "LEFT JOIN `user__rel__connexion__profile` ";
-        $query  .=      "ON `user__rel__connexion__profile`.`fk_profile` = `profile`.id ";
+
         $query  .=  "LEFT JOIN `user__policy` AS `policy` ";
         $query  .=      "ON `policy`.`fk_profile` = `profile`.`id` ";
+        
         $query  .=  "LEFT JOIN `witch` ";
         $query  .=      "ON `witch`.`id` = `policy`.`fk_witch` ";
         
@@ -460,6 +315,7 @@ class UserDataAccess
         
         $query  .=  "ORDER BY `profile_site` ASC, `profile_name` ASC ";
         
+        $ww->db->debugQuery($query, $params);
         $result = $ww->db->multipleRowsQuery($query, $params);
         
         $profilesData = [];
@@ -898,65 +754,6 @@ class UserDataAccess
         $query  .=  "VALUES ( :fk_connexion, :fk_profile ) ";
         
         return count( $ww->db->insertQuery($query, $params, true) );
-    }
-    
-    
-    static function checkEmailLoginValidity( WoodWiccan $ww, string $login, string $email, ?int $contentKeyId=null )
-    {
-        if( empty($login) && empty($email) ){
-            return false;
-        }
-        
-        $params = [ 'login' => $login, 'email' => $email ];
-        
-        $query = "";
-        $query  .=  "SELECT `id` ";
-        $query  .=  ", `name` ";
-        $query  .=  ", `login` ";
-        $query  .=  ", `email` ";
-        $query  .=  ", `craft_table` ";
-        $query  .=  ", `craft_attribute` ";
-        $query  .=  ", `craft_attribute_var` ";
-        $query  .=  ", `attribute_name` ";
-        $query  .=  "FROM `user__connexion` ";
-        $query  .=  "WHERE `craft_table` LIKE 'content_%' ";
-        $query  .=  "AND ( `login` = :login ";
-        $query  .=      "OR `email` = :email ) ";
-        
-        $result = $ww->db->selectQuery($query, $params);
-        
-        $loginCounter = 0;
-        $emailCounter = 0;
-        foreach( $result as $row )
-        {
-            $column =   Attribute::getColumnName($row['craft_attribute'], $row['attribute_name'], $row['craft_attribute_var']);
-            $params =   [ 'connexion_id' => $row['id'] ];
-            
-            $query = "";
-            $query  .=  "SELECT count(`id`) ";
-            $query  .=  "FROM `".$ww->db->escape_string($row['craft_table'])."` ";
-            $query  .=  "WHERE `".$ww->db->escape_string($column)."` = :connexion_id ";
-            
-            if( $contentKeyId )
-            {
-                $query              .=  "AND `id` <> :self_id ";
-                $params['self_id']  =   $contentKeyId;
-            }
-            
-            $result = $ww->db->countQuery($query, $params);
-            
-            if( $result && $login == $row['login'] ){
-                $loginCounter++; 
-            }
-            if( $result && $email == $row['email'] ){
-                $emailCounter++; 
-            }
-        }
-        
-        return [
-            'login' => $loginCounter, 
-            'email' => $emailCounter, 
-        ];
     }
     
 }

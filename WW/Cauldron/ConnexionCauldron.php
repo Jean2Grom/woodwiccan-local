@@ -19,6 +19,13 @@ class ConnexionCauldron extends Cauldron
 
     function readInputs( mixed $inputs=null ): self
     {
+$this->ww->debug( $this->id, 'readInputs' );
+        $connector = $this->content('user__connexion');
+$this->ww->debug( $connector, "connector", 2 );
+$this->ww->debug( $this->content, "aaa", 2 );
+//$this->generateContent();
+//$this->ww->dump( $inputs );
+
         $formattedInputs                                = $inputs;
         $formattedInputs['content']['email']['name']    = 'email';
         $formattedInputs['content']['email']['type']    = 'string';
@@ -43,14 +50,21 @@ class ConnexionCauldron extends Cauldron
             $passHashInputs,
             $formattedInputs['content']['pass_hash'] ?? []
         );
+//$this->ww->dump( $formattedInputs );
+//$this->ww->debug( $this->content, "bbb", 2 );
 
-        $connector = $this->content('user__connexion');
+        $this->content('email')->readInputs( $formattedInputs['content']['email'] );
+        $this->content('login')->readInputs( $formattedInputs['content']['login'] );
+        $this->content('pass_hash')->readInputs( $formattedInputs['content']['pass_hash'] );
+//$this->ww->debug( $this->content('email'), "bbb", 2 );
+//        parent::readInputs( $formattedInputs );
 
-        parent::readInputs( $formattedInputs );
+// $this->ww->debug( $this->content, "zzz", 2 );
+// $this->ww->debug->die('jean');
 
-        if( $connector ){
-            $this->addIngredient($connector);
-        }
+        // if( $connector ){
+        //     $this->addIngredient($connector);
+        // }
 
         return $this;
     }
@@ -58,6 +72,9 @@ class ConnexionCauldron extends Cauldron
 
     protected function saveAction(): bool
     {
+// $this->ww->dump( $this->id, 'saveAction' );
+// $this->ww->debug->die('jean');
+
         $this->position();
 
         if( $this->depth > $this->ww->cauldronDepth ){
@@ -161,38 +178,91 @@ class ConnexionCauldron extends Cauldron
         return true;
     }
 
-
-
-    function init()
+    protected function generateContent(): void
     {
-        if( !$connexionId = $this->content('user__connexion')?->value() ){
-            return;
+        foreach( $this->ingredients as $ingredient ){
+            if( $ingredient->name === 'user__connexion' )
+            {
+                $this->content  = [ $ingredient ];
+                $connexionId    = $ingredient->value();   
+            }
         }
-
-        if( $connexionId === $this->ww->user->id )
+        
+        if( empty($connexionId) ){
+            $data = [
+                'email'     => "",
+                'login'     => "",
+                'pass_hash' => "",
+            ];
+        }
+        elseif( $connexionId === $this->ww->user->id )
         {
-            $this->create( 'email', 'string', ['value' => $this->ww->user->email] );
-            $this->create( 'login', 'string', ['value' => $this->ww->user->login] );
-            $this->create( 'pass_hash', 'string', ['value' => $this->ww->user->pass_hash] );
-
-            return;
+            $data = [
+                'email'     => $this->ww->user->email,
+                'login'     => $this->ww->user->login,
+                'pass_hash' => $this->ww->user->pass_hash,
+            ];
         }
-
-        if( !$data = DataAccess::selectConnectedData( 
+        elseif( !$data = DataAccess::fetchConnectedData( 
                 $this->ww, 
                 'user__connexion', 
                 [ 'id' => $connexionId ]
             ) 
         ){
-            return;
+            $data = [
+                'email'     => "",
+                'login'     => "",
+                'pass_hash' => "",
+            ];
         }
 
-        $this->create( 'email', 'string', [ 'value' => $data[0]['email'] ] );
-        $this->create( 'login', 'string', [ 'value' => $data[0]['login'] ] );
-        $this->create( 'pass_hash', 'string', [ 'value' => $data[0]['pass_hash'] ] );
+        foreach( ['email', 'login', 'pass_hash'] as $stringItem )
+        {
+            $content          = IngredientHandler::factory('string');
+            $content->ww      = $this->ww;
+            $content->name    = $stringItem;
+            $content->priority= 0;
+            $content->init($data[ $stringItem ]);
 
+            $this->content[] = $content;
+        }
+        
         return;
     }
+
+
+    function clone(): self
+    {
+        Handler::writeProperties( $this );
+        $cloneProperties = $this->properties;
+        unset( $cloneProperties['id'] );
+        
+        $clone = Handler::createFromData( $this->ww, $cloneProperties );
+
+        foreach( $this->contents() as $content )
+        {
+            // Cauldron case 
+            if( is_a($content, self::class) ){
+                Handler::setParenthood( $clone, $content->clone() );
+            }
+            // Ingredient case
+            elseif( $content->name !== 'user__connexion' )
+            { 
+                IngredientHandler::writeProperties($content);
+                $cloneContentProperties = $content->properties;
+                unset( $cloneContentProperties['id'] );
+                unset( $cloneContentProperties['cauldron_fk'] );
+
+                $clone->content[] = IngredientHandler::createFromData( 
+                    $clone, 
+                    $content->type, 
+                    $cloneContentProperties 
+                );
+            }
+        }
+
+        return $clone;
+    }    
 
 }
 

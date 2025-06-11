@@ -75,7 +75,7 @@ class Cauldron implements CauldronContentInterface
     /** @var CauldronContentInterface[] */
     public array $pendingRemoveContents = [];
 
-    protected $content;
+    protected ?array $content   = null;
 
     public ?array $errors       = null;
 
@@ -267,7 +267,7 @@ class Cauldron implements CauldronContentInterface
             return array_values($this->content)[0];
         }
 
-        foreach( $this->content as $content ){
+        foreach( $this->content ?? [] as $content ){
             if( $content->name === $name ){
                 return $content;
             }
@@ -294,7 +294,7 @@ class Cauldron implements CauldronContentInterface
         $this->contents();
     }
 
-    private function generateContent(): void
+    protected function generateContent(): void
     {
         $buffer     = [];
         $indice     = 0;
@@ -779,8 +779,6 @@ class Cauldron implements CauldronContentInterface
             $recipe     = $this->ww->configuration->recipe( $type ) 
                             ?? $this->ww->configuration->recipe('folder');
             $content    = $recipe->factory( !empty($name)? $name: $recipe->name, $initProperties );
-
-            $content->init();
         }
 
         $content->priority  =  $initProperties['priority'] ?? 0; 
@@ -809,11 +807,53 @@ class Cauldron implements CauldronContentInterface
             }
         }
 
-        $this->draft  = Handler::createDraft( $this );
+        $this->draft            = $this->clone();
+        $this->draft->target    = $this;
+        $this->draft->status  = self::STATUS_DRAFT;
+        
         $folder->addCauldron( $this->draft );
         
         return $this->draft;
     }
+
+
+    /**
+     * Clone this cauldon and return it
+     * @return Cauldron
+     */
+    function clone(): self
+    {
+        Handler::writeProperties( $this );
+        $cloneProperties = $this->properties;
+        unset( $cloneProperties['id'] );
+        
+        $clone = Handler::createFromData( $this->ww, $cloneProperties );
+
+        foreach( $this->contents() as $content )
+        {
+            // Cauldron case 
+            if( is_a($content, self::class) ){
+                Handler::setParenthood( $clone, $content->clone() );
+            }
+            // Ingredient case
+            else
+            { 
+                IngredientHandler::writeProperties($content);
+                $cloneContentProperties = $content->properties;
+                unset( $cloneContentProperties['id'] );
+                unset( $cloneContentProperties['cauldron_fk'] );
+
+                IngredientHandler::createFromData( 
+                    $clone, 
+                    $content->type, 
+                    $cloneContentProperties 
+                );
+            }
+        }
+
+        return $clone;
+    }
+
 
     function publish( bool $transactionMode=true ): bool
     {

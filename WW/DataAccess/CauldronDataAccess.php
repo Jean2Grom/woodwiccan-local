@@ -364,6 +364,16 @@ class CauldronDataAccess
         return $ww->db->selectQuery( $query );
     }
 
+    static function fetchConnectedData( WoodWiccan $ww, string $table, array $conditions=[] )
+    {
+        $selectConnectedData = self::selectConnectedData($ww, $table, $conditions);
+        if( count($selectConnectedData) === 1 ){
+            return array_values($selectConnectedData)[0];
+        }
+
+        return $selectConnectedData;
+    }
+
     static function selectConnectedData( WoodWiccan $ww, string $table, array $conditions=[] )
     {
         $params = [];
