@@ -315,7 +315,6 @@ class UserDataAccess
         
         $query  .=  "ORDER BY `profile_site` ASC, `profile_name` ASC ";
         
-        $ww->db->debugQuery($query, $params);
         $result = $ww->db->multipleRowsQuery($query, $params);
         
         $profilesData = [];

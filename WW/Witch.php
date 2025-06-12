@@ -3,7 +3,6 @@ namespace WW;
 
 use WW\Handler\WitchHandler as Handler;
 use WW\DataAccess\WitchDataAccess as DataAccess;
-use WW\Structure;
 
 use WW\Handler\CauldronHandler;
 use WW\Trait\PropertiesAccessTrait;
@@ -32,7 +31,6 @@ class Witch
         "invoke",
         "cauldron",
         "cauldron_priority",
-        "is_main",
         "context",
         "datetime",
         "priority",
@@ -850,7 +848,6 @@ class Witch
             "status"            => $this->statusLevel,
             "cauldron"          => $this->cauldronId,
             "cauldron_priority" => 0,
-            "is_main"   => 0,
         ];
 
         foreach( self::FIELDS as $field ){
