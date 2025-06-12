@@ -19,12 +19,9 @@ class ConnexionCauldron extends Cauldron
 
     function readInputs( mixed $inputs=null ): self
     {
-$this->ww->debug( $this->id, 'readInputs' );
-        $connector = $this->content('user__connexion');
-$this->ww->debug( $connector, "connector", 2 );
-$this->ww->debug( $this->content, "aaa", 2 );
-//$this->generateContent();
-//$this->ww->dump( $inputs );
+        if( is_null($this->content) ){
+            $this->generateContent();
+        }
 
         $formattedInputs                                = $inputs;
         $formattedInputs['content']['email']['name']    = 'email';
@@ -50,21 +47,10 @@ $this->ww->debug( $this->content, "aaa", 2 );
             $passHashInputs,
             $formattedInputs['content']['pass_hash'] ?? []
         );
-//$this->ww->dump( $formattedInputs );
-//$this->ww->debug( $this->content, "bbb", 2 );
 
         $this->content('email')->readInputs( $formattedInputs['content']['email'] );
         $this->content('login')->readInputs( $formattedInputs['content']['login'] );
         $this->content('pass_hash')->readInputs( $formattedInputs['content']['pass_hash'] );
-//$this->ww->debug( $this->content('email'), "bbb", 2 );
-//        parent::readInputs( $formattedInputs );
-
-// $this->ww->debug( $this->content, "zzz", 2 );
-// $this->ww->debug->die('jean');
-
-        // if( $connector ){
-        //     $this->addIngredient($connector);
-        // }
 
         return $this;
     }
@@ -72,9 +58,6 @@ $this->ww->debug( $this->content, "aaa", 2 );
 
     protected function saveAction(): bool
     {
-// $this->ww->dump( $this->id, 'saveAction' );
-// $this->ww->debug->die('jean');
-
         $this->position();
 
         if( $this->depth > $this->ww->cauldronDepth ){
@@ -101,12 +84,7 @@ $this->ww->debug( $this->content, "aaa", 2 );
         if( $result === false ){
             return false;
         }
-
-        //$result = true;
         
-        // Deletion of pending deprecated contents
-        //$result = $result && $this->purge();
-
         $values = [ 'name' => $this->parent?->name ?? $this->name ];
         foreach( ['login', 'email', 'pass_hash'] as $field ){
             $values[ $field ] = $this->content( $field )?->value() ?? "";
