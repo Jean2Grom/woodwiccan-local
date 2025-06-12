@@ -60,7 +60,7 @@
                                 </a>
                             </td>   
                             <td class="full">
-                                <a href="<?=$witch->ww->website->getUrl("view?id=".$daughter->id."#tab-craft-part") ?>"
+                                <a href="<?=$witch->ww->website->getUrl("view?id=".$daughter->id."#tab-cauldron-part") ?>"
                                    class="text-center">
                                     <?php if( !$daughter->hasCauldron() ): ?>
                                         <em class="hover-hide">no</em>

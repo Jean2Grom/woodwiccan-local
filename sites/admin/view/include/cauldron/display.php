@@ -30,7 +30,7 @@
                     class="trigger-action"
                     style="display: none;"
                     data-action="import-cauldron"
-                    data-target="witch-add-new-cauldron">Import craft</button>
+                    data-target="witch-add-new-cauldron">Import cauldron</button>
             <button id="witch-get-existing-cauldron">
                 <i class="fa fa-project-diagram"></i>
                 Get existing cauldron

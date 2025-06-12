@@ -145,7 +145,7 @@ $this->addContextArrayItems( 'tabs', [
                             class="trigger-action"
                             style="display: none;"
                             data-action="import-cauldron"
-                            data-target="new-witch-add-new-cauldron">Import craft</button>
+                            data-target="new-witch-add-new-cauldron">Import cauldron</button>
                     <button id="new-witch-get-existing-cauldron">
                         <i class="fa fa-project-diagram"></i>
                         Get existing cauldron

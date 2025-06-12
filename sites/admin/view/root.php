@@ -47,7 +47,7 @@ $this->addJsFile('root.js');
                                 <?=$daughter->site ?>
                             </td>
                             <td>
-                                <?php if( !empty($daughter->invoke) && $daughter->hasCraft() ): ?>
+                                <?php if( !empty($daughter->invoke) && $daughter->hasCauldron() ): ?>
                                     Module & Contenu
                                 <?php elseif( !empty($daughter->invoke) ): ?>
                                     Module
