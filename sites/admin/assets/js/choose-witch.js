@@ -8,26 +8,33 @@ async function chooseWitch( conditions={}, label="Choose witch" )
         
         chooseWitchDom.querySelector('.close').addEventListener( 'click', () => resolve( false ) );
         
-        $('#choose-witch').on('click', '.arborescence-level__witch__name', function()
-        {
-            let witch = $(this).parents('.arborescence-level__witch');
-            
-            let match = true;
-            for( var data in conditions ) {
-                if( $(witch).data( data ) !== conditions[ data ] ){
-                    match = false;
+        document.querySelector('#choose-witch').addEventListener('click', 
+            e => {
+                if( e.target.classList.contains('arborescence-level__witch__name') ){
+
+                    let witch = e.target.closest('.arborescence-level__witch');
+
+                    console.log( witch );
+                    console.log('youpi3');
+
+                    let match = true;
+                    for( var data in conditions ) {
+                        if( witch.dataset[ data ] !== conditions[ data ] ){
+                            match = false;
+                        }
+                    }
+
+                    if( match ){
+                        resolve( witch.dataset.id );                
+                    }            
                 }
             }
-            
-            if( match ){
-                resolve( $(witch).data('id') );                
-            }            
-        });
-        
+        );
+
     }).then(( witchId ) => {
-        $('#choose-witch').off( "click", ".arborescence-level__witch__name" );
-        $('#choose-witch').off( "click", ".close" );
-        $('#choose-witch').hide();
+
+        //document.querySelector('#choose-witch').removeEventListener('click')
+        document.querySelector('#choose-witch').style.display = 'none';
         
         return witchId;
     });

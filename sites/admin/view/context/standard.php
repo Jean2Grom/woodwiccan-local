@@ -6,7 +6,7 @@ $this->addCssFile('header-footer.css');
 $this->addCssFile('context-standard.css');
 $this->addJsFile('fontawesome.js');
 $this->addJsFile('context-standard.js');
-$this->addJsLibFile('jquery-3.6.0.min.js');
+//$this->addJsLibFile('jquery-3.6.0.min.js');
 ?>
 <html lang="fr-FR" dir="ltr">
     <head>

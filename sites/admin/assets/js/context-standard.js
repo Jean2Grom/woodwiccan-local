@@ -1,8 +1,19 @@
-$(document).ready(function()
-{
-    $('.side-nav-toggler').click( function(){
-        $('nav').toggle();
-    });
+document.addEventListener("DOMContentLoaded", () => {
+
+    document.querySelectorAll('.side-nav-toggler').forEach( 
+        navTogglerDom => navTogglerDom.addEventListener("click", 
+            () => document.querySelectorAll('nav').forEach( 
+                navDom => {
+                    if( navDom.style.display !== 'block' ){
+                        navDom.style.display = 'block';
+                    }
+                    else {
+                        navDom.style.display = 'none';
+                    }
+                }
+            )
+        )
+    );
     
     var tabs = document.getElementsByClassName("tabs__item");
     

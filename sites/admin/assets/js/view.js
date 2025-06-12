@@ -1,137 +1,176 @@
 document.addEventListener("DOMContentLoaded", () => 
 {
     // Menu info edition behaviour
-    $('.edit__witch-menu-info').hide();
-    $('button.view-edit-menu-info-toggle').click(function(){
-        $('.view__witch-menu-info').toggle();
-        $('.edit__witch-menu-info').toggle();
-        
-        $('.edit__witch-info').hide();
-        $('.view__witch-info').show();
-        
-        $('.create__witch').hide();
-        $('.view__daughters').show();        
-    });
-    
-    $('button.edit-menu-info-reinit').click(function(){
-        $('.edit__witch-menu-info input, .edit__witch-menu-info textarea').each(function( i, input ){
-            if( $(input).data('init') !== undefined ){
-                $(input).val( $(input).data('init') );
-            }
-        });
-    });
-    
-    
+    document.querySelectorAll('.edit__witch-menu-info').forEach(
+        hideDom => hideDom.style.display = 'none'
+    );
+
+    document.querySelectorAll('button.view-edit-menu-info-toggle').forEach(
+        toggler => toggler.addEventListener("click", 
+        () => {
+            document.querySelectorAll('.view__witch-menu-info, .edit__witch-menu-info').forEach(
+                toggledDom => {
+                    if( toggledDom.style.display !== 'block' ){
+                        toggledDom.style.display = 'block';
+                    }
+                    else {
+                        toggledDom.style.display = 'none';
+                    }
+                }
+            );
+
+            document.querySelectorAll('.edit__witch-info, .create__witch').forEach(
+                hideDom => hideDom.style.display = 'none'
+            );
+
+            document.querySelectorAll('.view__witch-info, .view__daughters').forEach(
+                showDom => showDom.style.display = 'block'
+            );
+        })
+    );
+
+    document.querySelectorAll('button.edit-menu-info-reinit').forEach(
+        reinitDom => reinitDom.addEventListener("click", function () {
+            document.querySelectorAll('.edit__witch-menu-info input, .edit__witch-menu-info textarea').forEach(
+                input => {
+                    if( input.dataset.init !== undefined ){
+                        input.value = input.dataset.init;
+                    }
+                }
+            )
+        })
+    );
+
+
     // Add new witch behaviour
-    $('.create__witch').hide();
-    $('button.view-daughters__create-witch__toggle').click(function(){
-        $('.create__witch').toggle();
-        $('.view__daughters').toggle();
-        
-        $('.edit__witch-info').hide();
-        $('.view__witch-info').show();
-        
-        $('.edit__witch-menu-info').hide();
-        $('.view__witch-menu-info').show();        
-    });       
-    
-    
+    document.querySelectorAll('.create__witch').forEach(
+        hideDom => hideDom.style.display = 'none'
+    );
+
+    document.querySelectorAll('button.view-daughters__create-witch__toggle').forEach(
+        toggler => toggler.addEventListener("click", 
+        () => {
+            document.querySelectorAll('.create__witch, .view__daughters').forEach(
+                toggledDom => {
+                    if( toggledDom.style.display !== 'block' ){
+                        toggledDom.style.display = 'block';
+                    }
+                    else {
+                        toggledDom.style.display = 'none';
+                    }
+                }
+            );
+
+            document.querySelectorAll('.edit__witch-info, .edit__witch-menu-info').forEach(
+                hideDom => hideDom.style.display = 'none'
+            );
+
+            document.querySelectorAll('.view__witch-info, .view__witch-menu-info').forEach(
+                showDom => showDom.style.display = 'block'
+            );
+
+        })
+    );
+
+
     // Witch info edition behaviour
-    $('.edit__witch-info').hide();
-    $('button.view-edit-info-toggle').click(function(){
-        $('.view__witch-info').toggle();
-        $('.edit__witch-info').toggle();
-        
-        $('.edit__witch-menu-info').hide();
-        $('.view__witch-menu-info').show();
-        
-        $('.create__witch').hide();
-        $('.view__daughters').show();
-    });
-    
+    document.querySelectorAll('.edit__witch-info').forEach(
+        hideDom => hideDom.style.display = 'none'
+    );
+
+    document.querySelectorAll('button.view-edit-info-toggle').forEach(
+        toggler => toggler.addEventListener("click", 
+        () => {
+            document.querySelectorAll('.view__witch-info, .edit__witch-info').forEach(
+                toggledDom => {
+                    if( toggledDom.style.display !== 'block' ){
+                        toggledDom.style.display = 'block';
+                    }
+                    else {
+                        toggledDom.style.display = 'none';
+                    }
+                }
+            );
+
+            document.querySelectorAll('.edit__witch-menu-info, .create__witch').forEach(
+                hideDom => hideDom.style.display = 'none'
+            );
+
+            document.querySelectorAll('.view__witch-menu-info, .view__daughters').forEach(
+                showDom => showDom.style.display = 'block'
+            );
+
+        })
+    );
+
     witchInfoChange();
     autoUrlChange();
     
-    $('#witch-site, .witch-invoke').change( witchInfoChange );
-    $('#witch-auto-url').change( autoUrlChange );
-    
+    document.querySelectorAll('#witch-site, .witch-invoke').forEach(
+        selectDom => selectDom.addEventListener('change', witchInfoChange )
+    );
+
+    document.querySelector('#witch-auto-url').addEventListener('change', autoUrlChange);
+
     function witchInfoChange()
     {
-        $('.witch-info__part').hide();
-        $('#site-selected').hide();
+        document.querySelectorAll('.witch-info__part, #site-selected').forEach(
+            hideDom => hideDom.style.display = 'none'
+        );
 
-        let site = $('#witch-site').val();
-        $('.witch-info__part-' + site).show();
+        let site = document.querySelector('#witch-site').value;
+        document.querySelectorAll('.witch-info__part-' + site).forEach(
+            showDom => showDom.style.display = 'block'
+        );
 
-        if( site !== '' && $('#witch-invoke-' + site).val() !== '' ){
-            $('#site-selected').show();
+        if( site !== '' && document.querySelector('#witch-invoke-' + site).value !== '' ){
+            document.querySelector('#site-selected').style.display = 'block';
         }
     }    
     
     function autoUrlChange()
     {
-        if( $('#witch-auto-url').prop('checked') ){
-            $('.auto-url-disabled').hide();
+        if( document.querySelector('#witch-auto-url').checked ){
+            document.querySelectorAll('.auto-url-disabled').forEach(
+                hideDom => hideDom.style.display = 'none'
+            );
         }
         else {
-            $('.auto-url-disabled').show();
+            document.querySelectorAll('.auto-url-disabled').forEach(
+                showDom => showDom.style.display = 'block'
+            );
         }
     }
-    
-    $('button.edit-info-reinit').click(function(){
-        $('.edit__witch-info input, .edit__witch-info select').each(function( i, input ){
 
-            if( $(input).data('init') !== undefined ){
-                $(input).val( $(input).data('init') );
-            }
-        });
-        
-        if( $('#witch-url').val() === '' )
-        {
-            $('#witch-full-url').prop('checked', false);
-            $('#witch-auto-url').prop('checked', true);
-        }
-        else 
-        {
-            $('#witch-full-url').prop('checked', true);
-            $('#witch-auto-url').prop('checked', false);
-        }
-        witchInfoChange();
-        autoUrlChange();
-    });
-    
-    
-    // Craft part
-    $('#witch-content-structure').change(function(){
-        $('#witch-create-craft').prop( 'disabled', ($(this).val() === '') );
-        $('#witch-get-existing-craft').prop( 'disabled', ($(this).val() !== '') );
-    });    
-    
-    $('#witch-get-existing-craft').on('click', function()
-    {
-        chooseWitch({ craft: true }, "Choose importing craft witch").then( (witchId) => { 
-            if( witchId === false ){
-                return;
-            }
+    document.querySelectorAll('button.edit-info-reinit').forEach(
+        button => button.addEventListener('click', 
+            () => {
+                document.querySelectorAll('.edit__witch-info input, .edit__witch-info select').forEach(
+                    input => {
+                        if( input.dataset.init !== undefined ){
+                            input.value = input.dataset.init;
+                        }
+                    }
+                );
 
-            $('#imported-craft-witch').val( witchId );
-            $('#import-craft-action').trigger('click');
-        });
-    });
-    
-    $('#add-craft-witch').on('click', function()
-    {
-        chooseWitch().then( (witchId) => { 
-            if( witchId === false ){
-                return;
-            }
+                if( document.querySelector('#witch-url').value === '' )
+                {
+                    document.querySelector('#witch-full-url').checked = false;
+                    document.querySelector('#witch-auto-url').checked = true;
+                }
+                else 
+                {
+                    document.querySelector('#witch-full-url').checked = true;
+                    document.querySelector('#witch-auto-url').checked = false;
+                }
 
-            $('#new-mother-witch-id').val( witchId );
-            $('#add-craft-witch-action').trigger('click');
-        });
-    });    
+                witchInfoChange();
+                autoUrlChange();
+            }
+        )
+    );
     
-    
+
     // Cauldron part
     // enable/disable create new cauldron's button, based on recipe selection
     let cauldronRecipeSelector = document.getElementById('witch-cauldron-recipe');
@@ -222,31 +261,37 @@ document.addEventListener("DOMContentLoaded", () =>
 
     
     // Daughters cut/copy
-    $('.cut-descendants').on('click', function()
-    {
-        $('#origin-witch').val( $(this).data('id') );
-        
-        chooseWitch({}, "Choose moving destination witch").then( (witchId) => { 
-            if( witchId === false ){
-                return;
+    document.querySelectorAll('.cut-descendants').forEach(
+        cutDom => cutDom.addEventListener('click', 
+            () => {
+                document.querySelector('#origin-witch').value = cutDom.dataset.id;
+
+                chooseWitch({}, "Choose moving destination witch").then( (witchId) => { 
+                    if( witchId === false ){
+                        return;
+                    }
+                    
+                    document.querySelector('#destination-witch').value = witchId;
+                    document.querySelector('#move-witch-action').click();
+                });
             }
-            
-            $('#destination-witch').val( witchId );
-            $('#move-witch-action').trigger('click');
-        });
-    });
+        )
+    );
     
-    $('.copy-descendants').on('click', function()
-    {
-        $('#origin-witch').val( $(this).data('id') );
-        
-        chooseWitch({}, "Choose copy destination witch").then( (witchId) => { 
-            if( witchId === false ){
-                return;
+    document.querySelectorAll('.copy-descendants').forEach(
+        copyDom => copyDom.addEventListener('click',
+            () => {
+                document.querySelector('#origin-witch').value = copyDom.dataset.id;
+                
+                chooseWitch({}, "Choose copy destination witch").then( (witchId) => { 
+                    if( witchId === false ){
+                        return;
+                    }
+                    
+                    document.querySelector('#destination-witch').value = witchId;
+                    document.querySelector('#copy-witch-action').click();
+                });
             }
-            
-            $('#destination-witch').val( witchId );
-            $('#copy-witch-action').trigger('click');
-        });
-    });    
+        )
+    );    
 });
