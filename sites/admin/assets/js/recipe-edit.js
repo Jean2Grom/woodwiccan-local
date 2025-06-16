@@ -1,4 +1,4 @@
-$(document).ready(function() {
+document.addEventListener("DOMContentLoaded", () => {
 
     // RESTRICTIONS 
     document.querySelectorAll("select.check-restriction-toggle").forEach( 

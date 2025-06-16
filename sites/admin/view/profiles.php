@@ -4,6 +4,7 @@ $this->addCssFile('boxes.css');
 $this->addJsFile('triggers.js');
 $this->addCssFile('profiles.css');
 $this->addJsFile('profiles.js');
+$this->addJsLibFile('jquery-3.6.0.min.js');
 
 $this->addContextArrayItems( 'tabs', [
     'tab-current'       => [

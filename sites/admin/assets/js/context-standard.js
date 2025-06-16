@@ -88,9 +88,11 @@ document.addEventListener("DOMContentLoaded", () => {
     
     
     for( let triggerElemt of document.querySelectorAll(".tabs__item__triggering") ){
-        triggerElemt.addEventListener( 'click', function(){ 
-            triggerTabItem( $(this).attr('href') );
-            return false;
-        });
+        triggerElemt.addEventListener( 'click', 
+            () => { 
+                triggerTabItem( triggerElemt.getAttribute('href') );
+                return false;
+            }
+        );
     }
 });
