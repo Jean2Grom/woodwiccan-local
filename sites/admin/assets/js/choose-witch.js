@@ -46,13 +46,13 @@ async function chooseWitch( conditions={}, label="Choose witch" )
 
 function readWitchName( witchId )
 {
-    let witchDom = document.querySelector('#choose-witch .arborescence-level__witch[data-id='+witchId+']');
+    let witchDom = document.querySelector('#choose-witch .arborescence-level__witch[data-id="'+witchId+'"]');
     
     if( witchDom.length === 0 ){
         return false;
     }
     
-    let label = witchDom.querySelector('.arborescence-level__witch__name').html().trim();
+    let label = witchDom.querySelector('.arborescence-level__witch__name').innerHTML.trim();
     
     if( label === "" ){
         return witchId;
