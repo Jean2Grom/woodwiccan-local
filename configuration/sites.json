@@ -102,6 +102,18 @@
             "0": "public",
             "1": "admin"
         }
+    },
+    "demo": {
+        "access": [
+            "localhost/demo"
+        ], 
+        "witches": {
+            "home": {
+                "id": 181, 
+                "craft": 1
+            }
+        },
+        "debug": true
     }    
 }
     

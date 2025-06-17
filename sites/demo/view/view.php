@@ -1,8 +1,6 @@
-<?php
+<?php /** @var WW\Module $this */ ?>
 
-?>
-
-<? foreach( $contents as $i => $content ) { ?>
+<?php foreach( $contents ?? [] as $i => $content ): ?>
     <div id="bloc<?=$i%2+1?>">
         <h2><?=$content['name']?></h2>
         
@@ -78,4 +76,4 @@
             <div class="no_doc"></div>
         <? } ?>
     </div>
-<? } ?>
+<?php endforeach; ?>
