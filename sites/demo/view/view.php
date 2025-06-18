@@ -1,5 +1,5 @@
 <?php /** @var WW\Module $this */ ?>
-
+xxxx
 <?php foreach( $contents ?? [] as $i => $content ): ?>
     <div id="bloc<?=$i%2+1?>">
         <h2><?=$content['name']?></h2>

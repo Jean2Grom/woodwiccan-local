@@ -81,6 +81,29 @@ class Witch
     }
     
 
+    public function __get(string $name): mixed 
+    {
+        if( $this->properties[ $name ] ?? null ){
+            return $this->properties[ $name ];
+        }
+
+        if( $this->cauldron() ){
+            if( $this->cauldron()->name === $name ){
+                return $this->cauldron();
+            }
+            elseif( $this->cauldron()->content($name) ){
+                if( is_a($this->cauldron()->content( $name ), Cauldron::class) ){
+                    return $this->cauldron()->content( $name );
+                }
+                else {
+                    return $this->cauldron()->content( $name )->value();
+                }
+            }
+        }
+        
+        return null;
+    }
+
     /**
      * Is this witch exist in database ?
      * @return bool

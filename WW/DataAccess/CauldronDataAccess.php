@@ -242,6 +242,10 @@ class CauldronDataAccess
     {
         $depth = count($cauldron->position()) + 1;
         
+        if( $depth > $cauldron->ww->cauldronDepth ){
+            return 1;
+        }
+
         $params = [];
         $query  = "SELECT MAX(`level_".$depth."`) AS `maxIndex` FROM `cauldron` ";
         

@@ -6,7 +6,7 @@
     content="width=device-width, initial-scale=1, minimum-scale=0.25, maximum-scale=5.0, target-densitydpi=device-dpi" />
 
 <title>
-    <?=$contextData['meta-title'] ?? "" ?>
+    <?=$this->witch()->{'meta-title'} ?? $this->witch('home')->{'meta-title'} ?? "WoodWiccan" ?>
 </title>
 
 <?=$this->favicon() ?>

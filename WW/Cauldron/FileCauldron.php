@@ -62,5 +62,19 @@ class FileCauldron extends Cauldron
         return;
     }
 
+    function value()
+    {
+        $path = $this->content('storage-path')?->value();
+        if( !$path ){
+            return "";
+        }
+
+        $storage = $this->ww->configuration->storage();
+        if( !is_file($storage.'/'.$path) ){
+            return "";
+        }
+
+        return '/'.$storage.'/'.$path;
+    }
 }
 

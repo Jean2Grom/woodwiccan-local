@@ -1,9 +1,11 @@
 <?php /** @var WW\Context $this */ 
 
-// $this->ww->debug( $this );
-// $this->ww->debug( $this->witch() );
-$this->ww->debug( $this->witch('home')->cauldron() );
-// $this->ww->debug->die("jean");
+$this->ww->debug( $this->witch('home')->cauldron()->background->file->value() );
+$this->ww->debug( $this->witch('home')->cauldron()->list() );
+//$this->ww->debug( $this->witch('home')->cauldron()->logo->file->value() );
+//$this->ww->debug( $this->witch('home')->logo->file->{'storage-path'} );
+//$this->ww->debug( $this->witch('home')->cauldron()->logo->file->contents('storage-path') );
+//$this->ww->debug->die("jean");
 
 $this->addCssFile('styles.css');
 $this->addCssFile('responsive.css');
@@ -32,17 +34,21 @@ $this->addJsFile('case.jq.js');
             </div>
             
             <div class="menu">
-                <a href="<?=$this->website->getUrl()?>">
-                    <img    src="<?=$contextData['logo']['file'] ?? ""?>" 
-                            alt="<?=$contextData['logo']['title']?? ""?>"
-                            title="<?=$contextData['logo']['title']?? ""?>"/>
-                </a>
-                
-                <div id="download" >
-                    <a href="<?=$contextData['download-highlight']['file'] ?? ""?>">
-                        <p><?=$contextData['download-highlight']['text'] ?? ""?></p>
+                <?php if( $logo = $this->witch('home')?->cauldron()?->content('logo') ): ?>
+                    <a href="<?=$this->website->getUrl()?>">
+                        <img    src="<?=$logo->file->value() ?? ""?>" 
+                                alt="<?=$logo->content('caption')->value() ?? ""?>"
+                                title="<?=$logo->content('name')->value() ?? ""?>"/>
                     </a>
-                </div>
+                <?php endif; ?>
+                
+                <?php if( $download = $this->witch('home')?->cauldron()?->content('download-highlight') ): ?>
+                    <div id="download" >
+                        <a href="<?=$download->file->value() ?? ""?>">
+                            <p><?=$download->text ?? ""?></p>
+                        </a>
+                    </div>
+                <?php endif; ?>
                 
                 <div class="content_menu">  
                     <ul>
@@ -61,22 +67,22 @@ $this->addJsFile('case.jq.js');
             </div>
             
             <div id="conteneur">
-                <?php if( isset($backgroundImage) ): ?>
+                <?php if( $background = $this->witch('home')?->cauldron()?->content('background') ): ?>
                     <div    id="contenu_index" 
-                            style="background:url(<?=$backgroundImage?>) no-repeat center center;">
-                        <h1>
-                            <?=$headline?>
-                        </h1>
-                        <div id="baseline">
-                            <?=$headlineBody?>
-                        </div>
+                            style="background:url(<?=$background->file->value()?>) no-repeat center center;">
+
+                        <h1><?=$this->witch('home')->headline?></h1>
+
+                        <div id="baseline"><?=$this->witch('home')->body?></div>
 
                         <div id="boite_bouton">
-                            <div id="bouton">
-                                <a href="<?=$contextData['download-highlight']['file'] ?? ""?>">
-                                    <p><?=$contextData['download-highlight']['text'] ?? ""?></p>
-                                </a>
-                            </div>
+                            <?php if( $action = $this->witch('home')?->cauldron()?->content('call-to-action') ): ?>
+                                <div id="bouton">
+                                    <a href="<?=$action->file->value()?>">
+                                        <p><?=$action->text?></p>
+                                    </a>
+                                </div>
+                            <?php endif; ?>
                         </div>
                     </div>
                 <?php endif; ?>
@@ -87,12 +93,8 @@ $this->addJsFile('case.jq.js');
             
             <div id="footer">
                 <div id="footer_content">
-                    <div id="signature">
-                        <?=$contextData['footer-left'] ?? ""?>
-                    </div>
-                    <div id="copyright">
-                        <?=$contextData['footer-right'] ?? ""?>
-                    </div>
+                    <div id="signature">powered by WoodWiccan</div>
+                    <div id="copyright">©2025</div>
                 </div>
             </div>
         </div>

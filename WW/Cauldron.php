@@ -98,7 +98,21 @@ class Cauldron implements CauldronContentInterface
         if( $name === 'type' ){
             return str_replace(' ', '-', $this->recipe) ?? "cauldron";
         }
-        return $this->properties[ $name ] ?? null;
+
+        if( $this->properties[ $name ] ?? null ){
+            return $this->properties[ $name ];
+        }
+
+        if( $this->content($name) ){
+            if( is_a($this->content( $name ), __CLASS__) ){
+                return $this->content( $name );
+            }
+            else {
+                return $this->content( $name )->value();
+            }
+        }
+
+        return null;
     }
     
     /**
@@ -1028,6 +1042,17 @@ class Cauldron implements CauldronContentInterface
 
         return;
     }
+
+    function list()
+    {
+        $list = [];
+        foreach( $this->contents() as $content ){
+            $list[] = $content->name;
+        }
+
+        return $list;
+    }
+
 
     function init(){
         return;
