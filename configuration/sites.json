@@ -110,10 +110,14 @@
         "witches": {
             "home": {
                 "id": 181, 
-                "craft": 1
+                "craft": true,
+                "children": {
+                    "depth": "1",
+                    "craft": false
+                }
             }
         },
-        "debug": true
+        "debug": false
     }    
 }
     

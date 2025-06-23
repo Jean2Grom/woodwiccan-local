@@ -1,12 +1,5 @@
 <?php /** @var WW\Context $this */ 
 
-$this->ww->debug( $this->witch('home')->cauldron()->background->file->value() );
-$this->ww->debug( $this->witch('home')->cauldron()->list() );
-//$this->ww->debug( $this->witch('home')->cauldron()->logo->file->value() );
-//$this->ww->debug( $this->witch('home')->logo->file->{'storage-path'} );
-//$this->ww->debug( $this->witch('home')->cauldron()->logo->file->contents('storage-path') );
-//$this->ww->debug->die("jean");
-
 $this->addCssFile('styles.css');
 $this->addCssFile('responsive.css');
 $this->addJsFile('witch.js');
@@ -42,23 +35,24 @@ $this->addJsFile('case.jq.js');
                     </a>
                 <?php endif; ?>
                 
-                <?php if( $download = $this->witch('home')?->cauldron()?->content('download-highlight') ): ?>
+                <?php if( $action = $this->witch('home')?->cauldron()?->content('call-to-action') ): ?>
                     <div id="download" >
-                        <a href="<?=$download->file->value() ?? ""?>">
-                            <p><?=$download->text ?? ""?></p>
+                        <a  <?=$action->external? 'target="_blank"': ''?>
+                            href="<?=$action->href?>">
+                            <p><?=$action->text ?? ""?></p>
                         </a>
                     </div>
                 <?php endif; ?>
                 
                 <div class="content_menu">  
                     <ul>
-                        <?php foreach( $menu ?? [] as $menuItem ): ?>
+                        <?php foreach( $this->witch('home')->daughters() as $daughter ): ?>
                             <li>
-                                <a  <?=( strcmp($menuItem['url'], $baseUri.$localisation->url) == 0 )?
+                                <a  <?=($this->witch() === $daughter)?
                                         'id="en_cours"':
                                         'id="btn_menu"'?>
-                                    href="<?=$menuItem['url'] ?? ""?>">
-                                    <?=strtoupper($menuItem['name'])?>
+                                    href="<?=$daughter->url() ?>">
+                                    <?=strtoupper($daughter->name)?>
                                 </a>
                             </li>
                         <?php endforeach; ?>
@@ -68,18 +62,19 @@ $this->addJsFile('case.jq.js');
             
             <div id="conteneur">
                 <?php if( $background = $this->witch('home')?->cauldron()?->content('background') ): ?>
-                    <div    id="contenu_index" 
-                            style="background:url(<?=$background->file->value()?>) no-repeat center center;">
+                    <div    id="contenu_index" style="<?=$backgroundCss?>">
+                        <h1><?=$headline?></h1>
 
-                        <h1><?=$this->witch('home')->headline?></h1>
-
-                        <div id="baseline"><?=$this->witch('home')->body?></div>
+                        <?php if( $body ): ?>
+                            <div id="baseline"><?=$body?></div>
+                        <?php endif; ?>
 
                         <div id="boite_bouton">
-                            <?php if( $action = $this->witch('home')?->cauldron()?->content('call-to-action') ): ?>
+                            <?php if( $action ): ?>
                                 <div id="bouton">
-                                    <a href="<?=$action->file->value()?>">
-                                        <p><?=$action->text?></p>
+                                    <a  <?=$action->external? 'target="_blank"': ''?>
+                                        href="<?=$action->href?>">
+                                        <p><?=$action->text ?? ""?></p>
                                     </a>
                                 </div>
                             <?php endif; ?>

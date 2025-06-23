@@ -124,11 +124,11 @@ switch( $action )
         $errors     = [];
         $success    = [];
         foreach( $priorities as $witchId => $witchPriority ){
-            if( !$this->witch("target")->daughters( $witchId )->edit([ 'priority' => $witchPriority ]) ){
-                $errors[] = "<strong>".$this->witch("target")->daughters( $witchId )->name."</strong> priority not updated";
+            if( !$this->witch("target")->daughter( $witchId )->edit([ 'priority' => $witchPriority ]) ){
+                $errors[] = "<strong>".$this->witch("target")->daughter( $witchId )->name."</strong> priority not updated";
             }
             else {
-                $success[] = "<strong>".$this->witch("target")->daughters( $witchId )->name."</strong> priority updated";
+                $success[] = "<strong>".$this->witch("target")->daughter( $witchId )->name."</strong> priority updated";
             }
         }
         

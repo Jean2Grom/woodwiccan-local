@@ -538,20 +538,18 @@ class Cairn
     private function recursiveSearchByCauldronId( Witch $witch, int $cauldronId ): array
     {
         $return = [];
-        if( $witch->daughters() ){
-            foreach( $witch->daughters() as $daugther )
-            {
-                if( $daugther->cauldronId == $cauldronId ){
-                    $return[] = $daugther;
-                }
-                
-                $return = array_merge( 
-                    $return, 
-                    $this->recursiveSearchByCauldronId( $daugther, $cauldronId )
-                );
+        foreach( $witch->daughters() as $daugther )
+        {
+            if( $daugther->cauldronId == $cauldronId ){
+                $return[] = $daugther;
             }
+            
+            $return = array_merge( 
+                $return, 
+                $this->recursiveSearchByCauldronId( $daugther, $cauldronId )
+            );
         }
-
+        
         return $return;
     }
 }

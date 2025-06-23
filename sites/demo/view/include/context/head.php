@@ -6,13 +6,18 @@
     content="width=device-width, initial-scale=1, minimum-scale=0.25, maximum-scale=5.0, target-densitydpi=device-dpi" />
 
 <title>
-    <?=$this->witch()->{'meta-title'} ?? $this->witch('home')->{'meta-title'} ?? "WoodWiccan" ?>
+    <?=$this->title ?? $this->witch()->{'meta-title'} ?? $this->witch('home')->{'meta-title'} ?? "WoodWiccan" ?>
 </title>
 
 <?=$this->favicon() ?>
 
-<meta name="description" content="<?=$contextData['meta-description'] ?? ""?>">
-<meta name="keywords" content="<?=$contextData['meta-keywords'] ?? ""?>">
+<?php if( $description = $this->witch('home')?->cauldron()?->content('meta-description') ): ?>
+    <meta name="description" content="<?=$description?>" />
+<?php endif; ?>
+
+<?php if( $keywords = $this->witch('home')?->cauldron()?->content('meta-keywords') ): ?>
+    <meta name="description" content="<?=$keywords?>">
+<?php endif; ?>
 
 <?php foreach( $this->getCssFiles() as $cssFile ): ?>
     <link   rel="stylesheet" 

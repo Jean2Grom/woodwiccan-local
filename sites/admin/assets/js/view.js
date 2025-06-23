@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () =>
         () => {
             document.querySelectorAll('.view__witch-menu-info, .edit__witch-menu-info').forEach(
                 toggledDom => {
-                    if( toggledDom.style.display !== 'block' ){
+                    if( toggledDom.style.display === 'none' ){
                         toggledDom.style.display = 'block';
                     }
                     else {
@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", () =>
         () => {
             document.querySelectorAll('.create__witch, .view__daughters').forEach(
                 toggledDom => {
-                    if( toggledDom.style.display !== 'block' ){
+                    if( toggledDom.style.display === 'none' ){
                         toggledDom.style.display = 'block';
                     }
                     else {
@@ -83,7 +83,7 @@ document.addEventListener("DOMContentLoaded", () =>
         () => {
             document.querySelectorAll('.view__witch-info, .edit__witch-info').forEach(
                 toggledDom => {
-                    if( toggledDom.style.display !== 'block' ){
+                    if( toggledDom.style.display === 'none' ){
                         toggledDom.style.display = 'block';
                     }
                     else {

@@ -1,0 +1,17 @@
+{
+    "name": "demo-rubrique",
+    "composition": [
+        {
+            "name": "headline",
+            "type": "string"
+        },
+        {
+            "name": "body",
+            "type": "text"
+        },
+        {
+            "name": "background",
+            "type": "image"
+        }
+    ]
+}

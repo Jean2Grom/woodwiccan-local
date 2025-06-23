@@ -218,12 +218,11 @@ class Website
         }
         
         $modulesList = [];
-        
         foreach( $this->siteHeritages as $siteItem )
         {
             if( $siteItem == "global" ){
                 $dir = self::DEFAULT_SITE_DIR;
-            }
+            } 
             else {
                 $dir = self::SITES_DIR.'/'.$siteItem;
             }
@@ -249,7 +248,8 @@ class Website
         $dirContentArray = array_diff( scandir($dir), array('..', '.') );
         
         foreach( $dirContentArray as $dirContent ){
-            if( is_dir($dir.'/'.$dirContent) ){
+            if( is_dir($dir.'/'.$dirContent) && $dirContent !== self::VIEW_DIR ){
+
                 $modulesList = array_merge( $modulesList, $this->recursiveRead( $dir.'/'.$dirContent, $prefix ) );
             }
             else 

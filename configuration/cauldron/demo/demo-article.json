@@ -1,0 +1,45 @@
+{
+    "name": "demo-article",
+    "composition": [
+        {
+            "name": "headline",
+            "type": "string"
+        },
+        {
+            "name": "body",
+            "type": "text"
+        },
+        {
+            "name": "image",
+            "type": "image"
+        },
+        {
+            "name": "headline-left",
+            "type": "string"
+        },
+        {
+            "name": "body-left",
+            "type": "text"
+        },
+        {
+            "name": "headline-center",
+            "type": "string"
+        },
+        {
+            "name": "body-center",
+            "type": "text"
+        },
+        {
+            "name": "headline-right",
+            "type": "string"
+        },
+        {
+            "name": "body-right",
+            "type": "text"
+        },
+        {
+            "name": "link",
+            "type": "link"
+        }
+    ]
+}

@@ -55,7 +55,7 @@ class Witch
     /** @var ?self[] */
     public $sisters;
     /** @var ?self[] */
-    public $daughters;
+    public $daughters = null;
 
     public $cauldronId;
     public $cauldronPriority;
@@ -83,7 +83,7 @@ class Witch
 
     public function __get(string $name): mixed 
     {
-        if( $this->properties[ $name ] ?? null ){
+        if( isset($this->properties[ $name ]) ){
             return $this->properties[ $name ];
         }
 
@@ -280,32 +280,47 @@ class Witch
     }
     
     /**
-     * Read Daughter witches (get them if needed), 
-     * return mother witch or false if witch is root
-     * @return mixed
+     * Get Daughters witches (get them if needed), 
+     * return daughter witchs array 
+     * @return self[]
      */
-    function daughters( ?int $id=null ): mixed
+    function daughters(): array
     {
-        if( is_null($this->id) ){
-            return false;
-        }
-        
-        if( is_null($this->daughters) ){
-            Handler::addDaughters( 
-                $this, 
-                DataAccess::fetchDescendants($this->ww, $this->id, true) 
-            );
-        }
-        
-        if( !$id ){
+        if( isset($this->daughters) ){
             return $this->daughters;
         }
+
+        if( is_null($this->id) ){
+            return [];
+        }
         
-        return  $this->daughters[ $id ] 
-                    ?? Handler::instanciate(
-                        $this->ww, 
-                        [ 'name' => "ABSTRACT 404 WITCH", 'invoke' => '404' ]
-                    );
+        $this->daughters = [];
+        Handler::addDaughters( 
+            $this, 
+            DataAccess::fetchDescendants($this->ww, $this->id, true) 
+        );
+        
+        return $this->daughters;
+    }
+    
+    /**
+     * Read Daughter witches (get them if needed), 
+     * return mother witch or false if witch is root
+     * @return self
+     */
+    function daughter( int $id ): self
+    {
+        $daughters  = $this->daughters();
+        $return     = $daughters[ $id ] ?? null;
+
+        if( !$return ){
+            $return = Handler::instanciate(
+                $this->ww, 
+                [ 'name' => "ABSTRACT 404 WITCH", 'invoke' => '404' ]
+            );
+        }
+
+        return  $return;
     }
     
     
