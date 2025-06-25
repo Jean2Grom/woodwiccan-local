@@ -1,9 +1,4 @@
-<?php
-
-$backgroundImage    = $craft->attributes['background-image']->content()['file'];
-$headline           = $craft->attributes['headline']->content();
-$headlineBody       = $craft->attributes['body']->content();
-
+<?php /** @var WW\Module $this */ 
 
 $result = false;
 if( filter_has_var(INPUT_POST, "bouton_formulaire") )
@@ -20,5 +15,4 @@ if( filter_has_var(INPUT_POST, "bouton_formulaire") )
     $result = mail("info@witch-case.com", $subject, $message, $header);
 }
 
-
-include $module->getViewFile();
+$this->view();

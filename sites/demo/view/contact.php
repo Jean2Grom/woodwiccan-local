@@ -1,11 +1,9 @@
-<?php
-
-?>
+<?php /** @var WW\Module $this */ ?>
 
 <div id="bloc1">
     <h2>CONTACTEZ WOOD WICCAN</h2>
     
-    <? if( !$result ) { ?>
+    <?php if( !$result ): ?>
         <div id="text-contact">
             Merci de remplir ce formulaire et nous vous contacterons rapidemment afin de répondre à toutes vos questions.
         </div>
@@ -57,7 +55,7 @@
                 </ul>
             </form>
         </div>
-    <? } else { ?>
+    <?php else: ?>
         <div id="text-contact">
             Nous avons bien pris en compte votre message, nous vous réponderons au plus vite.<br/>
             Merci de l'intérès que vous nous portez.
@@ -66,5 +64,5 @@
             &nbsp;
         </div>
 
-    <? } ?>
+    <?php endif; ?>
 </div>
