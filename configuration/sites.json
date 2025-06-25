@@ -47,7 +47,7 @@
                 },
                 "children": {
                     "depth": 1,
-                    "craft": false
+                    "craft": true
                 }
             }, 
             "mother": {

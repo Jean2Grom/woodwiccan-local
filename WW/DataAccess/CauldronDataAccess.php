@@ -34,8 +34,13 @@ class CauldronDataAccess
         return (int) $depth;
     }
 
+    
     static function cauldronRequest( WoodWiccan $ww, array $configuration, bool $getWitches=true )
     {
+        if( !$configuration ){
+            return [];
+        }
+
         // Determine the list of fields in select part of query
         $query  =   "SELECT DISTINCT `c`.`".implode( "`, `c`.`", Cauldron::FIELDS)."` ";
 
@@ -67,12 +72,12 @@ class CauldronDataAccess
         
         $query  .= "FROM ";
 
-        $userConnexionJointure = false;
-        if( in_array('user', $configuration) && $ww->user->connexion )
-        {
-            $userConnexionJointure = true;
-            $query  .= "`ingredient__integer` AS `user_connexion`, ";
-        }
+        // $userConnexionJointure = false;
+        // if( in_array('user', $configuration) && $ww->user->connexion )
+        // {
+        //     $userConnexionJointure = true;
+        //     $query  .= "`ingredient__integer` AS `user_connexion`, ";
+        // }
         
         $query  .= "`cauldron` AS `c` ";
         foreach( Ingredient::DEFAULT_AVAILABLE_INGREDIENT_TYPES_PREFIX as $type => $prefix )
@@ -87,53 +92,49 @@ class CauldronDataAccess
             $query  .=  "ON `w`.`cauldron` = `c`.`id` ";
         }
 
-        foreach( $configuration as $conf )
-        {
-            $query  .= "LEFT JOIN `cauldron` AS `c_".$conf."` ";
-            $query  .=  "ON ( ";
-            $query  .=  self::childrenJointure( $ww->cauldronDepth, "c_".$conf, 'c', '*' );
-            $query  .=  ") ";            
-        }
+        $query  .= "LEFT JOIN `cauldron` AS `c_ref` ";
+        $query  .=  "ON ( ";
+        $query  .=  self::childrenJointure( $ww->cauldronDepth, "c_ref", 'c', '*' );
+        $query  .=  ") ";            
 
-        
-        $parameters = [];
-        $separator = "WHERE ( ";
-        
+        $parameters =   [];
+        $query      .=  "WHERE ";
+
+        $condition  =   " %s.`id` IN ( ";
+        $separator  =   " ";
         foreach( $configuration as $conf )
         {
             if( ctype_digit(strval($conf)) )
             {
                 $parameters[ 'c_'.$conf ]    = (int) $conf;
     
-                $condition  =   " %s.`id` = :c_".$conf." ";
-    
-                $query      .=  $separator;
-                $separator  =   "OR ";
+                $condition  .=  $separator.":c_".$conf." ";
+                $separator  =   ", ";
 
-                $query      .=  str_replace(' %s.', ' `c`.', $condition);
-                $query      .=  " OR ".str_replace(' %s.', " `c_".$conf."`.", $condition);
             }
         }
-        
-        if( $userConnexionJointure )
-        {
-            $query      .=  $separator;
-            $separator  =   "OR ";
+        $condition .=  ") ";
 
-            $query  .=  "( ";
-            $query  .=      " `c`.`id` = `user_connexion`.`cauldron_fk` ";
-            $query  .=          "OR  `c_user`.`id` = `user_connexion`.`cauldron_fk` ";
-            $query  .=  ") ";
-
-            $query  .=  "AND `user_connexion`.`id` IS NOT NULL ";
-            $query  .=  "AND `user_connexion`.`name` = \"user__connexion\" ";
-            $query  .=  "AND `user_connexion`.`value` = :user_id ";
-
-            $parameters[ 'user_id' ] = (int) $ww->user->id;
-        }
+        $query      .=  str_replace(' %s.', ' `c`.', $condition);
+        $query      .=  "OR ".str_replace(' %s.', " `c_ref`.", $condition);
         
-        $query .=  ") ";
-        
+        // if( $userConnexionJointure )
+        // {
+        //     $query      .=  $separator;
+        //     $separator  =   "OR ";
+
+        //     $query  .=  "( ";
+        //     $query  .=      " `c`.`id` = `user_connexion`.`cauldron_fk` ";
+        //     $query  .=          "OR  `c_user`.`id` = `user_connexion`.`cauldron_fk` ";
+        //     $query  .=  ") ";
+
+        //     $query  .=  "AND `user_connexion`.`id` IS NOT NULL ";
+        //     $query  .=  "AND `user_connexion`.`name` = \"user__connexion\" ";
+        //     $query  .=  "AND `user_connexion`.`value` = :user_id ";
+
+        //     $parameters[ 'user_id' ] = (int) $ww->user->id;
+        // }
+
         return $ww->db->selectQuery($query, $parameters);
     }
 
