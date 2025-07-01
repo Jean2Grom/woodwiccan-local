@@ -79,7 +79,7 @@ strong {
 	height: 14%;  
 	padding-left: 14%;
   	padding-right: 14%;
-	
+	min-height: 86px;
 }
 #en_cours {
 	color: #ff9900;
