@@ -105,7 +105,14 @@ class WoodWiccan
         try {
             $this->depth            = WitchDataAccess::getDepth( $this );
             $this->cauldronDepth    = CauldronDataAccess::getDepth( $this );
+
             $this->request          = new Request( $this );
+            if( $systemDebugIPFilter = $this->configuration->read('system', 'debug') ){
+                $this->debug->addEnableCondition( 
+                    in_array( $this->request->requesterIpAddress, $systemDebugIPFilter )
+                );    
+            }
+            
             $this->website          = $this->request->getWebsite();
             $this->debug->addEnableCondition( $this->website->debug );
             

@@ -90,7 +90,7 @@ class Configuration
         }
     }
     
-    function read( string $section, string $variable=null)
+    function read( string $section, ?string $variable=null)
     {
         if( $variable && isset($this->configuration[ $section ][ $variable ]) ){
             return $this->configuration[ $section ][ $variable ];

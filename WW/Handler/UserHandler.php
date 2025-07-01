@@ -55,7 +55,7 @@ class UserHandler
     {
         $policies = [];
         foreach( $profiles as $profileItem ){
-            foreach( $profileItem['policies'] as $policyId => $policyData ){
+            foreach( $profileItem['policies'] ?? [] as $policyId => $policyData ){
                 if( empty($policies[ $policyId ]) ){
                     $policies[ $policyId ] = $policyData;
                 }

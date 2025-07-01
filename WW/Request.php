@@ -52,7 +52,7 @@ class Request
         $this->path                 = $_SERVER["REQUEST_URI"] ?? $_SERVER["SCRIPT_URL"] ?? $_SERVER["PATH_INFO"] ?? "/";
         $this->queryString          = $_SERVER["QUERY_STRING"] ?? "";
         $this->requesterIpAddress   = self::getRequesterIpAddress();
-        
+
         if( !$this->protocole && isset($this->https) && $this->https == "on" ){
             $this->protocole = "https";
         }
@@ -169,12 +169,14 @@ class Request
     
     static function getRequesterIpAddress()
     {
-        return filter_input( 
-            INPUT_SERVER, 
-            'REMOTE_ADDR', 
-            FILTER_VALIDATE_IP 
-        ) ?? 
-        ( substr( filter_input(INPUT_SERVER, 'HTTP_HOST'), 0, 9) === 'localhost' )? '127.0.0.1': 
-            filter_input(INPUT_SERVER, 'HTTP_HOST', FILTER_VALIDATE_IP);
+        if( $ip = filter_input(INPUT_SERVER, 'REMOTE_ADDR', FILTER_VALIDATE_IP) ){
+            return $ip;
+        }
+
+        if( substr( filter_input(INPUT_SERVER, 'HTTP_HOST'), 0, 9) === 'localhost' ){
+            return '127.0.0.1';
+        }
+
+        return filter_input(INPUT_SERVER, 'HTTP_HOST', FILTER_VALIDATE_IP);
     }
 }
