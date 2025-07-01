@@ -38,6 +38,7 @@ services:
     volumes:
       - ./WW:/var/www/html/WW
       - ./sites:/var/www/html/sites
+      - ./files:/var/www/html/files
       - ./configuration:/var/www/html/configuration
       - ww-vendor:/var/www/html/vendor
 
