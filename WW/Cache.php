@@ -87,14 +87,20 @@ class Cache
     
     function read( string $folder, string $filebasename ): mixed
     {
-        $cached     = null;    
         $cacheFile  = $this->get( $folder, $filebasename );
-        
-        if( $cacheFile ){
-            include $cacheFile;
+        if( !$cacheFile  = $this->get( $folder, $filebasename ) ){
+            return null;
         }
-        
-        return $cached;
+
+        if( !$jsonString = file_get_contents($cacheFile) ){
+            return null;
+        }
+
+        if( !$jsonData   = json_decode($jsonString, true) ){
+            return null;
+        }
+
+        return $jsonData['cached'] ?? null;
     }    
     
     function get( string $folder, string $filebasename ): mixed
@@ -119,7 +125,7 @@ class Cache
             return false;
         }
         
-        $filename = $cacheFolder.'/'.$filebasename.".php";
+        $filename = $cacheFolder.'/'.$filebasename.".json";
         
         if( file_exists($filename) )
         {
@@ -130,15 +136,8 @@ class Cache
             
             unlink($filename);  
         }
-        
-        $method = 'create'.ucfirst($folder).'File';
-        
-        if( in_array($method, get_class_methods( get_called_class() )) ){   
-            return call_user_func( [ $this, $method ], $filebasename );    
-        }
-        else {
-            return false;
-        }
+
+        return false;
     }
     
     function delete( string $folder, string $filebasename ): bool
@@ -157,7 +156,7 @@ class Cache
             return false;
         }
         
-        $filename = $cacheFolder.'/'.$filebasename.".php";
+        $filename = $cacheFolder.'/'.$filebasename.".json";
         
         if( file_exists($filename) ){
             unlink($filename);
@@ -183,27 +182,18 @@ class Cache
             $this->ww->log->error("Can't create cache folder : ".$folder);
             return false;
         }
-                
+        
         // Writing cache policies files (based on profile)
-        $filename = $cacheFolder."/".$filebasename.".php";
+        $filename = $cacheFolder."/".$filebasename.".json";
         
         if( file_exists($filename) ){
             unlink($filename);
         }
         
         $cacheFileFP = fopen( $filename, 'a');
-        fwrite($cacheFileFP, "<?php\n");
-        fwrite($cacheFileFP, "$"."cached = ");
-        
-        ob_start();
-        var_export($value);
-        $buffer = ob_get_contents();
-        ob_end_clean();
-        
-        fwrite($cacheFileFP, $buffer);
-        fwrite($cacheFileFP, ";\n");
-        
-        fclose($cacheFileFP);
+
+        fwrite( $cacheFileFP, json_encode([ 'cached' => $value ], JSON_PRETTY_PRINT) );
+        fclose( $cacheFileFP );
 
         return $filename;
     }
