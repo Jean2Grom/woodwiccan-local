@@ -16,7 +16,6 @@ class Context
     const DIR           = "context";
     
     const VIEW_DIR          = "view/context";
-    const INCLUDE_VIEW_DIR  = "view/include/context";
     
     const IMAGES_SUBFOLDER          = "assets/images";
     const JS_SUBFOLDER              = "assets/js";
@@ -26,7 +25,7 @@ class Context
     const CSS_FILE_DISPLAY          = "css-file.php";
     const JS_FILE_DISPLAY           = "js-file.php";
     const IMAGE_FILE_DISPLAY        = "image-file.php";
-    const FAVICON_FILE_DISPLAY      = "favicon-file.php";
+    const FAVICON_FILE_DISPLAY      = "context/favicon-file.php";
     
     public $name;
     public $execFile;
@@ -119,34 +118,6 @@ class Context
         return $this->ww->website->getWebPath( self::CSS_SUBFOLDER."/".$cssFile );
     }
     
-    /**
-     * Display css file 
-     * 
-     * @param string $cssFile
-     * @param array $attributes
-     * @return void
-     */
-    function css( string $cssFile, array $attributes=[] ): void
-    {
-        $displayFilePath    = $this->ww->website->getFilePath( self::INCLUDE_VIEW_DIR."/".self::CSS_FILE_DISPLAY );
-        if( empty($displayFilePath) )
-        {
-            $this->ww->log->error("Can't get CSS file display file");
-            return;
-        }
-        
-        $cssSrc = $this->cssSrc( $cssFile );
-        if( empty($cssSrc) )
-        {
-            $this->ww->log->error("Can't get CSS file");
-            return;
-        }
-        
-        include $displayFilePath;
-        
-        return;
-    }
-    
     function addCssFile( string $cssFile ): bool
     {
         $cssWebPath = $this->cssSrc( $cssFile );
@@ -165,27 +136,6 @@ class Context
     
     function getCssFiles(): array {
         return $this->css;
-    }
-    
-    function js( string $jsFile, array $attributes=[] ): void
-    {
-        $displayFilePath    = $this->ww->website->getFilePath( self::INCLUDE_VIEW_DIR."/".self::JS_FILE_DISPLAY );
-        if( empty($displayFilePath) )
-        {
-            $this->ww->log->error("Can't get JS file display file");
-            return;
-        }
-        
-        $jsSrc = $this->jsSrc( $jsFile );
-        if( empty($jsSrc) )
-        {
-            $this->ww->log->error("Can't get JS file");
-            return;
-        }
-        
-        include $displayFilePath;
-        
-        return;
     }
     
     function jsSrc( string $jsFile ): ?string {
@@ -236,34 +186,13 @@ class Context
         return $this->ww->website->getWebPath( self::IMAGES_SUBFOLDER."/".$imageFile );
     }
     
-    function image( string $imageFile, array $attributes=[] ): void
-    {
-        $displayFilePath    = $this->ww->website->getFilePath( self::INCLUDE_VIEW_DIR."/".self::IMAGE_FILE_DISPLAY );
-        if( empty($displayFilePath) )
-        {
-            $this->ww->log->error("Can't get IMAGE file display file");
-            return;
-        }
-        
-        $imageSrc = $this->imageSrc( $imageFile );
-        if( empty($imageSrc) )
-        {
-            $this->ww->log->error("Can't get IMAGE file");
-            return;
-        }
-        
-        include $displayFilePath;
-        
-        return;
-    }
-    
     function getImageFile( string $imageFile ): ?string {
         return $this->imageSrc( $imageFile );
     }
     
     function favicon( string $iconFile="favicon.ico" ): void
     {
-        $displayFilePath    = $this->ww->website->getFilePath( self::INCLUDE_VIEW_DIR."/".self::FAVICON_FILE_DISPLAY );
+        $displayFilePath    = $this->ww->website->getFilePath( Website::INCLUDE_VIEW_DIR."/".self::FAVICON_FILE_DISPLAY );
         if( empty($displayFilePath) )
         {
             $this->ww->log->error("Can't get FAVICON file display file");
@@ -276,8 +205,6 @@ class Context
             $this->ww->log->error("Can't get FAVICON file");
             return;
         }
-        
-        $iconMime    = mime_content_type( $this->ww->website->getFilePath(self::IMAGES_SUBFOLDER."/".$iconFile) );
         
         include $displayFilePath;
         
@@ -296,18 +223,43 @@ class Context
         return "/".$fullPath;
     }
     
-    function getIncludeViewFile( $filename )
+    /**
+     * @param string $filename file to be searched
+     * @return ?string full path string if file fond, null if not
+     */
+    function getIncludeViewFile( string $filename ): ?string
     {
-        $fullPath = $this->ww->website->getFilePath(self::INCLUDE_VIEW_DIR."/".$filename );
-        
-        if( !$fullPath ){
-            return false;
+        if( !$fullPath = $this->ww->website->getFilePath(Website::INCLUDE_VIEW_DIR."/".$filename) ){
+            $fullPath = $this->ww->website->getFilePath($filename);
+        }
+
+        if( !$fullPath )
+        {
+            $this->ww->log->error("CONTEXT Ressource view file to be Included: \"".$filename."\" not found", 'CONTEXT');
+            return null;
         }
         
         $this->ww->debug->toResume("Ressource view file to be Included: \"".$fullPath."\"", 'CONTEXT');
         return $fullPath;
     }
     
+    function include( $filename, ?array $params=null ): void
+    {
+        $fullPath = $this->getIncludeViewFile($filename);
+
+        if( !$fullPath ){
+            return;
+        }
+
+        foreach( $params ?? [] as $includedFunctionParamName => $includedFunctionParamValue ){
+            $$includedFunctionParamName = $includedFunctionParamValue;
+        }
+
+        include $fullPath;
+        return;
+    }
+
+
     function display()
     {
         $this->execFile = $this->website->getFilePath( self::DIR."/". $this->name.".php" );
