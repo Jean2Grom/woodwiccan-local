@@ -4,12 +4,11 @@ $this->addCssFile('boxes.css');
 $this->addJsFile('triggers.js');
 $this->addJsFile('root.js');
 ?>
+
 <div class="content">
-    <h1>Tableau de bord</h1>
+    <?php $this->include('alerts.php', ['alerts' => $this->ww->user->getAlerts()]); ?>
     
-    <?php $this->include('alerts.php', ['alerts' => $alerts]); ?>
-    
-    <div class="content__data"><?=$this->witch->data?></div>
+    <!--div class="content__data"><?=$this->witch->data?></div>
     
     <form method="post" id="data-edit">
         <textarea name="data" id="witch__data"></textarea>
@@ -18,66 +17,65 @@ $this->addJsFile('root.js');
                 data-target="data-edit">
             Publier
         </button>
-    </form>
+    </form-->
     
     <div class="box-container">
         <div class="box content__daughters">
-            <h2>Liste des enfants</h2>
+            <h2>Daugthers</h2>
             
             <form method="post" id="daughters-action">
-            <table>
-                <thead>
-                    <tr>
-                        <?php foreach( $subTree['headers'] as $header ): ?>
-                            <th>
-                                <?=$header?>
-                            </th>
-                        <?php endforeach; ?>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach( $subTree['data'] as $daughter ): ?>
+                <table>
+                    <thead>
                         <tr>
-                            <td>
-                                <a href="<?=$this->ww->website->baseUri."/view?id=".$daughter->id ?>">
-                                    <?=$daughter->name ?>
-                                </a>
-                            </td>
-                            <td>
-                                <?=$daughter->site ?>
-                            </td>
-                            <td>
-                                <?php if( !empty($daughter->invoke) && $daughter->hasCauldron() ): ?>
-                                    Module & Contenu
-                                <?php elseif( !empty($daughter->invoke) ): ?>
-                                    Module
-                                <?php elseif( $daughter->hasCauldron() ): ?>
-                                    Contenu
-                                <?php else: ?>
-                                    Répertoire
-                                <?php endif; ?>
-                            </td>
-                            <td class="text-right">
-                                <input  class="priorities-input" 
-                                        type="number"
-                                        name="priorities[<?=$daughter->id ?>]" 
-                                        value="<?=$daughter->priority ?>" />
-                            </td>
+                            <th>Name</th>
+                            <th>Site</th>
+                            <th>Type</th>
+                            <th>Priority</th>
                         </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        <?php foreach($this->getDaughters() as $daughter): ?>
+                            <tr>
+                                <td>
+                                    <a href="<?=$this->ww->website->getUrl("/view?id=".$daughter->id) ?>">
+                                        <?=$daughter->name ?>
+                                    </a>
+                                </td>
+                                <td>
+                                    <?=$daughter->site ?>
+                                </td>
+                                <td>
+                                    <?php if( $daughter->hasInvoke() && $daughter->hasCauldron() ): ?>
+                                        Craft & Invoke 
+                                    <?php elseif( $daughter->hasInvoke() ): ?>
+                                        Invoke
+                                    <?php elseif( $daughter->hasCauldron() ): ?>
+                                        Craft
+                                    <?php else: ?>
+                                        Folder
+                                    <?php endif; ?>
+                                </td>
+                                <td class="text-right">
+                                    <input  class="priorities-input" 
+                                            type="number"
+                                            name="priorities[<?=$daughter->id ?>]" 
+                                            value="<?=$daughter->priority ?>" />
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
             </form>
 
             <div class="box__actions">
                 <button class="trigger-href" 
-                        data-href="<?=$createElementHref?>">
-                    Ajouter un enfant
+                        data-href="<?=$this->ww->website->getUrl("create?mother=".$this->witch->id)?>">
+                    Add daugther
                 </button>
                 <button class="trigger-action"
                         data-action="edit-priorities"
                         data-target="daughters-action">
-                    Changer les priorités
+                    Update priorities
                 </button>
             </div>
         </div>        

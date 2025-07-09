@@ -4,12 +4,10 @@
  */
 ?>
 <div class="view__witch-menu-info">
-    <h2 title="<?=$witch->data ?>">
+    <h2 class="view-edit-menu-info-toggle"
+        title="<?=$witch->data ?>">
         <?=$witch->name ?>
-        <button class="view-edit-menu-info-toggle">
-            <i class="fa fa-pencil"></i>
-        </button>
     </h2>
     
-    <p><em><?=$witch->data ?></em></p>
+    <p class="view-edit-menu-info-toggle"><em><?=$witch->data ?></em></p>
 </div>

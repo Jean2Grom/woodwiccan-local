@@ -1,5 +1,5 @@
 .view__witch-menu-info {
-    margin: 2vw 0 8vw;
+    cursor: pointer;
 }
     .view__witch-menu-info h2 {
         display: flex;
@@ -42,21 +42,12 @@
     display: flex;
     justify-content: end;
 }
-@media screen and (min-device-width: 480px) {
-    .view__witch-menu-info {
-        margin: 1.5vw 0;
-    }
-        .view__witch-menu-info h2 {
-            margin-bottom: 1vw;
-        }
-        
-}
 @media screen and (min-device-width: 768px) {
     .view__witch-menu-info {
-        margin: 1.2vw 0;
+        margin: 0 0 1.2vw 0;
     }
         .view__witch-menu-info h2 {
-            margin-bottom: 0.8vw;
+            margin-bottom: 0;
         }
     .box.edit__witch-menu-info {
         max-width: 720px;

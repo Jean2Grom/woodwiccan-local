@@ -3,27 +3,52 @@ header {
     top: 0;
     z-index: 22;
     padding: 7px 20px;
-    text-align: center;
     box-shadow: 0px 3px 5px #cccccc;
     background-color: #FFFFFF;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
 }
+    header .banner {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+    header .breadcrumb {
+        margin-left: 0;
+        font-size: 12px;
+        font-style: italic;
+        border: 1px solid;
+        border-radius: 4px;
+        padding: 4px 8px;
+        width: 100%;
+    }
     header .header-user {
         min-width: 55px;
-        padding: 8px;
-        /*
-        border: 1px solid;
-        border-radius: 8px;
-        box-shadow: 4px 4px 4px #999;
-        */
+    }
+        header .header-user span {
+            display: none;
+        }
+    header h1 {
+        margin: 0;
     }
     header .side-nav-toggler {
         position: absolute;
     }
     header .logo {
         margin-left: 6vw;
+    }
+    header .banner-nav {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 8px;
+    }
+    header .banner-nav > a {
+        border: 1px solid;
+        padding: 4px 12px;
+        border-radius: 4px;
+        font-size: 12px;
+        margin-right: 4px;
     }
 footer {
     text-align: center;
@@ -40,7 +65,16 @@ footer {
     }
     header .logo {
         margin-left: 0;
-    }    
+    }
+    header .banner-nav {
+        margin-left: 125px;
+    }
+    header .breadcrumb {
+        margin-left: 20px;
+    }
+        header .header-user span {
+            display: inline-block;
+        }
 }
 @media screen and (min-device-width: 1024px) {
 }

@@ -1,21 +1,46 @@
 <!DOCTYPE html>
 <?php /** @var WW\Context $this */
 
+use WW\Website;
+
 $this->addCssFile('base.css');
 $this->addCssFile('header-footer.css');
 $this->addCssFile('context-standard.css');
 $this->addJsFile('fontawesome.js');
 $this->addJsFile('context-standard.js');
-//$this->addJsLibFile('jquery-3.6.0.min.js');
 ?>
+
 <html lang="fr-FR" dir="ltr">
-    <head>
-        <?php include $this->getIncludeViewFile('head.php'); ?>
-    </head>
+    <head><?php $this->include('context/head.php'); ?></head>
     
     <body>
         <div class="container">
-            <header><?php include $this->getIncludeViewFile('header.php'); ?></header>
+            <header>
+                <?php $this->include('context/header.php'); ?>
+
+                <div class="banner-nav">
+                    <?php if( $breadcrumb && count($breadcrumb) > 1 ): ?>
+                        <a href="<?=array_reverse($breadcrumb)[1]['href']?>">
+                            <i class="fa fa-arrow-up"></i>
+                        </a>
+                    <?php endif; ?>
+
+                    <a href="javascript: location.reload()">
+                        <i class="fa fa-rotate-right"></i>
+                    </a>
+
+                    <div class="breadcrumb">
+                        <?php if( $this->witch()->id ): foreach( $breadcrumb as $i => $breadcrumbItem ): ?>
+                            <?=( $i > 0 )? "&nbsp;>&nbsp": "" ?>
+                            <span class="breadcrumb__item" title="<?=$breadcrumbItem['data'] ?>">
+                                <a href="<?=$breadcrumbItem['href'] ?>">
+                                    <?=$breadcrumbItem['name'] ?>
+                                </a>
+                            </span>
+                        <?php endforeach; endif; ?>
+                    </div>
+                </div>
+            </header>
             
             <?php if( count($this->witch('menu')?->daughters() ?? []) > 0 ): ?>
                 <nav>
@@ -31,20 +56,10 @@ $this->addJsFile('context-standard.js');
             <?php endif; ?>
 
             <main>
-                <h1 class="breadcrumb__label" title="<?=$this->witch()->data ?>">
-                    <a href="javascript: location.reload();"><?=$this->witch()->name ?></a>
-                </h1>
-                
-                <div class="breadcrumb">
-                    <?php if( $this->witch()->id ): foreach( $breadcrumb as $i => $breadcrumbItem ): ?>
-                        <?=( $i > 0 )? "&nbsp;>&nbsp": "" ?>
-                        <span class="breadcrumb__item" title="<?=$breadcrumbItem['data'] ?>">
-                            <a href="<?=$breadcrumbItem['href'] ?>">
-                                <?=$breadcrumbItem['name'] ?>
-                            </a>
-                        </span>
-                    <?php endforeach; endif; ?>
-                </div>
+                <?php if( $this->witch("target") ): ?>
+                    <div><?php $this->include( Website::INCLUDE_VIEW_DIR.'/witch/menu-info.php', [ 'witch' => $this->witch("target") ]); ?></div>
+                    <div><?php $this->include( Website::INCLUDE_VIEW_DIR.'/witch/edit-menu-info.php', [ 'witch' => $this->witch("target") ]); ?></div>
+                <?php endif; ?>
 
                 <div class="tabs">
                     <?php if( $this->ww->cairn->invokation("arborescence") ): ?>
@@ -123,7 +138,7 @@ $this->addJsFile('context-standard.js');
                 <?=$this->ww->cairn->invokation("chooseWitch") ?>
             <?php endif; ?>
             
-            <footer><?php include $this->getIncludeViewFile('footer.php'); ?></footer>
+            <footer><?php $this->include('context/footer.php'); ?></footer>
         </div>
         
         <?php foreach( $this->getJsFiles() as $jsFile ): ?>

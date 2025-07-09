@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", () =>
         hideDom => hideDom.style.display = 'none'
     );
 
-    document.querySelectorAll('button.view-edit-menu-info-toggle').forEach(
+    document.querySelectorAll('.view-edit-menu-info-toggle').forEach(
         toggler => toggler.addEventListener("click", 
         () => {
             document.querySelectorAll('.view__witch-menu-info, .edit__witch-menu-info').forEach(

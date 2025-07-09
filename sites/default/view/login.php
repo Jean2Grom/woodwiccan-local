@@ -1,7 +1,5 @@
 <?php /** @var WW\Module $this */ ?>
 
-<h1>Login</h1>
-
 <?php $this->include('alerts.php', ['alerts' => $alerts]); ?>
 
 <?php if( $this->isRedirection ): ?>
