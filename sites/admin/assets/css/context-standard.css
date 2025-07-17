@@ -2,11 +2,16 @@ nav {
     display: none;
     height: 100%;
     position: fixed;
-    z-index: 7;
+    z-index: 30;
     background-color: #cccccc;
     overflow-x: hidden;
-    padding-top: 15px;
 }
+    nav .nav-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 100%;
+    }
     nav a.side-nav-toggler {
         position: absolute;
         right: 10px;
@@ -16,24 +21,33 @@ nav {
     nav a {
         font-size: 1em;
         display: block;
-        margin: 20px;
+        margin: 24px;
     }
+    nav .nav-user {
+        font-size: 12px;
+        display: flex;
+        font-style: italic;
+        font-weight: normal;
+        justify-content: space-evenly;
+        background-color: white;
+        padding: 8px 0px;
+    }
+        nav .nav-user a {
+            margin: 0;
+        }
 
 main, footer {
-    padding: 20px;
+    padding: 16px;
 }
 main {
     padding-bottom: 0;
-}
-.breadcrumb__label {
-    margin: 0 0 1vh 0;
 }
 .breadcrumb {
     font-size: 0.8em;
 }
 fieldset {
     border-radius: 5px;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     padding: 8px;
 }
 .tabs {
@@ -68,14 +82,10 @@ fieldset {
         .tabs-target__item.selected {
             display: block;
         }
-
-@media screen and (min-device-width: 480px) {
-}
 @media screen and (min-device-width: 768px) {
     nav {
         display: block;
-        width: 125px;
-        padding-top: 0;
+        width: 128px;
     }
         nav a {
             display: block;
@@ -85,16 +95,7 @@ fieldset {
         nav a.side-nav-toggler {
             display: none;
         }
-    main, footer {
-        margin-left: 125px;
+    main, header, footer {
+        margin-left: 128px;
     }
-}
-@media screen and (min-device-width: 1024px) {
-    .breadcrumb {
-        font-size: 1em;
-    }
-    .tabs-target {
-        padding: 16px;
-    }
-
 }

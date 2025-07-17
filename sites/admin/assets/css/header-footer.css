@@ -1,8 +1,8 @@
 header {
     position: sticky;
     top: 0;
-    z-index: 22;
-    padding: 7px 20px;
+    z-index: 20;
+    padding: 8px 16px;
     box-shadow: 0px 3px 5px #cccccc;
     background-color: #FFFFFF;
 }
@@ -21,20 +21,15 @@ header {
         padding: 4px 8px;
         width: 100%;
     }
-    header .header-user {
-        min-width: 55px;
-    }
-        header .header-user span {
-            display: none;
-        }
     header h1 {
         margin: 0;
+        margin-right: 16px;
     }
     header .side-nav-toggler {
         position: absolute;
     }
     header .logo {
-        margin-left: 6vw;
+        margin-left: 8px;
     }
     header .banner-nav {
         display: flex;
@@ -54,11 +49,6 @@ footer {
     text-align: center;
 }
 
-@media screen and (min-device-width: 480px) {
-    header .logo {
-        margin-left: 5vw;
-    }    
-}
 @media screen and (min-device-width: 768px) {
     header .side-nav-toggler {
         display: none;
@@ -66,16 +56,8 @@ footer {
     header .logo {
         margin-left: 0;
     }
-    header .banner-nav {
-        margin-left: 125px;
-    }
     header .breadcrumb {
-        margin-left: 20px;
+        margin-left: 8px;
     }
-        header .header-user span {
-            display: inline-block;
-        }
-}
-@media screen and (min-device-width: 1024px) {
 }
 

@@ -12,53 +12,15 @@ $this->addJsFile('context-standard.js');
 
 <html lang="fr-FR" dir="ltr">
     <head><?php $this->include('context/head.php'); ?></head>
-    
     <body>
         <div class="container">
-            <header>
-                <?php $this->include('context/header.php'); ?>
-
-                <div class="banner-nav">
-                    <?php if( $breadcrumb && count($breadcrumb) > 1 ): ?>
-                        <a href="<?=array_reverse($breadcrumb)[1]['href']?>">
-                            <i class="fa fa-arrow-up"></i>
-                        </a>
-                    <?php endif; ?>
-
-                    <a href="javascript: location.reload()">
-                        <i class="fa fa-rotate-right"></i>
-                    </a>
-
-                    <div class="breadcrumb">
-                        <?php if( $this->witch()->id ): foreach( $breadcrumb as $i => $breadcrumbItem ): ?>
-                            <?=( $i > 0 )? "&nbsp;>&nbsp": "" ?>
-                            <span class="breadcrumb__item" title="<?=$breadcrumbItem['data'] ?>">
-                                <a href="<?=$breadcrumbItem['href'] ?>">
-                                    <?=$breadcrumbItem['name'] ?>
-                                </a>
-                            </span>
-                        <?php endforeach; endif; ?>
-                    </div>
-                </div>
-            </header>
-            
-            <?php if( count($this->witch('menu')?->daughters() ?? []) > 0 ): ?>
-                <nav>
-                    <a class="side-nav-toggler">
-                        <i class="fa fa-times"></i>
-                    </a>
-                    <?php foreach( $this->witch('menu')->daughters() as $menuItemWitch ): ?>
-                        <a href="<?=$menuItemWitch->url() ?>">
-                            <?=$menuItemWitch->name?>
-                        </a>
-                    <?php endforeach; ?>
-                </nav>
-            <?php endif; ?>
+            <?php $this->include('context/menu.php', [ 'menu' => $this->witch('menu')?->daughters() ]); ?>
+            <?php $this->include('context/header.php', [ 'breadcrumb' => $breadcrumb ?? [] ]); ?>
 
             <main>
                 <?php if( $this->witch("target") ): ?>
-                    <div><?php $this->include( Website::INCLUDE_VIEW_DIR.'/witch/menu-info.php', [ 'witch' => $this->witch("target") ]); ?></div>
-                    <div><?php $this->include( Website::INCLUDE_VIEW_DIR.'/witch/edit-menu-info.php', [ 'witch' => $this->witch("target") ]); ?></div>
+                    <div><?php $this->include( 'witch/menu-info.php', [ 'witch' => $this->witch("target") ]); ?></div>
+                    <div><?php $this->include( 'witch/edit-menu-info.php', [ 'witch' => $this->witch("target") ]); ?></div>
                 <?php endif; ?>
 
                 <div class="tabs">
@@ -138,7 +100,7 @@ $this->addJsFile('context-standard.js');
                 <?=$this->ww->cairn->invokation("chooseWitch") ?>
             <?php endif; ?>
             
-            <footer><?php $this->include('context/footer.php'); ?></footer>
+            <?php $this->include('context/footer.php'); ?>
         </div>
         
         <?php foreach( $this->getJsFiles() as $jsFile ): ?>
