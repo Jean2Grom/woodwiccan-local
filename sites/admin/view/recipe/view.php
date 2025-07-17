@@ -1,18 +1,13 @@
 <?php /** @var WW\Module $this */
 
-$this->addCssFile('content-edit.css');
 $this->addCssFile('recipe/view.css');
 $this->addJsFile('triggers.js');
 ?>
-<h1>
-    <i class="fa fa-eye"></i>
-    <?=$this->witch->name ?>
-</h1>
-<p><em><?=$this->witch->data?></em></p>
-    
-<?php $this->include('alerts.php', [ 'alerts' => $this->ww->user->getAlerts() ]); ?>
 
-<h3><?=$recipe->name?></h3>
+<h3>
+    <i class="fa fa-eye"></i>
+    <?=$recipe->name?>
+</h3>
 <em><?=$recipe->file ?? ''?></em>
 
 <?php  if( $recipe->require ): 

@@ -1,15 +1,7 @@
 <?php /** @var WW\Module $this */
 
 use WW\Cauldron\Ingredient;
-
-$possibleActionsList = [
-    'save',
-];
-
-$action = $this->ww->request->param('action');
-if( !in_array($action, $possibleActionsList) ){
-    $action = false;
-}
+use WW\Tools;
 
 $recipeName = $this->ww->request->param('recipe');
 if( $recipeName ){
@@ -39,8 +31,12 @@ foreach( $recipes as $recipeItem ){
 
 $globalRequireInputPrefix = "GLOBAL_RECIPE_REQUIREMENTS";
 
-switch( $action )
-{
+switch( $action = Tools::filterAction( 
+    $this->ww->request->param('action'),
+    [
+        'save',
+    ]
+) ){
     case 'save':
 
         if( $this->ww->request->param("recipe") !== $recipe->name ){

@@ -107,32 +107,14 @@
         cursor: pointer;
     } 
     
-    h3.box-info {
-        display: flex;
-        align-items: center;
-        line-height: 24px;
-    }
-        h3.box-info img {
-            height: 1.17em;
-            margin-right: 0.3em;
-            max-width: 2em;
-        }
-@media screen and (min-device-width: 480px) {
-    
-}
 @media screen and (min-device-width: 768px) {
     .box table .full {
         display: table-cell;
     }
-    
-}
-@media screen and (min-device-width: 1024px) {
-    
-    
-.box-container {
-    display: flex;
-    justify-content: flex-start;
-    flex-wrap: wrap;
-}
+    .box-container {
+        display: flex;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
     
 }

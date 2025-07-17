@@ -10,14 +10,6 @@ $this->addJsFile('triggers.js');
 $this->addJsFile('recipe-edit.js');
 ?>
 
-<h1>
-    <i class="fa fa-pencil"></i>
-    <?=$this->witch->name ?>
-</h1>
-<p><em><?=$this->witch->data?></em></p>
-    
-<?php $this->include('alerts.php', ['alerts' => $this->ww->user->getAlerts()]); ?>
-
 <form id="edit-action" method="post">
     <?php if( !empty($recipeName) ): ?>
         <input type="hidden" name="recipe" value="<?=$recipeName?>" />

@@ -8,3 +8,10 @@ ul.global-data li,
     display: flex;
     justify-content: space-between;
 }
+fieldset {
+    border: 1px solid #ccc;
+    box-shadow: 5px 5px 5px #ccc;
+}
+    fieldset legend {
+        font-weight: bold;
+    }

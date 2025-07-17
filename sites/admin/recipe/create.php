@@ -2,15 +2,7 @@
 
 use WW\Handler\RecipeHandler;
 use WW\Cauldron\Ingredient;
-
-$possibleActionsList = [
-    'publish',
-];
-
-$action = $this->ww->request->param('action');
-if( !in_array($action, $possibleActionsList) ){
-    $action = false;
-}
+use WW\Tools;
 
 $recipe      = RecipeHandler::createFromData($this->ww, []);
 
@@ -27,8 +19,12 @@ foreach( $recipes as $recipeItem ){
 
 $globalRequireInputPrefix = "GLOBAL_RECIPE_REQUIREMENTS";
 
-switch( $action )
-{
+switch( $action = Tools::filterAction( 
+    $this->ww->request->param('action'),
+    [
+        'publish',
+    ]
+) ){
     case 'publish':
 
         if( empty($this->ww->request->param("name")) ){

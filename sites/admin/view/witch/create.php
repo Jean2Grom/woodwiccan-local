@@ -7,24 +7,19 @@ $this->addContextArrayItems( 'tabs', [
     'tab-current'       => [
         'selected'  => true,
         'iconClass' => "fa fa-plus",
-        'text'      => "Add Witch a Daughter",
+        'text'      => "Add Daughter",
     ],
 ]);
 ?>
 
 <?php $this->include('alerts.php', ['alerts' => $this->ww->user->getAlerts()]); ?>
 
-<h2 title="<?=$this->witch->data ?>">
-    <?=$this->witch("target")->name ?>
-</h2>
-<p><em><?=$this->witch("target")->data ?></em></p>    
-
 <div class="tabs-target__item selected"  id="tab-current">
     <form method="post" id="create-witch">
         <div class="box-container">
             <div class="box ">
-                <h3 class="box-info">
-                    <img src="<?=$this->image('favicon.png') ?>" />
+                <h3>
+                    <i class="fa fa-info"></i>
                     Witch
                 </h3>
                 <label for="new-witch-name">Name*</label>
@@ -45,7 +40,7 @@ $this->addContextArrayItems( 'tabs', [
                         id="new-witch-priority" />
             </div>
 
-            <div class="box ">
+            <div class="box">
                 <h3>
                     <i class="fas fa-hand-sparkles"></i>
                     Access

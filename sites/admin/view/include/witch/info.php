@@ -6,28 +6,26 @@
 ?>
 
 <div class="box view__witch-info">
-    <h3 class="box-info">
-        <?php if( $imgSrc ): ?>
-            <img src="<?=$imgSrc ?>" />
-        <?php endif; ?>
-        Witch Information
+    <h3>
+        <i class="fa fa-hand-sparkles"></i>
+        Access
     </h3>
     <p><em>Wich inner information</em></p>
     
     <table class="vertical">
         <tr>
-            <td class="label">Witch ID</td>
-            <td class="value"><?=$witch->id ?></td>
-        </tr>        
-        <tr>
             <td class="label">Site</td>
             <td class="value">
-                <?php if( $witch->site ): ?>
+                <?php if( $witch->site ):  $this->ww->debug( $websitesList[ $witch->site ] ); ?>
                     <strong><?=$witch->site ?></strong>
                 <?php else: ?>
                     <em>no</em>
                 <?php endif; ?>
             </td>
+        </tr>
+        <tr>
+            <td class="label">Witch ID</td>
+            <td class="value"><?=$witch->id ?></td>
         </tr>
         <tr>
             <td class="label">Status</td>

@@ -1,12 +1,15 @@
 <?php /** @var WW\Module $this */
 
-/**
- * ACTIONS :
- *  edit-data
- *  edit-priorities
- */
-switch( $this->ww->request->param('action') )
-{
+use WW\Tools;
+
+switch( $action = Tools::filterAction( 
+    $this->ww->request->param('action'),
+    [
+        'edit-data',
+        'edit-priorities',
+
+        ]
+) ){
     case 'edit-data':
         $data = $this->ww->request->param('data');
         if( $data == $this->witch->data ){

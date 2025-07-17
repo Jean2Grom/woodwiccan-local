@@ -44,13 +44,12 @@ foreach( $websitesList as $site => $website ){
     $modules[ $site ] = $website->listModules();
 }
 
-switch(Tools::filterAction(
+switch( $action = Tools::filterAction(
     $this->ww->request->param('action'),
     [
         'create-new-witch',
     ], 
-))
-{
+) ){
     case 'create-new-witch':
         $params         = [];
         $params['name'] = trim($this->ww->request->param('new-witch-name') ?? "");

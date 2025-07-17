@@ -32,16 +32,12 @@ $this->addContextArrayItems( 'tabs', [
 ]);    
 ?>
 
-<h2>User Profiles</h2> 
-<p><em>Here you can manage permissions by handeling user profiles</em></p>
-
-<?php $this->include('alerts.php', ['alerts' => $alerts]); ?>
-
 <div class="tabs-target__item selected"  id="tab-current">
     <div class="box-container">
-        <div><div class="box ">
+        <div class="box ">
             <h3>
-                <i class="fas fa-users"></i> Profiles List
+                <i class="fas fa-users"></i> 
+                Profiles List
             </h3>
             <p><em>Filter by site here
             <select id="profile-list-site-filter">
@@ -91,7 +87,7 @@ $this->addContextArrayItems( 'tabs', [
                     Create new
                 </button>
             </div>
-        </div></div>
+        </div>
     </div>
 </div>
 

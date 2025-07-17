@@ -8,11 +8,9 @@
     <form   method="post"
             action="<?=$witch->ww->website->getUrl('edit?id='.$witch->id) ?>"
             id="edit-witch-info">
-        <h3 class="box-info">
-            <?php if( $imgSrc ): ?>
-                <img src="<?=$imgSrc ?>" />
-            <?php endif; ?>
-            Edit Witch Information Form
+        <h3>
+            <i class="fa fa-hand-sparkles"></i>
+            Access Edit Form
         </h3>
         
         <label for="witch-site">

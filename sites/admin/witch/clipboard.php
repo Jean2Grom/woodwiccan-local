@@ -13,16 +13,13 @@ if( !$this->witch('origin') || !$this->witch('destination') )
     exit();
 }
 
-$action = Tools::filterAction(
+switch( $action = Tools::filterAction(
     $this->ww->request->param('action'),
     [
         'move', 
         'copy',
     ], 
-);
-
-switch( $action )
-{
+) ){
     case 'move':
         $moveAction = !$this->witch('destination')->isMotherOf($this->witch('origin'));
 

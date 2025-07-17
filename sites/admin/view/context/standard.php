@@ -1,15 +1,13 @@
-<!DOCTYPE html>
 <?php /** @var WW\Context $this */
-
-use WW\Website;
 
 $this->addCssFile('base.css');
 $this->addCssFile('header-footer.css');
 $this->addCssFile('context-standard.css');
+$this->addCssFile('alert-message.css');
 $this->addJsFile('fontawesome.js');
 $this->addJsFile('context-standard.js');
 ?>
-
+<!DOCTYPE html>
 <html lang="fr-FR" dir="ltr">
     <head><?php $this->include('context/head.php'); ?></head>
     <body>
@@ -18,9 +16,19 @@ $this->addJsFile('context-standard.js');
             <?php $this->include('context/header.php', [ 'breadcrumb' => $breadcrumb ?? [] ]); ?>
 
             <main>
-                <?php if( $this->witch("target") ): ?>
-                    <div><?php $this->include( 'witch/menu-info.php', [ 'witch' => $this->witch("target") ]); ?></div>
-                    <div><?php $this->include( 'witch/edit-menu-info.php', [ 'witch' => $this->witch("target") ]); ?></div>
+                <?php $this->include('alerts.php', ['alerts' => $this->ww->user->getAlerts()]); ?>
+
+                <div>
+                    <?php $this->include( 'witch/menu-info.php', [ 
+                        'witch' => $this->witch("target") ?? $this->witch()
+                    ]); ?>
+                </div>
+                <?php if( $this->getVar('editMenuData') ): ?>
+                    <div>
+                        <?php $this->include( 'witch/edit-menu-info.php', [ 
+                            'witch' => $this->witch("target") ?? $this->witch()
+                        ]); ?>
+                    </div>
                 <?php endif; ?>
 
                 <div class="tabs">
@@ -53,6 +61,7 @@ $this->addJsFile('context-standard.js');
                                 </a>
                             <?php endif; ?>
                         </div>
+
                     <?php endforeach; else: ?>
                         <div class="tabs__item selected">
                             <a href="#tab-current">

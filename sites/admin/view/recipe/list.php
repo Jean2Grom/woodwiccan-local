@@ -2,14 +2,9 @@
 
 $this->addCssFile('boxes.css');
 $this->addJsFile('triggers.js');
-
 ?>
+
 <div class="box view-content">
-    <h1><?=$this->witch()->name?></h1>
-    <p><?=$this->witch()->data?></p>
-
-    <?php $this->include('alerts.php', ['alerts' => $this->ww->user->getAlerts()]); ?>
-
     <div id="navHeader">
         <h2><?=count( $recipeArray )?> Recipe structures</h2>
     </div>

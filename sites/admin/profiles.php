@@ -2,27 +2,17 @@
 
 use WW\User\Profile;
 use WW\Website;
+use WW\Tools;
 
-$possibleActionsList = [
-    'create-profile',
-    'edit-profile',
-    'delete-profile',
-];
-
-$action = false;
-if( filter_has_var(INPUT_POST, "action") ){
-    foreach( $possibleActionsList as $possibleAction ){
-        if(filter_input(INPUT_POST, "action") == $possibleAction ){
-            $action = $possibleAction;
-        }
-    }
-}
-
-$alerts = $this->ww->user->getAlerts();
-switch( $action )
-{
+switch( $action = Tools::filterAction( 
+    $this->ww->request->param('action'),
+    [
+        'create-profile',
+        'edit-profile',
+        'delete-profile',
+    ]
+) ){
     case 'create-profile':
-        
         $profileData = [
             'name'      =>  trim($this->ww->request->param('profile-name') ?? ""),
         ];
@@ -81,27 +71,27 @@ switch( $action )
         
         if( empty($profileData['site']) )
         {
-            $alerts[] = [
+            $this->ww->user->addAlert([
                 'level'     =>  'error',
                 'message'   =>  "Mandatory parameters missing, creation canceled"
-            ];
+            ]);
             break;
         }
         
         $newProfileId = Profile::createNew( $this->ww, $profileData );
         if( !$newProfileId )
         {
-            $alerts[] = [
+            $this->ww->user->addAlert([
                 'level'     =>  'error',
                 'message'   =>  "Creation failed"
-            ];
+            ]);
             break;
         }
         
-        $alerts[] = [
+        $this->ww->user->addAlert([
             'level'     =>  'success',
             'message'   =>  "Creation succeed"
-        ];
+        ]);
     break;
     
     case 'edit-profile': 
@@ -112,10 +102,10 @@ switch( $action )
         
         if( empty($profileData['id']) )
         {
-            $alerts[] = [
+            $this->ww->user->addAlert([
                 'level'     =>  'error',
                 'message'   =>  "Unidentified profile, edition canceled"
-            ];
+            ]);
             break;
         }
         
@@ -172,54 +162,53 @@ switch( $action )
         
         if( !Profile::edit( $this->ww, $profileData ) )
         {
-            $alerts[] = [
+            $this->ww->user->addAlert([
                 'level'     =>  'error',
                 'message'   =>  "Edition failed"
-            ];
+            ]);
             break;
         }
         
-        $alerts[] = [
+        $this->ww->user->addAlert([
             'level'     =>  'success',
             'message'   =>  "Profile updated"
-        ];
-        
+        ]);
     break;
 
     case 'delete-profile':
         $profileId = $this->ww->request->param('profile-id', 'post', FILTER_VALIDATE_INT);
         if( empty($profileId) )
         {
-            $alerts[] = [
+            $this->ww->user->addAlert([
                 'level'     =>  'error',
                 'message'   =>  "Unidentified profile, deletion canceled"
-            ];
+            ]);
             break;
         }
         
         $profile = Profile::createFromId($this->ww, $profileId);
         if( !$profile )
         {
-            $alerts[] = [
+            $this->ww->user->addAlert([
                 'level'     =>  'error',
                 'message'   =>  "Unidentified profile, deletion canceled"
-            ];
+            ]);
             break;
         }
 
         if( !$profile->delete() )
         {
-            $alerts[] = [
+            $this->ww->user->addAlert([
                 'level'     =>  'error',
                 'message'   =>  "Deletion failed"
-            ];
+            ]);
             break;
         }
-        
-        $alerts[] = [
+
+        $this->ww->user->addAlert([
             'level'     =>  'success',
             'message'   =>  "Profile ".$profile->name." deleted"
-        ];
+        ]);
     break;
 }
 

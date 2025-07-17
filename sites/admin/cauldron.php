@@ -38,7 +38,7 @@ elseif( !$this->witch("target")->cauldron()->draft() )
 $cauldron       = $this->witch("target")->cauldron();
 $return         = false;
 
-switch( Tools::filterAction( 
+switch( $action = Tools::filterAction( 
     $this->ww->request->param('action'),
     [
         'save',

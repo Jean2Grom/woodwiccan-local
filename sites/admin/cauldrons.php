@@ -3,15 +3,6 @@
 use WW\Cauldron;
 use WW\Handler\CauldronHandler;
 
-// $conf = [
-//     'user',
-//     1,
-// ];
-//$this->ww->dump( $conf );
-//$result = CauldronHandler::fetch($this->ww, [1]);
-//$this->ww->dump( $result, 'bbb');
-
-
 $obj = new class {
     public $baseUrl;
 
@@ -96,18 +87,10 @@ function recursiveTree( Cauldron $cauldron, array|bool $sitesRestrictions=false,
     return $tree;
 }
 
-
-
- /** @var WW\Module $this */
-
-//$this->addJsLibFile('jquery-3.6.0.min.js');
 $this->addCssFile('choose-witch.css');
-//$this->addJsFile('choose-cauldron.js');
 ?>
 <div id="cauldrons">
-    <h3>
-        <span>Cauldrons Navigation</span>
-    </h3>
+    <h3><span>Cauldrons Navigation</span></h3>
     
     <?php include $this->ww->website->getViewFilePath( 'arborescence.php' ); ?>
 </div>

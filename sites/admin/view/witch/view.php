@@ -5,6 +5,7 @@ $this->addCssFile('boxes.css');
 $this->addJsFile('triggers.js');
 $this->addJsFile('view.js');
 
+$this->addContextVar('editMenuData', true);
 $this->addContextArrayItems( 'tabs', [
     'tab-current'       => [
         'selected'  => true,
@@ -17,17 +18,17 @@ $this->addContextArrayItems( 'tabs', [
 ]);
 ?>
 
-<?php $this->include('alerts.php', ['alerts' => $this->ww->user->getAlerts()]); ?>
+<?php //$this->include('alerts.php', ['alerts' => $this->ww->user->getAlerts()]); ?>
 
 <div class="tabs-target__item selected"  id="tab-current">
     <div class="box-container">
         <div><?php $this->include('witch/info.php', [ 
             'witch'     => $this->witch("target"), 
-            'imgSrc'    => $this->image('favicon.png'),
+            //'imgSrc'    => $this->image('favicon.png'),
         ]); ?></div>
         <div><?php $this->include('witch/edit-info.php', [ 
             'witch'         => $this->witch("target"), 
-            'imgSrc'        => $this->image('favicon.png'),
+            //'imgSrc'        => $this->image('favicon.png'),
             'websitesList'  => $websitesList, 
         ]); ?></div>
         <div><?php $this->include('witch/daughters.php', [ 

@@ -13,7 +13,7 @@
     animation-duration: 1s;
     animation-fill-mode: forwards;
     animation-delay: 8s;
-    
+
     border: 1px solid #424242;
     padding: 1vw 2vw;
     display: block;
@@ -22,6 +22,9 @@
     box-shadow: 0.2vw 0.2vw 0.2vw #aaa;
     color: #424242;
     font-style: italic;
+    position: absolute;
+    right: 24px;
+    background-color: white;
 }
     .alert-message.error {
         border-color: #dc3545;

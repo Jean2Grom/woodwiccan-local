@@ -6,8 +6,6 @@ $this->addJsFile('root.js');
 ?>
 
 <div class="content">
-    <?php $this->include('alerts.php', ['alerts' => $this->ww->user->getAlerts()]); ?>
-    
     <!--div class="content__data"><?=$this->witch->data?></div>
     
     <form method="post" id="data-edit">
