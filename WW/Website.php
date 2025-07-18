@@ -117,6 +117,15 @@ class Website
         $this->context  = new Context( $this, $this->defaultContext );
     }
     
+    /**
+     * Name reading
+     * @return string
+     */
+    public function __toString(): string {
+        return $this->name;
+    }
+
+
     function get(string $name): mixed {
         return $this->ww->configuration->readSiteVar($name, $this);
     }
@@ -315,7 +324,7 @@ class Website
         return $this->rootUrl;
     }
     
-    function getFullUrl( string $urlPath='', ?array $urlParams=null, ?Request $request=null )
+    function getFullUrl( string $urlPath='', ?array $urlParams=null, ?Request $request=null ): string
     {
         if( !$request ){
             $request = $this->ww->request;
@@ -338,7 +347,7 @@ class Website
         return $fullUrl;
     }
     
-    function getUrl( string $urlPath='', ?array $urlParams=null )
+    function getUrl( string $urlPath='', ?array $urlParams=null ): string
     {
         $url    = $this->baseUri;
         if( !empty($urlPath) && !str_starts_with($urlPath, '/') ){

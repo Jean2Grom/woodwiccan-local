@@ -41,10 +41,10 @@ class Witch
     public $name;
     public $datetime;
     
-    public $statusLevel     = 0;
-    public $status;
+    public int $statusLevel = 0;
+    public ?string $status  = null;
     
-    public $site;
+    public Website|string|null $site = null;
     
     public $depth           = 0;
     public $position        = [];
@@ -117,22 +117,12 @@ class Witch
      * Resolve status label with Website generation
      * @return ?string status label
      */
-    function status()
+    function status(): ?string
     {
-        if( $this->status ){
-            return $this->status;
-        }
-        
-        if( $this->site ){
-            $statusList = (new Website( $this->ww, $this->site ))->status;
-        }
-        
-        if( empty($statusList) ){
-            $statusList = $this->ww->configuration->read('global', "status");
-        }
-        
-        if( isset($statusList[ $this->statusLevel ]) ){
-            $this->status = $statusList[ $this->statusLevel ];
+        if( is_null($this->status) )
+        {
+            $statusList     = $this->site()?->status ?? $this->ww->configuration->read('global', "status");
+            $this->status   = $statusList[ $this->statusLevel ] ?? null;
         }
         
         return $this->status;
@@ -772,17 +762,17 @@ class Witch
      * Generate this witch url, 
      * relative if no forcedWebsite is passed, full if there is one
      * @param array|null $queryParams
-     * @param Website|null $forcedWebsite
      */
-    function url( ?array $queryParams=null, ?Website $forcedWebsite=null )
+    function url( ?array $queryParams=null ): ?string
     {
-        $website = $forcedWebsite ?? $this->ww->website;
-        
-        if( $this->site !== $website->site || is_null($this->url) ){
+        if( is_null($this->url) ){
             return null;
         }
+
+        $website = $this->site() ?? $this->ww->website;
         
-        if( $forcedWebsite ){
+        
+        if( $website !==  $this->ww->website ){
             $method = "getFullUrl";
         }
         else {
@@ -937,6 +927,42 @@ class Witch
         }
         
         return $this->cauldron;
+    }
+    
+
+    /**
+     * witch website
+     * @return ?Website
+     */
+    function site(): ?Website
+    {
+        if( is_object($this->site) ){
+            return $this->site;
+        }
+        
+        $site       = $this->site;
+        $witchRef   = $this->mother;
+        
+        while( !$site && $witchRef )
+        {
+            $site       = $witchRef->site;
+            $witchRef   = $witchRef->mother;
+        }
+
+        if( !$site ){
+            return null;
+        }
+        elseif( is_object($site) ){
+            $this->site = $site;
+        }
+        elseif( $site === $this->ww->website->name ){
+            $this->site = $this->ww->website;
+        }
+        else {
+            $this->site = new Website( $this->ww, $site );
+        }
+
+        return $this->site;
     }
     
 

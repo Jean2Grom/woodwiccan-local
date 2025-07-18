@@ -16,7 +16,7 @@ if( !$this->witch("target") ){
     exit();
 }
 
-switch( Tools::filterAction( 
+switch( $action = Tools::filterAction( 
     $this->ww->request->param('action'),
     [
         'remove-cauldron',
@@ -487,7 +487,7 @@ while( !empty($breadcrumbWitch) )
         break;
     }
     
-    $breadcrumbWitch    = $breadcrumbWitch->mother();    
+    $breadcrumbWitch    = $breadcrumbWitch->mother();
 }
 
 $this->addContextVar( 'breadcrumb', array_reverse($breadcrumb) );

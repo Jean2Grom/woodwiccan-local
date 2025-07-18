@@ -6,7 +6,7 @@
 <div class="box view__cauldron">
     <?php if( !$witch->cauldron() ): ?>
         <h3>
-            <i class="fa fa-feather-alt"></i>
+            <i class="fa fa-mortar-pestle"></i>
             No cauldron
         </h3>
         <form method="post" id="witch-add-new-cauldron">
@@ -46,7 +46,7 @@
 
     <?php else: ?>
         <h3 title="ID <?=$witch->cauldron()->id ?>">
-            <i class="fa fa-feather-alt"></i>
+            <i class="fa fa-mortar-pestle"></i>
             <?=$witch->cauldron()->name ?>
         </h3>
         <h4 title="ID <?=$witch->cauldron()->id ?>">

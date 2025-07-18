@@ -7,45 +7,23 @@
 <div class="box view__daughters">
     <h3>
         <i class="fa fa-folder-open"></i>
-        Arborescence
+        Daughters
     </h3>
     
-    <?php if( $witch->mother() ): ?>
-        <table class="vertical">
-            <tr>
-                <td class="label"><em>Mother</em></td>
-                <td class="value">
-                    <a href="<?=$witch->ww->website->getUrl("view?id=".$witch->mother()->id) ?>">
-                        <?=$witch->mother() ?>
-                    </a>
-                </td>
-            </tr>
-        </table>
-    <?php endif; ?>
     
     <?php if( empty($witch->daughters()) ): ?>
         <p class="bottom-label"><em>No daughters for this witch</em></p>
         
     <?php else: ?>
-        <p class="bottom-label"><em>Daughters list for this Witch</em></p>
-        
         <form method="post" 
               id="view-daughters-action" 
-              action="<?=$witch->ww->website->getUrl('edit?id='.$witch->id) ?>">
-            <table >
-                <thead>
-                    <tr>
-                        <th><em>Daughters</em></th>
-                    </tr>
-                </thead>            
-            </table>
-            
+              action="<?=$witch->ww->website->getUrl("edit", [ 'id' => $witch->id ]) ?>">
             <table>
                 <thead>
                     <tr>
                         <th>Name</th>
-                        <th class="full">Cauldron</th>
                         <th class="full">Status</th>
+                        <th class="full">Cauldron</th>
                         <th class="full">Invoke</th>
                         <th>Actions</th>
                         <th>Priority</th>
@@ -56,9 +34,19 @@
                         <tr>
                             <td>
                                 <a href="<?=$witch->ww->website->getUrl("view?id=".$daughter->id) ?>">
+                                    <?php if( $daughter->hasCauldron() && $daughter->hasInvoke() ): ?>
+                                        <i class="fa fa-hat-wizard"></i>
+                                    <?php elseif( $daughter->hasCauldron() ): ?>
+                                        <i class="fa fa-mortar-pestle"></i>
+                                    <?php elseif( $daughter->hasInvoke() ): ?>
+                                        <i class="fa fa-hand-sparkles"></i>
+                                    <?php endif; ?>
                                     <?=$daughter->name ?>
                                 </a>
                             </td>   
+                            <td class="full" title="<?=$daughter->site ?? "" ?>">
+                                <span class="text-center"><?=$daughter->status() ?? "" ?></span>
+                            </td>
                             <td class="full">
                                 <a href="<?=$witch->ww->website->getUrl("view?id=".$daughter->id."#tab-cauldron-part") ?>"
                                    class="text-center">
@@ -70,12 +58,9 @@
                                     <?php endif; ?>
                                 </a>
                             </td>
-                            <td class="full" title="<?=$daughter->site ?? "" ?>">
-                                <span class="text-center"><?=$daughter->status() ?? "" ?></span>
-                            </td>
                             <td class="full">
                                 <?php if( $daughter->hasInvoke() ): 
-                                    $url = $daughter->url( null, $websitesList[ $daughter->site ] ?? null ); ?>
+                                    $url = $daughter->url(); ?>
                                     <a  class="text-center"
                                         target="_blank"
                                         href="<?=$url ?>" 

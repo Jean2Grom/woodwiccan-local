@@ -261,7 +261,7 @@ class WitchHandler
         $tree   = [ 
             'id'                => $witch->id,
             'name'              => $witch->name,
-            'site'              => $witch->site ?? "",
+            'site'              => (string) $witch->site ?? "",
             'description'       => $witch->data,
             'cauldron'          => $witch->hasCauldron(),
             'invoke'            => $witch->hasInvoke(),

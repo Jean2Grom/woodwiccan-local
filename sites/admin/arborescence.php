@@ -13,7 +13,7 @@ $obj = new class {
     {
         if( !$this->unSafeMode 
             && $witch->invoke 
-            && $witch->site === $this->currentSite 
+            && (string) $witch->site === $this->currentSite 
         ){
             return $witch->url();
         }
