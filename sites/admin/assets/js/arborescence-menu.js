@@ -12,6 +12,7 @@ const ArborescenceMenu = function( key ){
         dropped: null,
         clipboardUrl: null,
         createUrl: null,
+        cauldronUrl: null,
         urlHash: null,
 
         container: null,
@@ -33,6 +34,7 @@ const ArborescenceMenu = function( key ){
             //toggleDomOpen: {dom: "i", classes: [ 'fas', 'fa-chevron-right' ]},
 
             add: {dom: "i", classes: [ 'fa', 'fa-plus' ]}, 
+            view: {dom: "i", classes: [ 'fa', 'fa-eye' ]}, 
             cancel: {dom: "i", classes: [ 'fa', 'fa-times' ]}, 
             copy: {dom: "i", classes: [ 'fa', 'fa-clone' ]}, 
             move: {dom: "i", classes: [ 'fa', 'fa-arrows' ]}, 
@@ -49,6 +51,7 @@ const ArborescenceMenu = function( key ){
             this.draggable      = entries.draggable ?? false;
             this.clipboardUrl   = entries.clipboardUrl ?? null,
             this.createUrl      = entries.createUrl ?? null,
+            this.cauldronUrl    = entries.cauldronUrl ?? null,
             this.urlHash        = entries.urlHash ?? null,
 
             this.container      = document.querySelector('#' + this.key + '.arborescence-menu-container'),
@@ -77,14 +80,28 @@ const ArborescenceMenu = function( key ){
                             {
                                 targetedWitch.classList.add('targeted-witch');
 
-                                this.triggerContextual( e, [
+                                let menuArray = [
                                     { 
-                                        url: this.createUrl+'?id='+targetedWitch.dataset.id, 
-                                        icon: this.icons.add, 
-                                        text: "Create daughter" 
-                                    },
-                                    { icon: this.icons.cancel, text: "Cancel" },
-                                ]);
+                                        url: targetedWitch.querySelector('a.arborescence-level__witch__name').href, 
+                                        icon: this.icons.view, 
+                                        text: "View witch" 
+                                    }                                    
+                                ];
+                                if( targetedWitch.dataset.cauldron === 'true' ){
+                                    menuArray.push( {
+                                        url: this.cauldronUrl+'?id='+targetedWitch.dataset.id, 
+                                        icon: this.icons.cauldronWitch, 
+                                        text: "Edit cauldron" 
+                                    } );
+                                }
+                                menuArray.push( {
+                                    url: this.createUrl+'?id='+targetedWitch.dataset.id, 
+                                    icon: this.icons.add, 
+                                    text: "Create daughter" 
+                                } );
+                                menuArray.push( { icon: this.icons.cancel, text: "Cancel" }, );
+
+                                this.triggerContextual( e, menuArray );
 
                                 return;
                             }
@@ -231,7 +248,6 @@ const ArborescenceMenu = function( key ){
                     }
                     
                     arborescenceLevelWitchDom.dataset.id        = daughterId;
-arborescenceLevelWitchDom.dataset.craft     = daughterData['craft'];
                     arborescenceLevelWitchDom.dataset.cauldron  = daughterData['cauldron'];
                     arborescenceLevelWitchDom.dataset.invoke    = daughterData['invoke'];
                     

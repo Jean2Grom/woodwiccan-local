@@ -21,6 +21,7 @@ $key = "arborescence_".md5(microtime().rand());
         "draggable": <?=$draggble ?? null ? "true": "false"?>,
         "clipboardUrl": <?=($clipboardUrl ?? null)? '"'.$clipboardUrl.'"': "null" ?>,
         "createUrl": <?=($createUrl ?? null)? '"'.$createUrl.'"': "null" ?>,
+        "cauldronUrl": <?=($cauldronUrl ?? null)? '"'.$cauldronUrl.'"': "null" ?>,
         "urlHash": <?=($urlHash ?? null)? '"'.$urlHash.'"': "null" ?>,
     };
 </script>

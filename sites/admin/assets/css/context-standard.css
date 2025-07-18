@@ -42,6 +42,9 @@ main, footer {
 main {
     padding-bottom: 0;
 }
+    main > div {
+        display: flex;
+    }
 .breadcrumb {
     font-size: 0.8em;
 }
@@ -81,6 +84,7 @@ fieldset {
     }
         .tabs-target__item.selected {
             display: block;
+            width: 100%;
         }
 @media screen and (min-device-width: 768px) {
     nav {

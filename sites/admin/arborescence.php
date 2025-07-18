@@ -41,6 +41,7 @@ $daughters      = $root["daughters"];
 $draggble       = true;
 $clipboardUrl   = $this->ww->website->getUrl('clipboard');
 $createUrl      = $this->ww->website->getUrl('create-witch');
+$cauldronUrl    = $this->ww->website->getUrl('cauldron');
 $urlHash        = 'tab-navigation';
 
 while( $pathFound )
