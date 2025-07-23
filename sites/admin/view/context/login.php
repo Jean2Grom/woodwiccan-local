@@ -10,9 +10,9 @@ $this->addCssFile('header-footer.css');
     
     <body>
         <div class="container">
-            <header><?php $this->include('context/header.php'); ?></header>
+            <?php $this->include('context/header.php'); ?>
             <main><?=$this->witch()->result() ?></main>
-            <footer><?php $this->include('context/footer.php'); ?></footer>
+            <?php $this->include('context/footer.php'); ?>
         </div>
         
         <?php foreach( $this->getJsFiles() as $jsFile ): ?>
