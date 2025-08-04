@@ -6,20 +6,9 @@ $this->addJsFile('root.js');
 ?>
 
 <div class="content">
-    <!--div class="content__data"><?=$this->witch->data?></div>
-    
-    <form method="post" id="data-edit">
-        <textarea name="data" id="witch__data"></textarea>
-        <button class="trigger-action"
-                data-action="edit-data"
-                data-target="data-edit">
-            Publier
-        </button>
-    </form-->
-    
     <div class="box-container">
         <div class="box content__daughters">
-            <h2>Daugthers</h2>
+            <h2>Matriarches</h2>
             
             <form method="post" id="daughters-action">
                 <table>
@@ -32,7 +21,7 @@ $this->addJsFile('root.js');
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach($this->getDaughters() as $daughter): ?>
+                        <?php foreach( ($this->witch("root") ?? $this->witch())?->daughters() ?? [] as $daughter ): ?>
                             <tr>
                                 <td>
                                     <a href="<?=$this->ww->website->getUrl("/view?id=".$daughter->id) ?>">
@@ -67,12 +56,14 @@ $this->addJsFile('root.js');
 
             <div class="box__actions">
                 <button class="trigger-href" 
-                        data-href="<?=$this->ww->website->getUrl("create?mother=".$this->witch->id)?>">
+                        data-href="<?=$this->ww->website->getUrl("create-witch")?>">
+                    <i class="fa fa-plus"></i>
                     Add daugther
                 </button>
                 <button class="trigger-action"
                         data-action="edit-priorities"
                         data-target="daughters-action">
+                    <i class="fa fa-sort-numeric-up-alt"></i>
                     Update priorities
                 </button>
             </div>

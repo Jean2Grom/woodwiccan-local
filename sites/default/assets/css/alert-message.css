@@ -8,12 +8,21 @@
     }
 }
 
-.alert-message {
+.alert-message-container {
     animation-name: wwBasicFadeOut;
     animation-duration: 1s;
     animation-fill-mode: forwards;
     animation-delay: 8s;
 
+    position: absolute;
+    right: 16px;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.alert-message {
     border: 1px solid #424242;
     padding: 1vw 2vw;
     display: block;
@@ -22,8 +31,6 @@
     box-shadow: 0.2vw 0.2vw 0.2vw #aaa;
     color: #424242;
     font-style: italic;
-    position: absolute;
-    right: 24px;
     background-color: white;
 }
     .alert-message.error {
@@ -40,8 +47,41 @@
     }
     .alert-message strong {
         font-weight: bold;
-    }   
-    
+    }
+.restore-alert-message {
+    position: absolute;
+    border-radius: 8px;
+    right: 16px;
+    background-color: white;    
+    border: 1px solid #424242;
+    padding: 8px;
+    z-index: 5;
+    min-width: 14px;
+    min-height: 14px;
+    display: flex;
+    flex-direction: column;
+}
+    .restore-alert-message > span {
+        display: none;
+    }
+    .restore-alert-message .error {
+        color: #dc3545;
+    }
+    .restore-alert-message .warning {
+        color: #ff9900;
+    }
+    .restore-alert-message .success {
+        color: #28a745;
+    }
+    .restore-alert-message strong {
+        font-weight: bold;
+    }
+    .restore-alert-message:hover > span {
+        display: block;
+    }
+    .restore-alert-message:hover > i {
+        display: none;
+    }
 @media screen and (min-device-width: 1024px) {
     .alert-message {
         padding: 8px 12px;

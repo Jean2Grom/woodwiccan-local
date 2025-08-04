@@ -114,7 +114,7 @@ class Configuration
             $website = $this->ww->website;
         }
         
-        foreach( $website->siteHeritages as $section )
+        foreach( $website->heritages as $section )
         {
             $value = $this->read($section, $variable);
             
@@ -133,7 +133,7 @@ class Configuration
         }
         
         $return = null;
-        foreach( array_reverse($website->siteHeritages) as $section )
+        foreach( array_reverse($website->heritages) as $section )
         {
             $value = $this->read($section, $variable);
             
@@ -175,14 +175,14 @@ class Configuration
      */
     function getSiteHeritage( string $siteName ): array
     {
-        $siteHeritages      = $this->read( $siteName, "siteHeritages" );
+        $heritages      = $this->read( $siteName, "heritages" );
         
-        if( !$siteHeritages ){
+        if( !$heritages ){
             return [ $siteName ];
         }
         
         $return = [ $siteName ];
-        foreach( $siteHeritages as $siteHeritagesItem )
+        foreach( $heritages as $siteHeritagesItem )
         {
             $return[] = $siteHeritagesItem;                
             foreach( $this->getSiteHeritage($siteHeritagesItem) as  $subSiteHeritagesItem ){

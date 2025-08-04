@@ -769,21 +769,21 @@ class Witch
             return null;
         }
 
-        $website = $this->site() ?? $this->ww->website;
-        
-        
-        if( $website !==  $this->ww->website ){
-            $method = "getFullUrl";
+        $website    = $this->site() ?? $this->ww->website;
+        $method     = "getUrl";
+
+        if( $website->name ===  $this->ww->website->site ){
+            $website    = $this->ww->website;
         }
-        else {
-            $method = "getUrl";
+        elseif( $website->name !==  $this->ww->website->site ){
+            $method = "getFullUrl";
         }
         
         return call_user_func([$website, $method], $this->url, $queryParams ?? null);
     }
     
     
-    function moveTo( self $witch )
+    function moveTo( self $witch ): bool
     {
         $this->ww->db->begin();
         try {

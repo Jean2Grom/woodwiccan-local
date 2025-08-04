@@ -19,7 +19,7 @@ class Website
     public $site;
     
     public $access;
-    public $adminForSites;
+    public $manage;
     public $sitesRestrictions;
     
     public $baseUri;
@@ -34,7 +34,7 @@ class Website
     public bool $debug;    
     public $extensions;
     
-    public $siteHeritages;
+    public $heritages;
     
     public $defaultContext;
     
@@ -62,17 +62,17 @@ class Website
         $this->name             = $name;
         
         // Reading non heritable confs publiciables
-        $this->access               = $this->ww->configuration->read($this->name, "access");
-        $this->adminForSites        = $this->ww->configuration->read($this->name, "adminForSites");
-        $this->site                 = $this->ww->configuration->read($this->name, "visibility") ?? $this->name;
+        $this->access   = $this->ww->configuration->read($this->name, "access");
+        $this->manage   = $this->ww->configuration->read($this->name, "manage");
+        $this->site     = $this->ww->configuration->read($this->name, "site") ?? $this->name;
         
         if( $this->site !== $this->name ){
             $this->ww->debug->toResume("URL site is acceded by: \"".$this->site."\"", 'WEBSITE');
         }
         
         
-        $this->siteHeritages        = $this->ww->configuration->getSiteHeritage( $this->name );
-        $this->siteHeritages[]      = "global";
+        $this->heritages        = $this->ww->configuration->getSiteHeritage( $this->name );
+        $this->heritages[]      = "global";
         
         $this->modules              = $this->ww->configuration->readSiteMergedVar('modules', $this) ?? [];
         $witchesConf                = $this->ww->configuration->readSiteMergedVar('witches', $this) ?? [];
@@ -85,7 +85,7 @@ class Website
         }
         
         $this->sitesRestrictions    = [ $this->site ];
-        foreach( $this->adminForSites ?? [] as $adminisratedSite )
+        foreach( $this->manage ?? [] as $adminisratedSite )
         {
             if( $adminisratedSite == '*' )
             {
@@ -167,7 +167,7 @@ class Website
         }
         
         // Looking in herited sites
-        foreach( $this->siteHeritages as $heritedSite )
+        foreach( $this->heritages as $heritedSite )
         {
             $filePath = self::SITES_DIR.'/'.$heritedSite.'/'.$filename;
 
@@ -227,7 +227,7 @@ class Website
         }
         
         $modulesList = [];
-        foreach( $this->siteHeritages as $siteItem )
+        foreach( $this->heritages as $siteItem )
         {
             if( $siteItem == "global" ){
                 $dir = self::DEFAULT_SITE_DIR;
@@ -283,7 +283,7 @@ class Website
     {
         $contextsList = [];
         
-        foreach( $this->siteHeritages as $siteItem )
+        foreach( $this->heritages as $siteItem )
         {
             if( $siteItem == "global" ){
                 $dir = "sites/default/".Context::DIR;

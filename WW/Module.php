@@ -205,22 +205,6 @@ class Module
         return;
     }
     
-    function getDaughters( ?Witch $witch=null )
-    {
-        if( empty($witch) ){
-            $witch = $this->witch;
-        }
-        
-        $daughters = [];
-        foreach( $witch->daughters() as $daughterKey => $daughterWitch ){
-            if( $this->maxStatus === false || $daughterWitch->statusLevel <= $this->maxStatus ){
-                $daughters[ $daughterKey ] = $daughterWitch;
-            }
-        }
-        
-        return $daughters;
-    }
-    
     function setIsRedirection( bool $isRedirection ): self
     {
         $this->isRedirection = $isRedirection;

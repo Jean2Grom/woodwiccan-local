@@ -1,4 +1,9 @@
-<?php /** @var WW\Module $this */
+<?php 
+/** @var WW\Module $this 
+ *  @var ?WW\Witch $destWitch
+ */
+
+$destWitch = $destWitch ?? $this->witch("target");
 
 $this->addCssFile('boxes.css');
 $this->addJsFile('triggers.js');
@@ -51,12 +56,12 @@ $this->addContextArrayItems( 'tabs', [
                 </label>
                 <select name="new-witch-site" 
                         id="new-witch-site"
-                        data-init="<?=$this->witch("target")->site ?>">
+                        data-init="<?=$destWitch->site ?>">
                     <option value="">
                         no site selected
                     </option>
                     <?php foreach( $websitesList as $website ): ?>
-                        <option <?=($this->witch("target")->site === $website->site)? 'selected' :'' ?>
+                        <option <?=($destWitch->site === $website->site)? 'selected' :'' ?>
                                 value="<?=$website->site ?>">
                             <?=$website->name ?>
                         </option>
@@ -68,20 +73,20 @@ $this->addContextArrayItems( 'tabs', [
                 </label>
                 <select name="new-witch-status" 
                         id="new-witch-status" 
-                        data-init="<?=$this->witch("target")->statusLevel ?>"></select>
+                        data-init="<?=$destWitch->statusLevel ?>"></select>
                 
                 <div id="site-selected"
-                    <?=!$this->witch("target")->site? 'style="display: none;"' :'' ?>>
+                    <?=!$destWitch->site? 'style="display: none;"' :'' ?>>
                     
                     <label for="new-witch-invoke">
                         Module to invoke
                     </label>
                     <select name="new-witch-invoke" 
                             id="new-witch-invoke"
-                            data-init="<?=$this->witch("target")->invoke ?>"></select>
+                            data-init="<?=$destWitch->invoke ?>"></select>
                     
                     <div    id="invoke-selected"
-                            <?=!$this->witch("target")->invoke? 'style="display: none;"' :'' ?>>
+                            <?=!$destWitch->invoke? 'style="display: none;"' :'' ?>>
 
                         <div id="auto-url-disabled" style="display: none;">
                             <label for="new-witch-url">
@@ -158,7 +163,7 @@ $this->addContextArrayItems( 'tabs', [
     </button>
     
     <button class="trigger-href" 
-            data-href="<?=$this->ww->website->getUrl("view?id=".$this->witch("target")->id)?>">
+            data-href="<?=$this->ww->website->getUrl("view?id=".$destWitch->id)?>">
         <i class="fa fa-times"></i>
         Cancel
     </button>

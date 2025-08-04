@@ -5,7 +5,9 @@ namespace WW;
 use WW\Handler\CauldronHandler;
 use WW\Handler\WitchHandler;
 
-if( !$this->witch("target") ){
+$destWitch = $this->witch("target") ?? $this->witch("root");
+
+if( !$destWitch ){
     $this->ww->user->addAlert([
         'level'     =>  'error',
         'message'   =>  "Witch not found"
@@ -96,7 +98,7 @@ switch( $action = Tools::filterAction(
             $url    =   "";
             if( !$customFullUrl )
             {
-                $url    .=  trim( $this->witch("target")->getClosestUrl($site), '/' );
+                $url    .=  trim( $destWitch->getClosestUrl($site), '/' );
                 $url    .=  '/';
             }
             $url    .=  trim( $customUrl, '/' );
@@ -158,7 +160,7 @@ switch( $action = Tools::filterAction(
             $params['cauldron'] = $newCauldron->id;
         }
 
-        $newWitch = $this->witch("target")->createDaughter( $params );
+        $newWitch = $destWitch->createDaughter( $params );
 
         if( !$newWitch ){
             $this->ww->user->addAlert([
@@ -187,10 +189,10 @@ switch( $action = Tools::filterAction(
 }
 
 $breadcrumb         = [];
-$breadcrumbWitch    = $this->witch("target");
+$breadcrumbWitch    = $destWitch;
 while( !empty($breadcrumbWitch) )
 {
-    if( $breadcrumbWitch  === $this->witch("target") ){
+    if( $breadcrumbWitch  === $destWitch ){
         $url    = "javascript: location.reload();";
     }
     else {

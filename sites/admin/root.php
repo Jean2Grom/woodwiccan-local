@@ -2,42 +2,20 @@
 
 use WW\Tools;
 
+$witch = $this->witch("root") ?? $this->witch();
+
 switch( $action = Tools::filterAction( 
     $this->ww->request->param('action'),
     [
-        'edit-data',
         'edit-priorities',
-
-        ]
+    ]
 ) ){
-    case 'edit-data':
-        $data = $this->ww->request->param('data');
-        if( $data == $this->witch->data ){
-            $this->ww->user->addAlert([
-                'level'     =>  'warning',
-                'message'   =>  "Description identique"
-            ]);
-        }
-        elseif( $this->witch->edit([ 'data' => $data ]) ){
-            $this->ww->user->addAlert([
-                'level'     =>  'success',
-                'message'   =>  "Description mise à jour"
-            ]);
-        }
-        else {
-            $this->ww->user->addAlert([
-                'level'     =>  'error',
-                'message'   =>  "Une erreur est survenue, la description n'a pas été mise à jour."
-            ]);
-        }
-    break;
-    
     case 'edit-priorities':
         $priorities =  $this->ww->request->param('priorities', 'post',FILTER_VALIDATE_INT, FILTER_REQUIRE_ARRAY);
         
         $errors     = [];
         $success    = [];
-        $daughters  = $this->getDaughters();
+        $daughters  = $witch->daughters();
         foreach( $priorities as $witchId => $witchPriority )
         {
             $editResult = $daughters[ $witchId ]->edit([ 'priority' => $witchPriority ]);
