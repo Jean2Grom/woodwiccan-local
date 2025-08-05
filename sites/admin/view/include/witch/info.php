@@ -86,7 +86,4 @@
     </div>
 </div>
 
-<form method="post" 
-      action="<?=$witch->ww->website->getUrl('edit?id='.$witch->id) ?>"
-      id="view-info-action"></form>
-
+<form method="post" id="view-info-action"></form>

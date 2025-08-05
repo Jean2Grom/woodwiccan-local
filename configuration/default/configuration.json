@@ -1,0 +1,114 @@
+{
+    "database": {
+        "driver": "mysql",
+        "server": "<WW_DB_SERVER>",
+        "database": "<WW_DB_NAME>",
+        "user": "<WW_DB_USER>",
+        "password": "<WW_DB_PWD>",
+        "port": "",
+        "charset": "utf8mb4"
+    },
+    "cache": {
+        "directory": "cache",
+        "createFolderRights": "755",
+        "duration": 1,
+        "durationUnit": "h",
+        "folders": {
+            "system": {
+                "duration": 10,
+                "durationUnit": "min"
+            },
+            "structure": {
+                "directory": "structures",
+                "durationUnit": "week",
+                "duration": 1.5
+            },
+            "contexts": {
+                "duration": "*"
+            }
+        }
+    },
+    "system": {
+        "debug": [
+            "127.0.0.1",
+            "xxx.xxx.xxx.xxx"
+        ],
+        "createFolderRights": "755",
+        "maxLog": "10000000",        
+        "publicUser": "anonymous",
+        "publicUserProfile": "public",
+        "defaultSite": "admin"
+    },
+    "global": {
+        "debug": false,
+        "modules": {
+            "*": {
+                "notAllowed": "403"
+            },
+            "view": {
+                "notAllowed": "login"
+            },
+            "login": {
+                "public": true
+            },
+            "404": {
+                "public": true
+            },
+            "403": {
+                "public": true
+            },
+            "ajax/captcha": {
+                "public": true
+            }
+        },
+        "status": {
+            "0": "public",
+            "1": "subscribers",
+            "2": "customers",
+            "3": "suspended",
+            "4": "hidden",
+            "5": "draft",
+            "6": "pending",
+            "7": "archived",
+            "8": "edito",
+            "9": "admin",
+            "10": "superadmin"
+        },
+        "witches": {
+            "current": {
+                "url": true, 
+                "invoke": true,
+                "craft": true,
+                "parents": {
+                    "depth": "*",
+                    "craft": false
+                },
+                "sisters": {
+                    "depth": 1,
+                    "craft": false
+                },
+                "children": {
+                    "depth": 2,
+                    "craft": 2
+                }
+            },
+            "user": {
+                "user": true,
+                "children": {
+                    "depth": "*",
+                    "craft": "*"
+                }
+            }
+        },
+        "recipes": {
+            "allowed": "*",
+            "forbidden": []
+        },
+        "storage": {
+            "files": "files"
+        },
+        "extensions": [
+            "test"
+        ]
+    }
+}

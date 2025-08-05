@@ -19,11 +19,11 @@ document.addEventListener("DOMContentLoaded", () =>
                 }
             );
 
-            document.querySelectorAll('.edit__witch-info, .create__witch').forEach(
+            document.querySelectorAll('.edit__witch-info').forEach(
                 hideDom => hideDom.style.display = 'none'
             );
 
-            document.querySelectorAll('.view__witch-info, .view__daughters').forEach(
+            document.querySelectorAll('.view__witch-info').forEach(
                 showDom => showDom.style.display = 'block'
             );
         })
@@ -38,37 +38,6 @@ document.addEventListener("DOMContentLoaded", () =>
                     }
                 }
             )
-        })
-    );
-
-
-    // Add new witch behaviour
-    document.querySelectorAll('.create__witch').forEach(
-        hideDom => hideDom.style.display = 'none'
-    );
-
-    document.querySelectorAll('button.view-daughters__create-witch__toggle').forEach(
-        toggler => toggler.addEventListener("click", 
-        () => {
-            document.querySelectorAll('.create__witch, .view__daughters').forEach(
-                toggledDom => {
-                    if( toggledDom.style.display === 'none' ){
-                        toggledDom.style.display = 'block';
-                    }
-                    else {
-                        toggledDom.style.display = 'none';
-                    }
-                }
-            );
-
-            document.querySelectorAll('.edit__witch-info, .edit__witch-menu-info').forEach(
-                hideDom => hideDom.style.display = 'none'
-            );
-
-            document.querySelectorAll('.view__witch-info, .view__witch-menu-info').forEach(
-                showDom => showDom.style.display = 'block'
-            );
-
         })
     );
 
@@ -92,11 +61,11 @@ document.addEventListener("DOMContentLoaded", () =>
                 }
             );
 
-            document.querySelectorAll('.edit__witch-menu-info, .create__witch').forEach(
+            document.querySelectorAll('.edit__witch-menu-info').forEach(
                 hideDom => hideDom.style.display = 'none'
             );
 
-            document.querySelectorAll('.view__witch-menu-info, .view__daughters').forEach(
+            document.querySelectorAll('.view__witch-menu-info').forEach(
                 showDom => showDom.style.display = 'block'
             );
 

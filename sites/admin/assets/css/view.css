@@ -51,8 +51,7 @@
     .box.edit__witch-menu-info {
         max-width: 720px;
     }
-.box.view__witch-info, 
-.box.create__witch{ 
+.box.view__witch-info { 
     width: 350px;
 }
     

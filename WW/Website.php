@@ -28,7 +28,6 @@ class Website
     private $rootUrl;
     
     public $modules;
-    public $attributes;
     public $status;
     
     public bool $debug;    

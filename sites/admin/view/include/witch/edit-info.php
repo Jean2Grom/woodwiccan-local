@@ -6,7 +6,6 @@
 ?>
 <div class="box edit__witch-info">
     <form   method="post"
-            action="<?=$witch->ww->website->getUrl('edit?id='.$witch->id) ?>"
             id="edit-witch-info">
         <h3>
             <i class="fa fa-hand-sparkles"></i>
@@ -23,9 +22,9 @@
                 no site selected
             </option>
             <?php foreach( $websitesList as $website ): ?>
-                <option <?=($witch->site === $website->site)? 'selected' :'' ?>
+                <option <?=($witch->site()?->site === $website->site)? 'selected' :'' ?>
                         value="<?=$website->site ?>">
-                    <?=$website->name ?>
+                    <?=$website->name ?> 
                 </option>
             <?php endforeach; ?>
         </select>
@@ -131,7 +130,7 @@
     <div class="box__actions">
         <button class="trigger-action" 
                 data-target="edit-witch-info"
-                data-action="save-witch-info">
+                data-action="edit-witch-info">
             <i class="fas fa-save"></i>
             Save
         </button>        

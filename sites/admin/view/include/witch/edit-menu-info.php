@@ -5,7 +5,7 @@
 ?>
 <div class="box edit__witch-menu-info">
     <form   method="post"
-            action="<?=$witch->ww->website->getUrl('edit?id='.$witch->id) ?>"
+            action="<?=$witch->ww->website->getUrl('view', [ 'id' => $witch->id ]) ?>"
             id="edit-witch-menu-info">
         
         <p class="alert-message error" style="display: none;">Mandatory field</p>
@@ -24,7 +24,7 @@
     <div class="box__actions">
         <button class="trigger-action" 
                 data-target="edit-witch-menu-info"
-                data-action="save-witch-menu-info">
+                data-action="edit-witch-menu-info">
             <i class="fas fa-save"></i>
             Save
         </button>

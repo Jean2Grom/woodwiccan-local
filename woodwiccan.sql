@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : db
--- Généré le : mar. 01 juil. 2025 à 09:36
+-- Généré le : mar. 05 août 2025 à 16:07
 -- Version du serveur : 11.7.2-MariaDB-ubu2404
 -- Version de PHP : 8.2.27
 
@@ -113,12 +113,12 @@ INSERT INTO `cauldron` (`id`, `target`, `status`, `name`, `recipe`, `data`, `pri
 (936, NULL, NULL, 'Le CMS', 'demo-rubrique', NULL, 0, NULL, '2025-06-19 13:52:30', NULL, '2025-06-19 13:53:44', 1, 6, 1, NULL, NULL, NULL, NULL),
 (937, NULL, NULL, 'background', 'image', NULL, 100, NULL, '2025-06-19 13:52:30', NULL, '2025-06-19 13:52:30', 1, 6, 1, 1, NULL, NULL, NULL),
 (938, NULL, NULL, 'file', 'ww-file', NULL, 200, NULL, '2025-06-19 13:52:30', NULL, '2025-06-19 13:52:30', 1, 6, 1, 1, 1, NULL, NULL),
-(939, NULL, NULL, 'background', 'image', NULL, 100, NULL, '2025-06-23 13:57:45', NULL, '2025-06-23 13:57:45', 1, 2, 1, 26, NULL, NULL, NULL),
-(940, NULL, NULL, 'file', 'ww-file', NULL, 200, NULL, '2025-06-23 13:57:45', NULL, '2025-06-23 13:57:45', 1, 2, 1, 26, 1, NULL, NULL),
-(941, NULL, NULL, 'contact-email', 'link', NULL, 100, NULL, '2025-06-23 13:57:45', NULL, '2025-06-23 13:57:45', 1, 2, 1, 27, NULL, NULL, NULL),
-(942, NULL, NULL, 'call-to-action', 'link', NULL, 100, NULL, '2025-06-23 13:57:45', NULL, '2025-06-23 13:57:45', 1, 2, 1, 28, NULL, NULL, NULL),
-(943, NULL, NULL, 'logo', 'image', NULL, 400, NULL, '2025-06-23 13:57:45', NULL, '2025-06-23 13:57:45', 1, 2, 1, 29, NULL, NULL, NULL),
-(944, NULL, NULL, 'file', 'ww-file', NULL, 200, NULL, '2025-06-23 13:57:45', NULL, '2025-06-23 13:57:45', 1, 2, 1, 29, 1, NULL, NULL),
+(939, NULL, NULL, 'background', 'image', NULL, 100, NULL, '2025-06-23 13:57:45', NULL, '2025-07-01 15:54:25', 1, 2, 1, 6, 6, 1, NULL),
+(940, NULL, NULL, 'file', 'ww-file', NULL, 200, NULL, '2025-06-23 13:57:45', NULL, '2025-07-01 15:54:25', 1, 2, 1, 6, 6, 1, 1),
+(941, NULL, NULL, 'contact-email', 'link', NULL, 100, NULL, '2025-06-23 13:57:45', NULL, '2025-07-01 15:54:25', 1, 2, 1, 6, 6, 2, NULL),
+(942, NULL, NULL, 'call-to-action', 'link', NULL, 100, NULL, '2025-06-23 13:57:45', NULL, '2025-07-01 15:54:25', 1, 2, 1, 6, 6, 3, NULL),
+(943, NULL, NULL, 'logo', 'image', NULL, 400, NULL, '2025-06-23 13:57:45', NULL, '2025-07-01 15:54:25', 1, 2, 1, 6, 6, 4, NULL),
+(944, NULL, NULL, 'file', 'ww-file', NULL, 200, NULL, '2025-06-23 13:57:45', NULL, '2025-07-01 15:54:25', 1, 2, 1, 6, 6, 4, 1),
 (945, 819, b'1', 'Home', 'folder', NULL, 0, NULL, '2025-06-23 13:57:45', NULL, '2025-06-23 13:57:45', 1, 2, 1, 6, 5, NULL, NULL),
 (946, NULL, NULL, 'demo-article', 'ww-recipe-folder', NULL, 0, NULL, '2025-06-23 15:17:13', NULL, '2025-06-23 15:17:13', 1, 7, NULL, NULL, NULL, NULL, NULL),
 (947, NULL, NULL, 'REPRENEZ LE CONTRÔLE', 'demo-article', NULL, 0, NULL, '2025-06-23 15:17:13', NULL, '2025-06-23 16:55:34', 1, 7, 1, NULL, NULL, NULL, NULL),
@@ -154,7 +154,23 @@ INSERT INTO `cauldron` (`id`, `target`, `status`, `name`, `recipe`, `data`, `pri
 (977, NULL, NULL, 'WITCH CASE EN BREF', 'demo-article', NULL, 0, NULL, '2025-06-25 16:56:31', NULL, '2025-06-25 16:58:14', 1, 7, 7, NULL, NULL, NULL, NULL),
 (978, NULL, NULL, 'image', 'image', NULL, 800, NULL, '2025-06-25 16:56:31', NULL, '2025-06-25 16:56:31', 1, 7, 7, 1, NULL, NULL, NULL),
 (979, NULL, NULL, 'file', 'ww-file', NULL, 200, NULL, '2025-06-25 16:56:31', NULL, '2025-06-25 16:56:31', 1, 7, 7, 1, 1, NULL, NULL),
-(980, NULL, NULL, 'link', 'link', NULL, 100, NULL, '2025-06-25 16:56:31', NULL, '2025-06-25 16:56:31', 1, 7, 7, 2, NULL, NULL, NULL);
+(980, NULL, NULL, 'link', 'link', NULL, 100, NULL, '2025-06-25 16:56:31', NULL, '2025-06-25 16:56:31', 1, 7, 7, 2, NULL, NULL, NULL),
+(981, NULL, NULL, 'logo', 'image', NULL, 400, NULL, '2025-07-01 15:54:25', NULL, '2025-07-09 14:55:08', 1, 2, 1, 6, 7, 1, NULL),
+(982, NULL, NULL, 'file', 'ww-file', NULL, 200, NULL, '2025-07-01 15:54:25', NULL, '2025-07-09 14:55:08', 1, 2, 1, 6, 7, 1, 1),
+(983, NULL, NULL, 'background', 'image', NULL, 100, NULL, '2025-07-01 15:54:25', NULL, '2025-07-09 14:55:08', 1, 2, 1, 6, 7, 2, NULL),
+(984, NULL, NULL, 'file', 'ww-file', NULL, 200, NULL, '2025-07-01 15:54:25', NULL, '2025-07-09 14:55:08', 1, 2, 1, 6, 7, 2, 1),
+(985, NULL, NULL, 'contact-email', 'link', NULL, 100, NULL, '2025-07-01 15:54:25', NULL, '2025-07-09 14:55:08', 1, 2, 1, 6, 7, 3, NULL),
+(986, NULL, NULL, 'call-to-action', 'link', NULL, 100, NULL, '2025-07-01 15:54:25', NULL, '2025-07-09 14:55:08', 1, 2, 1, 6, 7, 4, NULL),
+(987, 819, b'1', 'Home', 'folder', NULL, 0, NULL, '2025-07-01 15:54:25', NULL, '2025-07-01 15:54:25', 1, 2, 1, 6, 6, NULL, NULL),
+(988, NULL, NULL, 'logo', 'image', NULL, 400, NULL, '2025-07-09 14:55:08', NULL, '2025-07-09 14:55:08', 1, 2, 1, 34, NULL, NULL, NULL),
+(989, NULL, NULL, 'file', 'ww-file', NULL, 200, NULL, '2025-07-09 14:55:08', NULL, '2025-07-09 14:55:08', 1, 2, 1, 34, 1, NULL, NULL),
+(990, NULL, NULL, 'background', 'image', NULL, 100, NULL, '2025-07-09 14:55:08', NULL, '2025-07-09 14:55:08', 1, 2, 1, 35, NULL, NULL, NULL),
+(991, NULL, NULL, 'file', 'ww-file', NULL, 200, NULL, '2025-07-09 14:55:08', NULL, '2025-07-09 14:55:08', 1, 2, 1, 35, 1, NULL, NULL),
+(992, NULL, NULL, 'contact-email', 'link', NULL, 100, NULL, '2025-07-09 14:55:08', NULL, '2025-07-09 14:55:08', 1, 2, 1, 36, NULL, NULL, NULL),
+(993, NULL, NULL, 'call-to-action', 'link', NULL, 100, NULL, '2025-07-09 14:55:08', NULL, '2025-07-09 14:55:08', 1, 2, 1, 37, NULL, NULL, NULL),
+(994, 819, b'1', 'Home', 'folder', NULL, 0, NULL, '2025-07-09 14:55:08', NULL, '2025-07-09 14:55:08', 1, 2, 1, 6, 7, NULL, NULL),
+(996, NULL, NULL, 'DRAFTS', 'ww-drafts-folder', NULL, 0, NULL, '2025-07-18 15:26:07', NULL, '2025-07-18 15:26:07', 1, 7, 2, 3, NULL, NULL, NULL),
+(997, NULL, NULL, 'DRAFTS', 'ww-drafts-folder', NULL, 0, NULL, '2025-07-18 15:36:44', NULL, '2025-07-18 15:36:44', 1, 6, 2, 2, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -197,7 +213,11 @@ INSERT INTO `ingredient__boolean` (`id`, `cauldron_fk`, `name`, `value`, `priori
 (112, 965, 'external', b'0', 100),
 (113, 969, 'external', b'0', 100),
 (114, 973, 'external', b'0', 100),
-(115, 980, 'external', b'1', 100);
+(115, 980, 'external', b'1', 100),
+(116, 985, 'external', b'1', 100),
+(117, 986, 'external', b'1', 100),
+(118, 992, 'external', b'1', 100),
+(119, 993, 'external', b'1', 100);
 
 -- --------------------------------------------------------
 
@@ -427,10 +447,10 @@ INSERT INTO `ingredient__string` (`id`, `cauldron_fk`, `name`, `value`, `priorit
 (1501, 937, 'caption', '', 100),
 (1502, 938, 'storage-path', 'image/jpeg/07dc80a48b17f3ddd11a7a3fbfbedfcc29afad02', 200),
 (1503, 938, 'filename', 'img_fond_home.jpg', 100),
-(1504, 819, 'headline', 'WoodWiccan', 900),
-(1505, 819, 'meta-title', 'WoodWiccan', 400),
-(1506, 819, 'meta-description', 'description du site WoodWiccan', 300),
-(1507, 819, 'meta-keywords', ' woodwiccan, cms, ecologie, arborescence ', 200),
+(1504, 987, 'headline', 'WoodWiccan', 900),
+(1505, 987, 'meta-title', 'WoodWiccan', 400),
+(1506, 987, 'meta-description', 'description du site WoodWiccan', 300),
+(1507, 987, 'meta-keywords', ' woodwiccan, cms, ecologie, arborescence ', 200),
 (1508, 939, 'name', 'img_fond_contact', 300),
 (1509, 939, 'caption', 'witch on broom shadow', 100),
 (1510, 940, 'storage-path', 'image/jpeg/77f2fbf841a9e524934edd24a15b620f837b37a8', 200),
@@ -522,7 +542,39 @@ INSERT INTO `ingredient__string` (`id`, `cauldron_fk`, `name`, `value`, `priorit
 (1596, 979, 'storage-path', '', 200),
 (1597, 979, 'filename', '', 100),
 (1598, 980, 'href', 'https://github.com/Jean2Grom/witchcase-local', 300),
-(1599, 980, 'text', 'Contribuez sur GitHub', 200);
+(1599, 980, 'text', 'Contribuez sur GitHub', 200),
+(1600, 994, 'headline', 'WoodWiccan', 900),
+(1601, 994, 'meta-title', 'WoodWiccan', 700),
+(1602, 994, 'meta-description', 'description du site WoodWiccan', 500),
+(1603, 994, 'meta-keywords', ' woodwiccan, cms, ecologie, arborescence ', 400),
+(1604, 981, 'name', 'logo3', 300),
+(1605, 981, 'caption', '', 100),
+(1606, 982, 'storage-path', 'image/png/40061adc99a7c79078d8ffae255e31eece407e0d', 200),
+(1607, 982, 'filename', 'logo3.png', 100),
+(1608, 983, 'name', 'img_fond_contact', 300),
+(1609, 983, 'caption', 'witch on broom shadow', 100),
+(1610, 984, 'storage-path', 'image/jpeg/77f2fbf841a9e524934edd24a15b620f837b37a8', 200),
+(1611, 984, 'filename', 'img_fond_contact.jpg', 100),
+(1612, 985, 'href', ' mailto:info@witchcase.com', 300),
+(1613, 985, 'text', 'info@witchcase.com', 200),
+(1614, 986, 'href', 'https://github.com/Jean2Grom/woodwiccan-local', 300),
+(1615, 986, 'text', 'Github repository', 200),
+(1616, 819, 'headline', 'WoodWiccan', 900),
+(1617, 819, 'meta-title', 'WoodWiccan', 700),
+(1618, 819, 'meta-description', 'description du site WoodWiccan', 600),
+(1619, 819, 'meta-keywords', ' woodwiccan, cms, ecologie, arborescence ', 500),
+(1620, 988, 'name', 'logo', 300),
+(1621, 988, 'caption', '', 100),
+(1622, 989, 'storage-path', 'image/png/ccee949c8ff555fe0d74bf9e8f0923de35bf18bc', 200),
+(1623, 989, 'filename', 'logo.png', 100),
+(1624, 990, 'name', 'img_fond_contact', 300),
+(1625, 990, 'caption', 'witch on broom shadow', 100),
+(1626, 991, 'storage-path', 'image/jpeg/77f2fbf841a9e524934edd24a15b620f837b37a8', 200),
+(1627, 991, 'filename', 'img_fond_contact.jpg', 100),
+(1628, 992, 'href', ' mailto:info@witchcase.com', 300),
+(1629, 992, 'text', 'info@witchcase.com', 200),
+(1630, 993, 'href', 'https://github.com/Jean2Grom/woodwiccan-local', 300),
+(1631, 993, 'text', 'Github repository', 200);
 
 -- --------------------------------------------------------
 
@@ -559,7 +611,7 @@ INSERT INTO `ingredient__text` (`id`, `cauldron_fk`, `name`, `value`, `priority`
 (146, 934, 'body', '<p>le gestionnaire de contenus web qui s\'adapte aux métiers</p>', 500),
 (147, 945, 'body', '<p>le gestionnaire de contenus web qui s\'adapte aux métiers</p>', 500),
 (148, 936, 'body', '<p>L\'outil qui s\'adapte aux métiers</p>', 200),
-(149, 819, 'body', '<p>le gestionnaire de contenus web qui s\'adapte aux métiers</p>', 800),
+(149, 987, 'body', '<p>le gestionnaire de contenus web qui s\'adapte aux métiers</p>', 800),
 (150, 947, 'body', '', 900),
 (151, 947, 'body-left', '<p>Woody CMS est développé sur des technologies purement&nbsp;<strong>PHP/MySQL, en licence GPL</strong>. Le langage PHP est la seule connaissance requise pour y développer un site. Le concept de Woody CMS est une simplification fondamentale du stockage de données&nbsp;:&nbsp;<strong>plus de cache</strong>&nbsp;sur la visualisation des contenus, et aucune perte de temps due au renouvellement de ses fichiers pour valider ses développements. Les éléments contextuels (le menu par exemple) sont cachés par un système très simple et très accessible laissé aux soins du développeur.<br>De plus Woody CMS est une&nbsp;<strong>plateforme multisites</strong>&nbsp;avec un système d\'héritage et laisse une grande liberté dans le développement des modules.<br>En somme Woody CMS fonctionne comme une véritable&nbsp;<strong>\"boite à outils\"</strong>&nbsp;pour les développeurs.</p>', 600),
 (152, 947, 'body-center', '<p>A l’heure actuelle, la contribution d’un site web implique un temps de visualisation de son travail en ligne avant de considérer ou non cette tâche achevée. Ce temps de validation doit prendre en compte la gestion du cache qui, suivant son niveau de complexité, peut prendre jusqu\'à 20 minutes pour une seule contribution. Un site implémenté avec Woody CMS permet la&nbsp;<strong>mise en ligne immédiate</strong>&nbsp;d’une information grâce à l’absence de cache de visualisation. Les contributeurs peuvent ainsi valider immédiatement leur travail. De plus Woody CMS est multisite et gère efficacement le&nbsp;<strong>multi-positionnement de contenus</strong>. Les contributeurs peuvent gérer différents sites via&nbsp;<strong>une seule et même interface</strong>, où la modification d’un contenu multipositionné est effective automatiquement à l’ensemble du site. Les visiteurs consultent alors une information instantanément à jour, sans s’impatienter devant un site ralenti par la régénération des fichiers de cache.</p>', 400),
@@ -589,7 +641,9 @@ INSERT INTO `ingredient__text` (`id`, `cauldron_fk`, `name`, `value`, `priority`
 (176, 977, 'body', '', 900),
 (177, 977, 'body-left', '<p>C’est en constatant que le développement informatique relève d’une&nbsp;<strong>nouvelle forme d’artisanat</strong>, contrairement à l’évolution actuelle du métier de développeur, que Witch case est née. L\'industrialisation et la normalisation des besoins actuellement en cours dans la profession nuit à l’<strong>adaptabilité</strong>, alors qu’elle représente une question&nbsp;<strong>primordiale</strong>&nbsp;dans le domaine de l’informatique, et plus spécifiquement dans celui du web. C’est par la volonté d’affirmer notre vision du métier, en proposant des produits&nbsp;<strong>innovants et de qualité</strong>, que Witch case a été fondé.</p>', 600),
 (178, 977, 'body-center', '<p>L\'<strong>intégrité</strong>&nbsp;est sans doute la première des valeurs de Witch case, le respect humain et l\'honnêteté sont des points sur lesquels nous ne pouvons transiger. La&nbsp;<strong>créativité</strong>&nbsp;et la&nbsp;<strong>qualité</strong>&nbsp;sont les valeurs fondamentales de Witch case, elles représentent le cœur de métier et nous sont indispensables pour proposer des solutions fiables, convaincantes et innovantes. Enfin c’est l’<strong>humanisme</strong>&nbsp;qui nous pousse à développer des produits&nbsp;<strong>utiles</strong>&nbsp;et&nbsp;<strong>libres</strong>, Il nous est essentiel que l’ensemble des utilisateurs puissent se réconcilier avec les outils informatiques.</p>', 400),
-(179, 977, 'body-right', '<p>Si Woody CMS est la première réalisation de Witch case, il existe déjà d\'autres projets engagés vers une future réalisation. Les technologies développées à travers Woody CMS peuvent se décliner vers d\'autres domaines d\'applications. La vision d’avenir de Witch case est une&nbsp;<strong>coopérative</strong>, avec une répartition&nbsp;<strong>collective</strong>&nbsp;des tâches et des décisions, afin de préserver la&nbsp;<strong>vision artisanale</strong>&nbsp;et non industrielle du métier d\'édition, et donc de garantir un haut niveau de qualité. Si vous êtes intéressé par cette aventure, nous ne saurions que trop vous conseiller de participer aux&nbsp;<strong>développements sur gitHub</strong>&nbsp;et n\'<strong>hésitez pas à nous contacter</strong>&nbsp;si vous le souhaitez, nous vous répondrons avec grand plaisir !</p>', 200);
+(179, 977, 'body-right', '<p>Si Woody CMS est la première réalisation de Witch case, il existe déjà d\'autres projets engagés vers une future réalisation. Les technologies développées à travers Woody CMS peuvent se décliner vers d\'autres domaines d\'applications. La vision d’avenir de Witch case est une&nbsp;<strong>coopérative</strong>, avec une répartition&nbsp;<strong>collective</strong>&nbsp;des tâches et des décisions, afin de préserver la&nbsp;<strong>vision artisanale</strong>&nbsp;et non industrielle du métier d\'édition, et donc de garantir un haut niveau de qualité. Si vous êtes intéressé par cette aventure, nous ne saurions que trop vous conseiller de participer aux&nbsp;<strong>développements sur gitHub</strong>&nbsp;et n\'<strong>hésitez pas à nous contacter</strong>&nbsp;si vous le souhaitez, nous vous répondrons avec grand plaisir !</p>', 200),
+(180, 994, 'body', '<p>le gestionnaire de contenus web qui s\'adapte aux métiers</p>', 800),
+(181, 819, 'body', '<p>le gestionnaire de contenus web qui s\'adapte aux métiers</p>', 800);
 
 -- --------------------------------------------------------
 
@@ -702,29 +756,27 @@ CREATE TABLE `witch` (
 
 INSERT INTO `witch` (`id`, `name`, `data`, `site`, `url`, `status`, `invoke`, `cauldron`, `cauldron_priority`, `context`, `datetime`, `priority`, `level_1`, `level_2`, `level_3`, `level_4`, `level_5`) VALUES
 (1, 'Root', 'Ici se trouve la racine de la plateforme. C\'est à partir d\'ici que sont créées les homes de chaque site de la plateforme.', NULL, NULL, 0, NULL, NULL, 0, NULL, '2024-03-01 15:46:01', 0, NULL, NULL, NULL, NULL, NULL),
-(2, 'Admin WoodWiccan', 'Site d\'administration', NULL, NULL, 0, NULL, NULL, 0, NULL, '2024-03-01 15:46:01', 400, 1, NULL, NULL, NULL, NULL),
-(3, 'Utilisateurs', '', 'admin', 'utilisateurs', 0, '', NULL, 0, NULL, '2024-03-01 15:46:01', -300, 1, 1, NULL, NULL, NULL),
+(2, 'Admin WoodWiccan', 'Site d\'administration', NULL, NULL, 0, NULL, NULL, 0, NULL, '2024-03-01 15:46:01', 19, 1, NULL, NULL, NULL, NULL),
+(3, 'Utilisateurs', '', 'admin', 'utilisateurs', 0, '', NULL, 0, NULL, '2024-03-01 15:46:01', 200, 1, 1, NULL, NULL, NULL),
 (4, 'Administrateur', '', 'admin', 'utilisateurs/administrateur', 0, '', 4, 200, '', '2024-03-01 15:46:01', 0, 1, 1, 1, NULL, NULL),
-(5, 'Home', '', 'admin', '', 0, 'root', NULL, 0, NULL, '2024-03-01 15:46:01', -400, 1, 2, NULL, NULL, NULL),
-(6, 'Login', 'Module de déconnexion/connexion', 'admin', 'login', 0, 'login', NULL, 0, NULL, '2024-03-01 15:46:01', 800, 1, 2, 1, NULL, NULL),
-(7, 'Witch', 'Visualisation des Witches, c\'est a dire de chaque point de l\'arborescence -appelé ici Matriarcat. Chacun de ces points peut être associé à un contenu et/ou à un module exécutable. \r\nOn peut également définir une URL permettant de cibler cette witch.', 'admin', 'view', 0, 'witch/view', NULL, 0, NULL, '2024-03-01 15:46:01', 700, 1, 2, 2, NULL, NULL),
-(8, 'Edit Witch', '', 'admin', 'edit', 0, 'witch/edit', NULL, 0, NULL, '2024-03-01 15:46:01', 500, 1, 2, 3, NULL, NULL),
-(10, 'Menu', '', NULL, NULL, 0, NULL, NULL, 0, NULL, '2024-03-01 15:46:01', 200, 1, 2, 5, NULL, NULL),
+(5, 'Home admin ww', 'landing page for ww admin', 'admin', '', 0, 'root', NULL, 0, NULL, '2024-03-01 15:46:01', 0, 1, 2, NULL, NULL, NULL),
+(6, 'Logout', 'Module de déconnexion/connexion', 'admin', 'login', 0, 'login', NULL, 0, NULL, '2024-03-01 15:46:01', 600, 1, 2, 10, NULL, NULL),
+(7, 'Witch', 'Visualisation des Witches, c\'est a dire de chaque point de l\'arborescence -appelé ici Matriarcat. Chacun de ces points peut être associé à un contenu et/ou à un module exécutable. \r\nOn peut également définir une URL permettant de cibler cette witch.', 'admin', 'view', 0, 'witch', NULL, 0, NULL, '2024-03-01 15:46:01', 500, 1, 2, 2, NULL, NULL),
+(10, 'Menu', '', NULL, NULL, 0, NULL, NULL, 0, NULL, '2024-03-01 15:46:01', 100, 1, 2, 5, NULL, NULL),
 (11, 'Profiles', 'Permissions handeling is based on user profiles.', 'admin', 'profiles', 0, 'profiles', NULL, 0, NULL, '2024-03-01 15:46:01', 600, 1, 2, 5, 1, NULL),
 (13, 'Apply', '', 'admin', 'apply', 0, 'emptyCache', NULL, 0, NULL, '2024-03-01 15:46:28', 300, 1, 2, 5, 3, NULL),
 (15, 'Recipes', 'Les données sont stockées sous la forme de structures qui sont éditables ici.', 'admin', 'recipe', 0, 'recipe/list', NULL, 0, NULL, '2024-03-09 15:48:02', 500, 1, 2, 5, 4, NULL),
-(16, 'Cauldron', '', 'admin', 'cauldron', 0, 'cauldron', NULL, 0, NULL, '2024-04-08 15:04:18', 600, 1, 2, 9, NULL, NULL),
-(25, 'View Structure', 'Cauldron\'s inside element\'s structure visualization', 'admin', 'recipe/view', 0, 'recipe/view', NULL, 0, NULL, '2024-06-11 13:57:05', 0, 1, 2, 5, 4, 1),
-(26, 'Edit Structure', '', 'admin', 'recipe/edit', 0, 'recipe/edit', NULL, 0, NULL, '2024-06-13 13:54:51', 0, 1, 2, 5, 4, 2),
-(27, 'Create Structure', '', 'admin', 'recipe/create', 0, 'recipe/create', NULL, 0, NULL, '2024-08-07 15:05:40', 0, 1, 2, 5, 4, 3),
-(30, 'Create Witch', '', 'admin', 'create-witch', 0, 'witch/create', NULL, 0, NULL, '2024-09-24 21:02:27', 300, 1, 2, 7, NULL, NULL),
-(37, 'Witch', 'Witch Folder', 'admin', NULL, 0, NULL, NULL, 0, NULL, '2024-10-01 13:59:43', 100, 1, 2, 8, NULL, NULL),
-(38, 'clipboard', NULL, 'admin', 'clipboard', 0, 'witch/clipboard', NULL, 0, NULL, '2024-10-01 15:24:28', 0, 1, 2, 8, 1, NULL),
+(16, 'Cauldron', 'test', 'admin', 'cauldron', 0, 'cauldron', NULL, 0, NULL, '2024-04-08 15:04:18', 400, 1, 2, 9, NULL, NULL),
+(25, 'View', 'Cauldron\'s inside element\'s structure visualization', 'admin', 'recipe/view', 0, 'recipe/view', NULL, 0, NULL, '2024-06-11 13:57:05', 0, 1, 2, 5, 4, 1),
+(26, 'Edit', '', 'admin', 'recipe/edit', 0, 'recipe/edit', NULL, 0, NULL, '2024-06-13 13:54:51', 0, 1, 2, 5, 4, 2),
+(27, 'Create', '', 'admin', 'recipe/create', 0, 'recipe/create', NULL, 0, NULL, '2024-08-07 15:05:40', 0, 1, 2, 5, 4, 3),
+(30, 'Create', '', 'admin', 'create-witch', 0, 'witch/create', NULL, 0, NULL, '2024-09-24 21:02:27', 100, 1, 2, 2, 2, NULL),
+(38, 'clipboard', NULL, 'admin', 'clipboard', 0, 'witch/clipboard', NULL, 0, NULL, '2024-10-01 15:24:28', 0, 1, 2, 2, 1, NULL),
 (127, 'Cauldrons', NULL, 'admin', 'cauldrons', 0, 'cauldrons', NULL, 0, NULL, '2024-11-26 15:11:01', 200, 1, 2, 5, 5, NULL),
 (129, 'Jean', '', 'admin', NULL, 0, NULL, 7, 0, NULL, '2025-01-10 16:01:18', 0, 1, 1, 2, NULL, NULL),
-(180, 'Site Demo', NULL, NULL, NULL, 0, NULL, NULL, 0, NULL, '2025-06-17 08:25:10', 0, 3, NULL, NULL, NULL, NULL),
-(181, 'Home', 'Home landing page for demo site', 'demo', '', 0, 'blank', 819, 0, NULL, '2025-06-17 08:39:29', 0, 3, 1, NULL, NULL, NULL),
-(182, 'Le CMS', NULL, 'demo', 'le-cms', 0, 'default', 936, 0, NULL, '2025-06-19 13:52:30', 500, 3, 1, 1, NULL, NULL),
+(180, 'Site Demo', 'racine du site démo', NULL, NULL, 0, NULL, NULL, 0, NULL, '2025-06-17 08:25:10', -1, 3, NULL, NULL, NULL, NULL),
+(181, 'Demo site Home', 'Home landing page for demo website', 'demo', '', 0, 'blank', 819, 0, NULL, '2025-06-17 08:39:29', 188, 3, 1, NULL, NULL, NULL),
+(182, 'Le CMS', '', 'demo', 'le-cms', 0, 'default', 936, 0, NULL, '2025-06-19 13:52:30', 500, 3, 1, 1, NULL, NULL),
 (183, 'REPRENEZ LE CONTRÔLE', 'Woody CMS est le premier CMS dont la technologie est orientée vers les acteurs du web. Que vous soyez développeur, contributeur, webmaster ou même administrateur réseau, ce gestionnaire de contenu (CMS) a pour objectif de vous simplifier la vie en supprimant les attentes interminables dues au fonctionnement d\'un site web, tout en bénéficiant de la malléabilité exigée d\'un site qui vous représente.', 'demo', NULL, 0, NULL, 947, 0, NULL, '2025-06-23 15:17:13', 0, 3, 1, 1, 1, NULL),
 (184, 'Woody CMS en quelques mots', 'Woody CMS est un prototype de gestion de contenu, à partir duquel on développe, contribue et administre un site web. Woody CMS propose un modèle de stockage des données en base, gère la sécurité, assure une partition MVC des codes, et propose une interface web pour administrer son ou ses site(s).', 'demo', NULL, 0, NULL, 951, 0, NULL, '2025-06-23 17:05:47', 0, 3, 1, 1, 2, NULL),
 (185, 'Technologies', NULL, 'demo', 'technologies', 0, 'default', 955, 0, NULL, '2025-06-24 08:00:18', 400, 3, 1, 2, NULL, NULL),
@@ -733,7 +785,7 @@ INSERT INTO `witch` (`id`, `name`, `data`, `site`, `url`, `status`, `invoke`, `c
 (188, 'CONTENU AJUSTABLE', 'Afin de récupérer toutes les informations du contenu à afficher, Witch case a développé une solution qui consiste à ajuster en direct la table correspondant au contenu à afficher. Ainsi, on peut récupérer l\'ensemble des informations en une seule requête.', 'demo', NULL, 0, NULL, 966, 0, NULL, '2025-06-25 16:47:03', 300, 3, 1, 2, 3, NULL),
 (189, 'NOMMAGE STRUCTUREL DES CHAMPS', 'Afin de permettre une plus grande complexité des attributs qui composent un contenu, il faut connaitre sa structure et son comportement avant d\'envoyer la requête visant à récupérer les contenus. Pour cela nous identifions les champs en BDD par un nommage structurel.', 'demo', NULL, 0, NULL, 970, 0, NULL, '2025-06-25 16:49:33', 200, 3, 1, 2, 4, NULL),
 (190, 'À Propos', NULL, 'demo', 'a-propos', 0, 'default', 974, 0, NULL, '2025-06-25 16:52:32', 300, 3, 1, 3, NULL, NULL),
-(191, 'WITCH CASE EN BREF', 'Witch case est une société d\'édition web crée en 2016 par Jean de Gromard. Ingénieur de formation, il a passé 10 ans dans les technologies du web dont 5 à se spécialiser dans l\'intégration de site via des CMS, avec une expertise sur eZPublish. Woody CMS est le premier projet de Witch case. Le prototype a été développé entre 2015 et 2016, sur une durée d\'environ un an.', 'demo', NULL, 0, NULL, 977, 0, NULL, '2025-06-25 16:56:31', 0, 3, 1, 3, 1, NULL),
+(191, 'WITCH CASE EN BREF', 'Witch case est une société d\'édition web crée en 2016 par Jean de Gromard. Ingénieur de formation, il a passé 10 ans dans les technologies du web dont 5 à se spécialiser dans l\'intégration de site via des CMS, avec une expertise sur eZPublish. Woody CMS est le premier projet de Witch case. Le prototype a été développé entre 2015 et 2016, sur une durée d\'environ un an...', NULL, NULL, 0, NULL, 977, 0, NULL, '2025-06-25 16:56:31', 0, 3, 1, 3, 1, NULL),
 (192, 'Contacter', NULL, 'demo', 'contacter', 0, 'contact', NULL, 0, NULL, '2025-06-25 17:01:12', 200, 3, 1, 4, NULL, NULL);
 
 --
@@ -840,13 +892,13 @@ ALTER TABLE `witch`
 -- AUTO_INCREMENT pour la table `cauldron`
 --
 ALTER TABLE `cauldron`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=981;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=998;
 
 --
 -- AUTO_INCREMENT pour la table `ingredient__boolean`
 --
 ALTER TABLE `ingredient__boolean`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=116;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=120;
 
 --
 -- AUTO_INCREMENT pour la table `ingredient__datetime`
@@ -864,7 +916,7 @@ ALTER TABLE `ingredient__float`
 -- AUTO_INCREMENT pour la table `ingredient__integer`
 --
 ALTER TABLE `ingredient__integer`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=234;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=235;
 
 --
 -- AUTO_INCREMENT pour la table `ingredient__price`
@@ -876,13 +928,13 @@ ALTER TABLE `ingredient__price`
 -- AUTO_INCREMENT pour la table `ingredient__string`
 --
 ALTER TABLE `ingredient__string`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1600;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1632;
 
 --
 -- AUTO_INCREMENT pour la table `ingredient__text`
 --
 ALTER TABLE `ingredient__text`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=180;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=182;
 
 --
 -- AUTO_INCREMENT pour la table `user__connexion`
@@ -894,17 +946,17 @@ ALTER TABLE `user__connexion`
 -- AUTO_INCREMENT pour la table `user__policy`
 --
 ALTER TABLE `user__policy`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT pour la table `user__profile`
 --
 ALTER TABLE `user__profile`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT pour la table `witch`
 --
 ALTER TABLE `witch`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=193;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=212;
 COMMIT;

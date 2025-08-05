@@ -1,0 +1,107 @@
+nav {
+    display: none;
+    height: 100%;
+    position: fixed;
+    z-index: 30;
+    background-color: #cccccc;
+    overflow-x: hidden;
+}
+    nav .nav-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 100%;
+    }
+    nav a.side-nav-toggler {
+        position: absolute;
+        right: 10px;
+        top: 10px;
+        margin: 0;
+    }
+    nav a {
+        font-size: 1em;
+        display: block;
+        margin: 24px;
+    }
+    nav .nav-user {
+        font-size: 12px;
+        display: flex;
+        font-style: italic;
+        font-weight: normal;
+        justify-content: space-evenly;
+        background-color: white;
+        padding: 8px 0px;
+    }
+        nav .nav-user a {
+            margin: 0;
+        }
+body {
+    background-color: ghostwhite;
+}
+main, footer {
+    padding: 16px;
+}
+main {
+    padding-bottom: 0;
+}
+    main > div {
+        display: flex;
+    }
+.breadcrumb {
+    font-size: 0.8em;
+}
+fieldset {
+    border-radius: 5px;
+    margin-bottom: 8px;
+    padding: 8px;
+}
+.tabs {
+    display: flex;
+}
+    .tabs__item {
+        border-top: 1px solid #ccc;
+        border-left: 1px solid #ccc;
+        border-right: 1px solid #ccc;
+        border-bottom: 1px solid #ccc;
+        padding: 8px 16px;
+        margin-right: 5px;
+        cursor: pointer;
+        background-color: #f3f3f3;
+    }
+        .tabs__item.selected {
+            border-bottom: 1px solid #FFF;
+            background-color: #FFF;
+            color: #ff9900;
+        }
+.tabs-target {
+    border: 1px solid #ccc;
+    margin-top: -1px;
+    box-shadow: 5px 5px 5px #ccc;
+    background-color: #FFF;
+    padding: 2vw;
+
+}
+    .tabs-target__item {
+        display: none;
+    }
+        .tabs-target__item.selected {
+            display: block;
+            width: 100%;
+        }
+@media screen and (min-device-width: 768px) {
+    nav {
+        display: block;
+        width: 128px;
+    }
+        nav a {
+            display: block;
+            margin-top: 20px;
+            margin-left: 20px;
+        }
+        nav a.side-nav-toggler {
+            display: none;
+        }
+    main, header, footer {
+        margin-left: 128px;
+    }
+}

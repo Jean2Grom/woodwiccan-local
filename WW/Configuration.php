@@ -15,7 +15,7 @@ class Configuration
     const DEFAULT_DIRECTORY         = "configuration";
     const CONFIG_FILE               = 'configuration.json';
     const SITES_FILE                = 'sites.json';
-    const RECIPES_DIR               = "configuration/cauldron";
+    const RECIPES_DIR               = "configuration/recipes";
 
     const DEFAULT_STORAGE       = "files";
     const DEFAULT_DIR_RIGHTS    = "755";    // read/execute for all, write limited to self
@@ -50,6 +50,24 @@ class Configuration
             $this->dir = self::DEFAULT_DIRECTORY;
         }
         
+        if( !file_exists($this->dir.'/'.self::CONFIG_FILE) 
+            && file_exists($this->dir.'/default/'.self::CONFIG_FILE) 
+        ){
+            copy( 
+                $this->dir.'/default/'.self::CONFIG_FILE, 
+                $this->dir.'/'.self::CONFIG_FILE 
+            );
+        }
+
+        if( !file_exists($this->dir.'/'.self::SITES_FILE) 
+            && file_exists($this->dir.'/default/'.self::SITES_FILE) 
+        ){
+            copy( 
+                $this->dir.'/default/'.self::SITES_FILE, 
+                $this->dir.'/'.self::SITES_FILE 
+            );
+        }
+
         if( $mandatory
             &&  ( !file_exists($this->dir.'/'.self::CONFIG_FILE) 
                 || !file_exists($this->dir.'/'.self::SITES_FILE)  )

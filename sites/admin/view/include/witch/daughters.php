@@ -16,8 +16,7 @@
         
     <?php else: ?>
         <form method="post" 
-              id="view-daughters-action" 
-              action="<?=$witch->ww->website->getUrl("edit", [ 'id' => $witch->id ]) ?>">
+              id="view-daughters-action">
             <table>
                 <thead>
                     <tr>
@@ -106,7 +105,8 @@
                 style="display: none;"
                 data-action="copy-witch"
                 data-target="view-daughters-action">Copy witch</button>
-        <button class="view-daughters__create-witch__toggle">
+        <button class="trigger-href"
+                data-href="<?=$witch->ww->website->getUrl("create-witch?id=".$witch->id) ?>">
             <i class="fa fa-plus"></i>
             Add Daughter
         </button>

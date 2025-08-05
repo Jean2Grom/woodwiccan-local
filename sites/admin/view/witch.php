@@ -18,24 +18,19 @@ $this->addContextArrayItems( 'tabs', [
 ]);
 ?>
 
-<?php //$this->include('alerts.php', ['alerts' => $this->ww->user->getAlerts()]); ?>
-
 <div class="tabs-target__item selected"  id="tab-current">
     <div class="box-container">
         <div><?php $this->include('witch/info.php', [ 
             'witch'     => $this->witch("target"), 
-            //'imgSrc'    => $this->image('favicon.png'),
         ]); ?></div>
         <div><?php $this->include('witch/edit-info.php', [ 
             'witch'         => $this->witch("target"), 
-            //'imgSrc'        => $this->image('favicon.png'),
             'websitesList'  => $websitesList, 
         ]); ?></div>
         <div><?php $this->include('witch/daughters.php', [ 
             'witch'         => $this->witch("target"), 
             'websitesList'  => $websitesList, 
         ]); ?></div>
-        <div><?php $this->include('witch/create.php', [ 'witch' => $this->witch("target") ]); ?></div>
         <div><?php $this->include('cauldron/display.php', [ 'witch'=> $this->witch("target") ]); ?></div>
         <div><?php $this->include('cauldron/witches.php', [ 'witch'=> $this->witch("target") ]); ?></div>
     </div>
