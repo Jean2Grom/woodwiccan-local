@@ -627,9 +627,10 @@ class Cauldron implements CauldronContentInterface
         if( isset($params['name']) ){
             $this->name = htmlspecialchars($params['name']);
         }
-
+        
         $priorityInterval   = 100;
-        $priority           = count($params['content'] ?? []) * $priorityInterval;
+        $contentParam       = $params['content']? $params['content']: [];
+        $priority           = count($contentParam) * $priorityInterval;
         
         $contents               = $this->contents();
         $this->content          = null;
@@ -637,7 +638,7 @@ class Cauldron implements CauldronContentInterface
         $this->ingredients  = [];
         $this->children     = [];
         $storage            = $this->ww->configuration->storage();
-        foreach( $params['content'] ?? [] as $indice => $contentParams )
+        foreach( $contentParam as $indice => $contentParams )
         {
             if( !($contentParams['type'] ?? null) )
             {
@@ -755,7 +756,7 @@ class Cauldron implements CauldronContentInterface
                     ] 
                 );
 
-                if( $contentParams['content'] ?? null ){
+                if( !empty($contentParams['content']) ){
                     $content->readInputs( $contentParams );
                 }
             }

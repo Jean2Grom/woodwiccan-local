@@ -17,8 +17,6 @@ $this->addContextArrayItems( 'tabs', [
 ]);
 ?>
 
-<?php $this->include('alerts.php', ['alerts' => $this->ww->user->getAlerts()]); ?>
-
 <div class="tabs-target__item selected"  id="tab-current">
     <form method="post" id="create-witch">
         <div class="box-container">

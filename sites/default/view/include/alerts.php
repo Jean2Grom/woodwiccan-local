@@ -1,4 +1,8 @@
-<?php /** @var WW\Module $this */ 
+<?php 
+/**
+ * @var WW\Module $this
+ * @var ?array $alerts
+ */
 
 if( !empty($alerts) ): 
     $this->addCssFile('alert-message.css');

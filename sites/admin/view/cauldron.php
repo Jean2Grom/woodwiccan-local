@@ -15,8 +15,6 @@ $this->addJsFile('triggers.js');
 </h1>
 <p><em><?=$this->witch("target")->data?></em></p>
 
-<?php $this->include('alerts.php', ['alerts' => $this->ww->user->getAlerts()]); ?>
-
 <form id="edit-action" method="post" enctype="multipart/form-data">
     <input type="hidden" name="MAX_FILE_SIZE" value="3000000" />
     
