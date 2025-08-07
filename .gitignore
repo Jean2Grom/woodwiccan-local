@@ -2,3 +2,5 @@ local
 log
 cache
 vendor
+configuration/configuration.json
+configuration/sites.json
