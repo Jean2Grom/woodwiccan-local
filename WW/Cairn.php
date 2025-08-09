@@ -63,14 +63,14 @@ class Cairn
                     $innerCraft = $init['craft'];
                 }
 
-                if( $innerDepth == '*' || $new['depth'] == '*' ){
+                if( $innerDepth === '*' || $new['depth'] === '*' ){
                     $innerDepth = '*';
                 }
                 elseif( !empty($new['depth']) && $new['depth'] >= $innerDepth ){
                     $innerDepth = $new['depth'];
                 }
 
-                if( $innerCraft == '*' || $new['craft'] == '*' ){
+                if( $innerCraft === '*' || $new['craft'] === '*' ){
                     $innerCraft = '*';
                 }
                 elseif( !empty($new['craft']) && $new['craft'] >= $innerCraft ){
@@ -407,7 +407,7 @@ class Cairn
     {
         foreach( $this->witches as $witch )
         {
-            if( $witch->position == $position ){
+            if( $witch->position === $position ){
                 return $witch;
             }
             $witchBuffer    = $witch;

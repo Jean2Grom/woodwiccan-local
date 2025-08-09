@@ -19,10 +19,10 @@ switch( $action = Tools::filterAction(
         
         if( empty($profileData['name']) )
         {
-            $alerts[] = [
+            $this->ww->user->addAlert([
                 'level'     =>  'error',
                 'message'   =>  "Name is mandatory, creation canceled"
-            ];
+            ]);
             break;
         }
         
@@ -221,14 +221,14 @@ if( !$sites ){
 
 $websitesList   = [];
 foreach( $sites as $site ){
-    if( $site == $this->ww->website->name ){
+    if( $site === $this->ww->website->name ){
         $website = $this->ww->website;
     }
     else {
         $website = new Website( $this->ww, $site );
     }
     
-    if( $website->site == $website->name ) {
+    if( $website->site === $website->name ) {
         $websitesList[ $site ] = $website;
     }
 }

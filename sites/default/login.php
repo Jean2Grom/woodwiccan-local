@@ -1,6 +1,6 @@
 <?php /** @var WW\Module $this */ 
 
-if( $this->ww->request->param("action") == "login" && $this->ww->user->connexion )
+if( $this->ww->request->param("action") === "login" && $this->ww->user->connexion )
 {
     header( 'Location: '.$this->ww->website->getFullUrl() );
     exit();

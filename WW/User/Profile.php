@@ -47,10 +47,10 @@ class Profile
         $profile->name  = $data['name'];
         $profile->site  = $data['site'];
         
-        if( $profile->site == '*' ){
+        if( $profile->site === '*' ){
             $statusLabels = $ww->configuration->read("global", "status");
         }
-        elseif( $ww->website->name == $profile->site ){
+        elseif( $ww->website->name === $profile->site ){
             $statusLabels = $ww->website->status;
         }
         else

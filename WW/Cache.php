@@ -129,7 +129,7 @@ class Cache
         
         if( file_exists($filename) )
         {
-            if( $cacheDuration == '*' 
+            if( $cacheDuration === '*' 
                 || (time() - filemtime($filename)) < (int) $cacheDuration ){
                 return $filename;
             }

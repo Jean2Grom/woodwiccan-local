@@ -24,14 +24,14 @@ if( !$sites ){
 
 $websitesList   = [];
 foreach( $sites as $site ){
-    if( $site == $this->ww->website->name ){
+    if( $site === $this->ww->website->name ){
         $website = $this->ww->website;
     }
     else {
         $website = new Website( $this->ww, $site );
     }
     
-    if( $website->site == $website->name ) {
+    if( $website->site === $website->name ) {
         $websitesList[ $site ] = $website;
     }
 }

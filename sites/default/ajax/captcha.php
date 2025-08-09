@@ -49,7 +49,7 @@ for( $i=0; $i < $iterations; $i++ )
     
     $captchaImages[ $i ] = $imageData;
     
-    if( $i == $match )
+    if( $i === $match )
     {
         $session->write('captcha', $captchaCode);
         
@@ -77,7 +77,7 @@ if( $captchaError )
 {
     $session->delete('captcha-error');
     
-    if( !is_string($captchaError) || strlen($captchaError) == 0 ){
+    if( !is_string($captchaError) || strlen($captchaError) === 0 ){
         $captchaError = "Wrong Catpcha";
     }
 }

@@ -40,15 +40,15 @@ $this->addContextArrayItems( 'tabs', [
                 Profiles List
             </h3>
             <p><em>Filter by site here
-            <select id="profile-list-site-filter">
-                <option value="">All sites</option>
-                <option value="all">Global</option>
-                <?php foreach( $websitesList as $website ): ?>
-                    <option value="<?=$website->site ?>">
-                        <?=$website->site ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
+                <select id="profile-list-site-filter">
+                    <option value="">All sites</option>
+                    <option value="all">Global</option>
+                    <?php foreach( $websitesList as $website ): ?>
+                        <option value="<?=$website->site ?>">
+                            <?=$website->site ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
             </em></p>
             
             <table>
@@ -61,12 +61,16 @@ $this->addContextArrayItems( 'tabs', [
                 </thead>
                 <tbody>
                     <?php foreach( $profiles as $profile ): ?>
-                        <tr class="profile-container profile-site-<?=$profile->site == '*'? 'all': $profile->site ?>" data-id="<?=$profile->id?>">
+                        <tr class="profile-container profile-site-<?=$profile->site === '*'? 'all': $profile->site ?>" 
+                            data-id="<?=$profile->id?>">
                             <td>
-                                <span class="text-center"><?=$profile->site ?></span>
+                                <span class="text-center">
+                                    <?=$profile->site ?>
+                                </span>
                             </td>
                             <td>
-                                <a class="view-profile" data-id="<?=$profile->id?>">
+                                <a  class="view-profile" 
+                                    data-id="<?=$profile->id?>">
                                     <?=$profile->name?>
                                 </a>
                             </td>
@@ -82,7 +86,8 @@ $this->addContextArrayItems( 'tabs', [
             </table>
             
             <div class="box__actions">
-                <button class="tabs__item__triggering" href="#tab-profile-add" >
+                <button class="tabs__item__triggering" 
+                        href="#tab-profile-add" >
                     <i class="fa fa-plus"></i>
                     Create new
                 </button>

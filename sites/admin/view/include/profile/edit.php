@@ -18,11 +18,11 @@
                 <select name="profile-site" 
                         class="profile-site"
                         data-init="<?=$profile->site ?>">
-                    <option value="*" <?=($profile->site == "*")? 'selected': '' ?>>
+                    <option value="*" <?=($profile->site === "*")? 'selected': '' ?>>
                         All sites
                     </option>
                     <?php foreach( $websitesList as $website ): ?>
-                        <option <?=($profile->site == $website->site)? 'selected': '' ?>
+                        <option <?=($profile->site === $website->site)? 'selected': '' ?>
                                 value="<?=$website->site ?>">
                             <?=$website->site ?>
                         </option>
