@@ -183,12 +183,16 @@ class Module
         return false;
     }
     
-    function getIncludeViewFile( $filename )
+    function getIncludeViewFile( $filename ): ?string
     {
-        $fullPath = $this->ww->website->getIncludeViewFilePath($filename );
-        
-        if( !$fullPath ){
-            return false;
+        if( !$fullPath = $this->ww->website->getIncludeViewFilePath($filename) ){
+            $fullPath = $this->ww->website->getIncludeViewFilePath( $filename.'.php' );
+        }
+
+        if( !$fullPath )
+        {
+            $this->ww->log->error( "Ressource view file:\"".$filename."\" can't be Included" );
+            return null;
         }
         
         $this->ww->debug->toResume("Ressource view file to be Included: \"".$fullPath."\"", 'MODULE '.$this->name);
@@ -201,7 +205,9 @@ class Module
             $$includedFunctionParamName = $includedFunctionParamValue;
         }
 
-        include $this->getIncludeViewFile($filename);
+        if( $file = $this->getIncludeViewFile($filename) ){
+            include $this->getIncludeViewFile($filename);
+        };
         return;
     }
     
