@@ -1,0 +1,29 @@
+{
+    "name": "gh-review",
+    "composition": [
+        {
+            "name": "name",
+            "type": "string"
+        },
+        {
+            "name": "status",
+            "type": "string"
+        },
+        {
+            "name": "photo",
+            "type": "image"
+        },
+        {
+            "name": "datetime",
+            "type": "datetime"
+        },
+        {
+            "name": "body",
+            "type": "string"
+        },
+        {
+            "name": "rating",
+            "type": "float"
+        }
+    ]
+}

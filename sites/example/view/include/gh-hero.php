@@ -3,7 +3,8 @@
  * @var WW\Cauldron $cauldron
  */
 ?>
-<section id="home" class="hero flex items-center justify-center text-center text-white pt-20">
+<section    id="<?=$cauldron->type.$cauldron->id ?>" 
+            class="hero flex items-center justify-center text-center text-white pt-20">
     <div class="container mx-auto px-4 animate-fade-in">
         <h1 class="text-4xl md:text-6xl font-bold mb-6">
             <?=$cauldron->content('headline')?->value()?>

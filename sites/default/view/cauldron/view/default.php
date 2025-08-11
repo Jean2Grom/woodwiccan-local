@@ -3,13 +3,13 @@
 <ul>
     <?php foreach( $this->contents() as $ingredient ): ?>
         <li style="display: flex;justify-content: space-between;">
-            <div>
+            <div style="text-align: left;">
                 <?php if( $ingredient->name ): ?>
                     <?=$ingredient->name ?>
                 <?php endif; ?>
                 <?="[".$ingredient->type."] " ?>
             </div>
-            <div style="padding-left: 10px;">
+            <div style="margin-left: 40px;text-align: right;">
                 <?php $ingredient->display( null, 40 ); ?>
             </div>
         </li>

@@ -3,7 +3,8 @@
  * @var WW\Cauldron $cauldron
  */
 ?>
-<section class="py-16 bg-amber-50">
+<section    id="<?=$cauldron->type.$cauldron->id ?>"
+            class="py-16 bg-amber-50">
     <div class="container mx-auto px-4 text-center">
         <h2 class="text-3xl md:text-4xl font-bold mb-6">
             <?=$cauldron->headline ?>

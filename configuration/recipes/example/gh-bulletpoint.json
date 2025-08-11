@@ -1,0 +1,17 @@
+{
+    "name": "gh-bulletpoint",
+    "composition": [
+        {
+            "name": "icon_class",
+            "type": "string"
+        },
+        {
+            "name": "head",
+            "type": "string"
+        },
+        {
+            "name": "body",
+            "type": "text"
+        }
+    ]
+}

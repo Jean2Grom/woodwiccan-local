@@ -3,7 +3,8 @@
  * @var WW\Cauldron $cauldron
  */
 ?>
-<section id="about" class="py-20 bg-white">
+<section    id="<?=$cauldron->type.$cauldron->id ?>" 
+            class="py-20 bg-white">
     <div class="container mx-auto px-4">
         <div class="flex flex-col lg:flex-row items-center">
             <div class="lg:w-1/2 mb-12 lg:mb-0 lg:pr-12">

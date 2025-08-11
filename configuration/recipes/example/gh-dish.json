@@ -1,0 +1,33 @@
+{
+    "name": "gh-dish",
+    "composition": [
+        {
+            "mandatory": true,
+            "name": "title",
+            "type": "string"
+        },
+        {
+            "mandatory": true,
+            "name": "description",
+            "type": "string"
+        },
+        {
+            "mandatory": true,
+            "name": "photo",
+            "type": "image"
+        },
+        {
+            "mandatory": true,
+            "name": "price",
+            "type": "price"
+        },
+        {
+            "name": "rate",
+            "type": "float"
+        },
+        {
+            "name": "evals_quantity",
+            "type": "integer"
+        }
+    ]
+}

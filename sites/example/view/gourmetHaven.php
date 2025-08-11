@@ -1,7 +1,5 @@
 <?php /** @var WW\Module $this */ 
 
-//$this->addJsLibFile('tailwindcss.3.4.17.js');
-//$this->addCssFile('font-awesome.6.4.0.all.min.css');
 $this->addCssFile('gourmet-haven.css');
 $this->addJsFile('gourmet-haven.js');
 $this->addContextVar('title', "Gourmet Haven | Fine Dining Experience");
@@ -19,30 +17,40 @@ $this->addContextVar('bodyClass', "font-sans text-gray-800");
         </div>
         
         <div class="hidden md:flex space-x-8">
-            <a href="#home" class="nav-link text-gray-800 hover:text-amber-500">Home</a>
-            <a href="#menu" class="nav-link text-gray-800 hover:text-amber-500">Menu</a>
-            <a href="#about" class="nav-link text-gray-800 hover:text-amber-500">About</a>
-            <a href="#testimonials" class="nav-link text-gray-800 hover:text-amber-500">Testimonials</a>
-            <a href="#contact" class="nav-link text-gray-800 hover:text-amber-500">Contact</a>
+            <?php foreach( $menu as $link ): ?>
+                <a  href="<?=$link['href'] ?>" 
+                    class="nav-link text-gray-800 hover:text-amber-500">
+                    <?=$link['text'] ?>
+                </a>
+            <?php endforeach; ?>
         </div>
-        
+
         <div class="flex items-center space-x-4">
-            <a href="#" class="hidden md:block bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-full transition duration-300">Reservations</a>
-            <button id="mobile-menu-button" class="md:hidden text-gray-800 focus:outline-none">
+            <a  href="<?=$callToAction->href ?>" 
+                class="hidden md:block bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-full transition duration-300">
+                <?=$callToAction->text ?>
+            </a>
+            <button id="mobile-menu-button" 
+                    class="md:hidden text-gray-800 focus:outline-none">
                 <i class="fas fa-bars text-2xl"></i>
             </button>
         </div>
     </div>
     
     <!-- Mobile Menu -->
-    <div id="mobile-menu" class="hidden md:hidden bg-white w-full px-4 pb-4 shadow-lg">
+    <div    id="mobile-menu" 
+            class="hidden md:hidden bg-white w-full px-4 pb-4 shadow-lg">
         <div class="flex flex-col space-y-3">
-            <a href="#home" class="nav-link text-gray-800 hover:text-amber-500 py-2">Home</a>
-            <a href="#menu" class="nav-link text-gray-800 hover:text-amber-500 py-2">Menu</a>
-            <a href="#about" class="nav-link text-gray-800 hover:text-amber-500 py-2">About</a>
-            <a href="#testimonials" class="nav-link text-gray-800 hover:text-amber-500 py-2">Testimonials</a>
-            <a href="#contact" class="nav-link text-gray-800 hover:text-amber-500 py-2">Contact</a>
-            <a href="#" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-full text-center transition duration-300">Reservations</a>
+            <?php foreach( $menu as $link ): ?>
+                <a  href="<?=$link['href'] ?>" 
+                    class="nav-link text-gray-800 hover:text-amber-500 py-2">
+                    <?=$link['text'] ?>
+                </a>
+            <?php endforeach; ?>
+            <a  href="<?=$callToAction->href ?>" 
+                class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-full text-center transition duration-300">
+                <?=$callToAction->text ?>
+            </a>
         </div>
     </div>
 </nav>
@@ -58,8 +66,13 @@ $this->addContextVar('bodyClass', "font-sans text-gray-800");
     <div class="container mx-auto px-4">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div>
-                <h3 class="text-xl font-bold mb-4">Gourmet Haven</h3>
-                <p class="text-gray-400 mb-4">Where passion meets perfection in every dish we serve.</p>
+                <h3 class="text-xl font-bold mb-4">
+                    <?=$footer->headline ?>
+                </h3>
+
+                <div class="text-gray-400 mb-4">
+                    <?=$footer->description ?>
+                </div>
 
                 <div class="flex space-x-4">
                     <a href="#" class="text-gray-400 hover:text-amber-500 transition duration-300">
@@ -80,48 +93,38 @@ $this->addContextVar('bodyClass', "font-sans text-gray-800");
             <div>
                 <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
                 <ul class="space-y-2">
-                    <li><a href="#home" class="text-gray-400 hover:text-amber-500 transition duration-300">Home</a></li>
-                    <li><a href="#menu" class="text-gray-400 hover:text-amber-500 transition duration-300">Menu</a></li>
-                    <li><a href="#about" class="text-gray-400 hover:text-amber-500 transition duration-300">About Us</a></li>
-                    <li><a href="#testimonials" class="text-gray-400 hover:text-amber-500 transition duration-300">Testimonials</a></li>
-                    <li><a href="#contact" class="text-gray-400 hover:text-amber-500 transition duration-300">Contact</a></li>
+                    <?php foreach( $menu as $link ): ?>
+                        <li>
+                            <a  href="<?=$link['href'] ?>" 
+                                class="text-gray-400 hover:text-amber-500 transition duration-300">
+                                <?=$link['text'] ?>
+                            </a>
+                        </li>
+                    <?php endforeach; ?>
                 </ul>
             </div>
             
             <div>
                 <h4 class="text-lg font-semibold mb-4">Hours</h4>
                 <ul class="space-y-2 text-gray-400">
-                    <li class="flex justify-between">
-                        <span>Tuesday - Thursday</span>
-                        <span>5:00 PM - 9:30 PM</span>
-                    </li>
-                    <li class="flex justify-between">
-                        <span>Friday - Saturday</span>
-                        <span>5:00 PM - 10:30 PM</span>
-                    </li>
-                    <li class="flex justify-between">
-                        <span>Sunday</span>
-                        <span>5:00 PM - 9:00 PM</span>
-                    </li>
-                    <li class="flex justify-between">
-                        <span>Brunch (Sat-Sun)</span>
-                        <span>10:00 AM - 2:00 PM</span>
-                    </li>
+                    <?php foreach( $footer->hours->value() as $hourSection ): ?>
+                        <li class="flex justify-between">
+                            <?=$hourSection ?>
+                        </li>
+                    <?php endforeach; ?>
                 </ul>
             </div>
             
             <div>
                 <h4 class="text-lg font-semibold mb-4">Contact Info</h4>
                 <address class="not-italic text-gray-400 space-y-2">
-                    <p>123 Gourmet Street<br>New York, NY 10001</p>
-                    <p>Phone: (555) 123-4567</p>
-                    <p>Email: info@gourmethaven.com</p>
+                    <?=$footer->content('contact-info') ?>
                 </address>
             </div>
         </div>
         
         <div class="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
-            <p class="text-gray-400 mb-4 md:mb-0">© 2023 Gourmet Haven. All rights reserved.</p>
+            <p class="text-gray-400 mb-4 md:mb-0">© 2025 Gourmet Haven. All rights reserved.</p>
 
             <div class="flex space-x-6">
                 <a href="#" class="text-gray-400 hover:text-amber-500 transition duration-300">Privacy Policy</a>
