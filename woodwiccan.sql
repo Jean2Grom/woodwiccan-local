@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : db
--- Généré le : lun. 11 août 2025 à 16:51
+-- Généré le : lun. 11 août 2025 à 17:33
 -- Version du serveur : 11.7.2-MariaDB-ubu2404
 -- Version de PHP : 8.2.27
 
@@ -316,9 +316,9 @@ INSERT INTO `cauldron` (`id`, `target`, `status`, `name`, `recipe`, `data`, `pri
 (1145, NULL, NULL, 'email', 'gh-bulletpoint', NULL, 100, NULL, '2025-08-11 11:30:08', NULL, '2025-08-11 11:30:08', 1, 12, 1, 6, 3, NULL, NULL, NULL, NULL),
 (1146, NULL, NULL, 'hours', 'gh-bulletpoint', NULL, 100, NULL, '2025-08-11 11:30:08', NULL, '2025-08-11 11:30:08', 1, 12, 1, 6, 4, NULL, NULL, NULL, NULL),
 (1147, 1015, b'1', 'Contact', 'gh-contact', NULL, 0, NULL, '2025-08-11 11:30:08', NULL, '2025-08-11 11:30:08', 1, 12, 1, 3, 3, NULL, NULL, NULL, NULL),
-(1148, NULL, NULL, 'actions', 'folder', NULL, 100, NULL, '2025-08-11 14:25:37', NULL, '2025-08-11 14:25:37', 1, 8, 1, 4, NULL, NULL, NULL, NULL, NULL),
-(1149, NULL, NULL, 'button', 'link', NULL, 100, NULL, '2025-08-11 14:25:37', NULL, '2025-08-11 14:25:37', 1, 8, 1, 4, 1, NULL, NULL, NULL, NULL),
-(1150, NULL, NULL, 'button', 'link', NULL, 100, NULL, '2025-08-11 14:25:37', NULL, '2025-08-11 14:25:37', 1, 8, 1, 4, 2, NULL, NULL, NULL, NULL),
+(1148, NULL, NULL, 'actions', 'folder', NULL, 100, NULL, '2025-08-11 14:25:37', NULL, '2025-08-11 17:27:48', 1, 8, 1, 2, 3, 1, NULL, NULL, NULL),
+(1149, NULL, NULL, 'button', 'link', NULL, 100, NULL, '2025-08-11 14:25:37', NULL, '2025-08-11 17:27:48', 1, 8, 1, 2, 3, 1, 1, NULL, NULL),
+(1150, NULL, NULL, 'button', 'link', NULL, 100, NULL, '2025-08-11 14:25:37', NULL, '2025-08-11 17:27:48', 1, 8, 1, 2, 3, 1, 2, NULL, NULL),
 (1151, 1007, b'1', 'Home', 'gh-hero', NULL, 0, NULL, '2025-08-11 14:25:37', NULL, '2025-08-11 14:25:37', 1, 8, 1, 2, 2, NULL, NULL, NULL, NULL),
 (1152, NULL, NULL, 'menu-call-to-action', 'link', NULL, 100, NULL, '2025-08-11 14:49:13', NULL, '2025-08-11 15:10:14', 1, 2, 2, 4, 1, 1, NULL, NULL, NULL),
 (1153, NULL, NULL, 'footer', 'folder', NULL, 100, NULL, '2025-08-11 14:51:21', NULL, '2025-08-11 15:10:14', 1, 2, 2, 4, 1, 2, NULL, NULL, NULL),
@@ -332,7 +332,13 @@ INSERT INTO `cauldron` (`id`, `target`, `status`, `name`, `recipe`, `data`, `pri
 (1161, NULL, NULL, 'menu-call-to-action', 'link', NULL, 100, NULL, '2025-08-11 15:25:50', NULL, '2025-08-11 15:25:50', 1, 2, 2, 7, NULL, NULL, NULL, NULL, NULL),
 (1162, NULL, NULL, 'footer', 'folder', NULL, 100, NULL, '2025-08-11 15:25:50', NULL, '2025-08-11 15:25:50', 1, 2, 2, 8, NULL, NULL, NULL, NULL, NULL),
 (1163, NULL, NULL, 'hours', 'folder', NULL, 100, NULL, '2025-08-11 15:25:50', NULL, '2025-08-11 15:25:50', 1, 2, 2, 8, 1, NULL, NULL, NULL, NULL),
-(1164, 1005, b'1', 'GourmetHaven', 'folder', NULL, 0, NULL, '2025-08-11 15:25:50', NULL, '2025-08-11 15:25:50', 1, 2, 2, 4, 2, NULL, NULL, NULL, NULL);
+(1164, 1005, b'1', 'GourmetHaven', 'folder', NULL, 0, NULL, '2025-08-11 15:25:50', NULL, '2025-08-11 15:25:50', 1, 2, 2, 4, 2, NULL, NULL, NULL, NULL),
+(1166, NULL, NULL, 'actions', 'folder', NULL, 100, NULL, '2025-08-11 17:27:23', NULL, '2025-08-11 17:27:48', 1, 8, 1, 5, NULL, NULL, NULL, NULL, NULL),
+(1167, NULL, NULL, 'button', 'link', NULL, 100, NULL, '2025-08-11 17:27:23', NULL, '2025-08-11 17:27:48', 1, 8, 1, 5, 1, NULL, NULL, NULL, NULL),
+(1168, NULL, NULL, 'button', 'link', NULL, 100, NULL, '2025-08-11 17:27:23', NULL, '2025-08-11 17:27:48', 1, 8, 1, 5, 2, NULL, NULL, NULL, NULL),
+(1169, NULL, NULL, 'background', 'image', NULL, 100, NULL, '2025-08-11 17:27:23', NULL, '2025-08-11 17:27:48', 1, 8, 1, 6, NULL, NULL, NULL, NULL, NULL),
+(1170, NULL, NULL, 'file', 'ww-file', NULL, 200, NULL, '2025-08-11 17:27:23', NULL, '2025-08-11 17:27:48', 1, 8, 1, 6, 1, NULL, NULL, NULL, NULL),
+(1171, 1007, b'1', 'Home', 'gh-hero', NULL, 0, NULL, '2025-08-11 17:27:48', NULL, '2025-08-11 17:27:48', 1, 8, 1, 2, 3, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -388,7 +394,9 @@ INSERT INTO `ingredient__boolean` (`id`, `cauldron_fk`, `name`, `value`, `priori
 (125, 1150, 'external', b'0', 100),
 (126, 1152, 'external', b'0', 100),
 (127, 1157, 'external', b'0', 100),
-(128, 1161, 'external', b'0', 100);
+(128, 1161, 'external', b'0', 100),
+(129, 1167, 'external', b'0', 100),
+(130, 1168, 'external', b'0', 100);
 
 -- --------------------------------------------------------
 
@@ -1032,8 +1040,8 @@ INSERT INTO `ingredient__string` (`id`, `cauldron_fk`, `name`, `value`, `priorit
 (1871, 1145, 'head', 'Email', 200),
 (1872, 1146, 'icon_class', 'fa-clock', 300),
 (1873, 1146, 'head', 'Hours', 200),
-(1874, 1007, 'headline', 'Experience Culinary Excellence', 300),
-(1875, 1007, 'description', 'Where passion meets perfection in every dish we serve', 200),
+(1874, 1171, 'headline', 'Experience Culinary Excellence', 300),
+(1875, 1171, 'description', 'Where passion meets perfection in every dish we serve', 200),
 (1876, 1149, 'href', '#gh-menu1009', 300),
 (1877, 1149, 'text', 'View Menu', 200),
 (1878, 1150, 'href', '#gh-contact1015', 300),
@@ -1046,7 +1054,17 @@ INSERT INTO `ingredient__string` (`id`, `cauldron_fk`, `name`, `value`, `priorit
 (1885, 1158, 'headline', 'Gourmet Haven', 400),
 (1886, 1161, 'href', '#gh-contact1015', 300),
 (1887, 1161, 'text', 'Reservations', 200),
-(1888, 1162, 'headline', 'Gourmet Haven', 400);
+(1888, 1162, 'headline', 'Gourmet Haven', 400),
+(1889, 1007, 'headline', 'Experience Culinary Excellence', 400),
+(1890, 1007, 'description', 'Where passion meets perfection in every dish we serve', 300),
+(1891, 1167, 'href', '#gh-menu1009', 300),
+(1892, 1167, 'text', 'View Menu', 200),
+(1893, 1168, 'href', '#gh-contact1015', 300),
+(1894, 1168, 'text', 'Book a Table', 200),
+(1895, 1169, 'name', 'hero-bckgnd', 300),
+(1896, 1169, 'caption', '', 100),
+(1897, 1170, 'storage-path', 'image/jpeg/62960b0c9c7ca965fb3a489ce5dadfe79a486354', 200),
+(1898, 1170, 'filename', 'hero-bckgnd.jpg', 100);
 
 -- --------------------------------------------------------
 
@@ -1436,13 +1454,13 @@ ALTER TABLE `witch`
 -- AUTO_INCREMENT pour la table `cauldron`
 --
 ALTER TABLE `cauldron`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1165;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1172;
 
 --
 -- AUTO_INCREMENT pour la table `ingredient__boolean`
 --
 ALTER TABLE `ingredient__boolean`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=129;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=131;
 
 --
 -- AUTO_INCREMENT pour la table `ingredient__datetime`
@@ -1472,7 +1490,7 @@ ALTER TABLE `ingredient__price`
 -- AUTO_INCREMENT pour la table `ingredient__string`
 --
 ALTER TABLE `ingredient__string`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1889;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1899;
 
 --
 -- AUTO_INCREMENT pour la table `ingredient__text`
