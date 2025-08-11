@@ -12,7 +12,7 @@
             <?=$cauldron->content('description')?->value()?>
         </p>
         <div class="flex flex-col sm:flex-row justify-center gap-4">
-            <?php foreach( $cauldron->content('actions')?->contents() ?? [] as $key => $action ): 
+            <?php foreach( $cauldron->actions?->value() ?? [] as $key => $action ): 
                 if( $action->recipe()->name === 'link' ):
                     $class = !($key % 2)? 
                                 "bg-amber-500 hover:bg-amber-600 text-white":

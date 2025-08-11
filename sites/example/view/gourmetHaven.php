@@ -11,11 +11,11 @@ $this->addContextVar('bodyClass', "font-sans text-gray-800");
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 
- <!-- Navigation -->
- <nav class="fixed w-full bg-white shadow-md z-50 transition-all duration-300">
+<!-- Navigation -->
+<nav class="fixed w-full bg-white shadow-md z-50 transition-all duration-300">
     <div class="container mx-auto px-4 py-3 flex justify-between items-center">
         <div class="flex items-center">
-            <a href="#" class="text-2xl font-bold text-amber-500">Gourmet<span class="text-gray-800">Haven</span></a>
+            <a href="#top" class="text-2xl font-bold text-amber-500">Gourmet<span class="text-gray-800">Haven</span></a>
         </div>
         
         <div class="hidden md:flex space-x-8">
@@ -45,10 +45,11 @@ $this->addContextVar('bodyClass', "font-sans text-gray-800");
             <a href="#" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-full text-center transition duration-300">Reservations</a>
         </div>
     </div>
- </nav>
- 
+</nav>
+
+<div id="top"></div>
+
 <?php foreach( $this->witch()->daughters() as $section ): ?>
-<?php $this->ww->debug( $section->cauldron()->recipe ); ?>
     <?php $this->include($section->cauldron()->recipe, [ 'cauldron' => $section->cauldron() ]); ?>
 <?php endforeach; ?>
  

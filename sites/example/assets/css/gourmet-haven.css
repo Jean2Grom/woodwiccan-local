@@ -57,3 +57,13 @@
  .animate-fade-in {
      animation: fadeIn 1s ease forwards;
  }
+ .page-body p {
+    margin-bottom: 1.5rem;
+ }
+ .page-bulletpoint p {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+ }
+ .contact-bulletpoint-body p strong {
+    font-weight: 500;
+ }

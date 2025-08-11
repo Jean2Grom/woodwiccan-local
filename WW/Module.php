@@ -136,7 +136,7 @@ class Module
             $this->ww->log->error("Can't get view file: ".$designName, $mandatory);
         }
         
-        $this->ww->debug->toResume("Design file to be included : \"".$this->viewFile."\"", 'MODULE '.$this->name);
+        $this->ww->debug->toResume("View file : \"".$this->viewFile."\"", 'MODULE '.$this->name);
         return $this->viewFile;
     }
     
@@ -191,11 +191,11 @@ class Module
 
         if( !$fullPath )
         {
-            $this->ww->log->error( "Ressource view file:\"".$filename."\" can't be Included" );
+            $this->ww->log->error( "Include view file:\"".$filename."\" can't be reached" );
             return null;
         }
         
-        $this->ww->debug->toResume("Ressource view file to be Included: \"".$fullPath."\"", 'MODULE '.$this->name);
+        $this->ww->debug->toResume("Include view file : \"".$fullPath."\"", 'MODULE '.$this->name);
         return $fullPath;
     }
     
@@ -206,7 +206,7 @@ class Module
         }
 
         if( $file = $this->getIncludeViewFile($filename) ){
-            include $this->getIncludeViewFile($filename);
+            include $file;
         };
         return;
     }

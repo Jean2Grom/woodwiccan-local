@@ -305,7 +305,7 @@ class Cauldron implements CauldronContentInterface
 
 
     function value(){
-        $this->contents();
+        return $this->contents();
     }
 
     protected function generateContent(): void
