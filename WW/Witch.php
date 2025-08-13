@@ -81,12 +81,17 @@ class Witch
     }
     
 
+    /**
+     * property reading, 
+     * if not property is found it try to read cauldron content
+     * @var string $name
+     */
     public function __get(string $name): mixed 
     {
-        if( isset($this->properties[ $name ]) ){
+        if( array_key_exists($name, $this->properties) ){
             return $this->properties[ $name ];
         }
-
+        
         if( $this->cauldron() ){
             if( $this->cauldron()->name === $name ){
                 return $this->cauldron();
