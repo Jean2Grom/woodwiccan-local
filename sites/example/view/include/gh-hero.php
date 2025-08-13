@@ -5,7 +5,7 @@
 ?>
 <section    id="<?=$cauldron->type.$cauldron->id ?>" 
             class="hero flex items-center justify-center text-center text-white pt-20"
-            style="background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('<?=$cauldron->background->file->value() ?>');">
+            style="background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('<?=$cauldron->background->file->value() ?>') center;">
     <div class="container mx-auto px-4 animate-fade-in">
         <h1 class="text-4xl md:text-6xl font-bold mb-6">
             <?=$cauldron->content('headline')?->value()?>
