@@ -12,9 +12,10 @@
             
             <?php if( $daughter->image?->file ): ?>
                 <div class="schema">
-                    <img src="<?=$daughter->image->file->value()?>" 
-                         alt="<?=$daughter->image->caption?>" 
-                         title="<?=$daughter->image->name?>" />
+                    <img    src="<?=$daughter->image->file->value()?>" 
+                            loading="lazy"
+                            alt="<?=$daughter->image->caption?>" 
+                            title="<?=$daughter->image->name?>" />
                 </div>
             <?php endif; ?>
             

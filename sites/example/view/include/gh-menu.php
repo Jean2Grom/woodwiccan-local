@@ -28,6 +28,7 @@ $menu = $witch ?? $cauldron->witches()[0] ?? $this->witch();
                         <div class="h-48 overflow-hidden">
                             <img    src="<?=$dish->photo->file->value()?>" 
                                     alt="<?=$dish->photo->caption?>" 
+                                    loading="lazy"
                                     class="menu-img w-full h-full object-cover" />
                         </div>
 

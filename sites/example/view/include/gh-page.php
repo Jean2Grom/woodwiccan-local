@@ -11,6 +11,7 @@
 
                 <img    src="<?=$cauldron->image->file->value()?>" 
                         alt="<?=$cauldron->image->caption ?>" 
+                        loading="lazy"
                         class="rounded-lg shadow-xl w-full" />
             </div>
             <div class="lg:w-1/2">

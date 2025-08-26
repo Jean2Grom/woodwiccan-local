@@ -55,7 +55,9 @@ $key = "_FILES__".md5( microtime().rand() );
     <div class="image-display" <?=$storagePath? '': 'style="display: none;"' ?>>
         <?php if( $storagePath ): ?>
             <legend class="current-image-focus">Current image</legend>
-            <img class="current-image-focus" src="<?='/'.$storagePath ?>" /> 
+            <img    class="current-image-focus" 
+                    loading="lazy"
+                    src="<?='/'.$storagePath ?>" /> 
 
             <input  type="hidden" 
                     class="current-image-focus"

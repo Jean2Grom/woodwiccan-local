@@ -59,6 +59,7 @@
                     <div class="flex items-center">
                         <img    src="<?=$review->photo->file->value() ?>" 
                                 alt="<?=$review->photo->caption?>" 
+                                loading="lazy"
                                 class="w-12 h-12 rounded-full mr-4" />
                         <div>
                             <h4 class="font-bold">
