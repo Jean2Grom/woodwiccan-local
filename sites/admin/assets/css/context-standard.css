@@ -53,6 +53,12 @@ fieldset {
     margin-bottom: 8px;
     padding: 8px;
 }
+    fieldset ul li {
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        margin-bottom: 4px;
+        padding: 4px 8px;
+    }
 .tabs {
     display: flex;
 }

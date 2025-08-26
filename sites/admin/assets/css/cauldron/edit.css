@@ -9,6 +9,9 @@ h2 {
     flex-direction: column;
     align-items: flex-start;
 }
+    .fieldsets-container > .cauldron {
+        margin-left: 4vw;
+    }
 fieldset {
     width: -moz-available;
     width: -webkit-fill-available;
@@ -64,38 +67,23 @@ fieldset.ingredient {
     background-color: #fff;
 }
 fieldset > .fieldsets-container {
-    margin-left: 24px;
+    margin-left: 8px;
 }
-    fieldset > .fieldsets-container > fieldset.cauldron {
-        box-shadow: none;
-        border: 1px solid #444;
-        border-radius: 0;
-    }
-        fieldset > .fieldsets-container > fieldset.cauldron .cauldron-add-actions .add-form {
-            box-shadow: none;
-            border: 1px solid #444;
-            border-radius: 0;
-        }
 fieldset.cauldron.integration-0 {
-    background-color: #ddd;
+    background-color: #eee; 
 }
 fieldset.cauldron.integration-1 {
-    background-color: #ccc;
+    background-color: #fff;
 }
-fieldset.cauldron.integration-2 {
-    background-color: #bbb;
-}
-fieldset.cauldron.integration-3 {
-    background-color: #aaa;
-}
-
 .cauldron-add-actions {
     display: flex;
-    align-items: center;
+    align-items: start;
     flex-direction: column;
     justify-content: center;
     justify-items: initial;
     width: 100%;
+    margin-top: 4px;
+    margin-left: 4px;
 }
 .cauldron-add-actions .add-form {
     display: none;
@@ -126,7 +114,9 @@ fieldset.cauldron.integration-3 {
         font-style: italic;
     }
 .cauldron-add-actions .show-form {
-    border-radius: 24px;
+    border-radius: 4px;
+    padding: 4px 8px;
+    box-shadow: 4px 4px 4px #999;
 }
 
 #edit-action {

@@ -13,7 +13,7 @@
         />
     
     <?php else: foreach( $this->contents() as $contentIndex => $content ): 
-        $integrationCountClass  = substr_count($input, '[content]') % 4;
+        $integrationCountClass  = substr_count($input, '[content]') % 2;
         $contentInput           = $input."[".$contentIndex."]";
         ?>
         <fieldset class="<?=$content->isIngredient()? 'ingredient': 'cauldron integration-'.$integrationCountClass?>">
