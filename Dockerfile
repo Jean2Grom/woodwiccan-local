@@ -8,7 +8,7 @@ RUN --mount=type=bind,source=composer.json,target=composer.json \
 #    --mount=type=cache,target=/tmp/cache \
     composer install --no-dev --no-interaction
 
-FROM php:8.1-apache as final
+FROM php:8.2-apache
 
 RUN docker-php-ext-install mysqli pdo pdo_mysql && a2enmod rewrite && docker-php-ext-enable mysqli pdo pdo_mysql
 
