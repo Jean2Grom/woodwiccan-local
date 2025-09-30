@@ -1,6 +1,7 @@
 <?php
 namespace WW\DataAccess;
 
+use WW\Cairn;
 use WW\Handler\CauldronHandler;
 use WW\WoodWiccan;
 use WW\Witch;
@@ -24,6 +25,10 @@ class Summoning
     
     private static function witchesInstanciate( WoodWiccan $ww, $configuration, $result )
     {
+        if( !$result ){
+            return [];
+        }
+        
         $witches        = [];
         $witchesList    = [];
         
@@ -51,11 +56,6 @@ class Summoning
             }
         }
         
-        // if( !empty($configuration['user']) && !empty($result[0]['user_cauldron']) ){
-        //     foreach( array_keys($configuration['user']['entries']) as $witchRef ){
-        //         $conditions[ $witchRef ] = [ 'cauldron' => $result[0]['user_cauldron'] ];
-        //     }
-        // }
         if( !empty($configuration['user']) ){
             foreach( array_keys($configuration['user']['entries']) as $witchRef ){
                 $conditions[ $witchRef ] = [ 'cauldron' => $ww->user->cauldron ];
@@ -65,6 +65,10 @@ class Summoning
         foreach( $result as $row )
         {
             $id                             = $row['id'];
+            if( isset($witchesList[ $id ]) ){
+                continue;
+            }
+
             $witch                          = Handler::instanciate( $ww, $row );
             $depthArray[ $witch->depth ][]  = $id;
             $witchesList[ $id ]             = $witch;
@@ -86,7 +90,7 @@ class Summoning
                 }
             }
         }
-        
+
         for( $i=0; $i < $ww->depth; $i++ ){
             foreach( $depthArray[ $i ] as $potentialMotherId )
             {
@@ -193,7 +197,6 @@ class Summoning
         return $witches;
     }
     
-    
     private static function initChildren( Witch $witch, int $depthLimit )
     {
         if( $depthLimit < 0 ){
@@ -287,7 +290,8 @@ class Summoning
                 }
 
                 $query  .= "LEFT JOIN `witch` AS `".$witchRef."` ";
-                $query  .=  "ON ( ";
+                //$query  .=  "ON ( ";
+                $query  .=  "ON  `w`.`id` <> `".$witchRef."`.`id` AND ";
 
                 $separator = "";
                 foreach( self::RELATIONSHIPS as $relationship )
@@ -309,14 +313,14 @@ class Summoning
                     $query .= call_user_func_array([ __CLASS__, $functionName ], array_merge([$ww], $params) );
                 }
 
-                $query  .=  ") ";            
+                //$query  .=  ") ";            
             }
         }
         
         $parameters = [];
         $separator = "WHERE ( ";
         
-        foreach( $configuration['url'] as $witchRef => $witchRefConf )
+        foreach( $configuration['url'] ?? [] as $witchRef => $witchRefConf )
         {
             $parameters[$witchRef.'_site']  = $witchRefConf['site'];
             $parameters[$witchRef.'_url']   = $witchRefConf['url'];
@@ -332,7 +336,7 @@ class Summoning
             }
         }
         
-        foreach( $configuration['id'] as $witchRef => $witchRefConf )
+        foreach( $configuration['id'] ?? [] as $witchRef => $witchRefConf )
         {
             $parameters[ $witchRef ]    = (int) $witchRefConf['id'];
 
@@ -465,8 +469,8 @@ class Summoning
                 }
             }
             $query .= ") ";
-        }
-// $ww->db->debugQuery($query, $parameters);
+        } 
+
         return $ww->db->selectQuery($query, $parameters);
     }
 
@@ -479,12 +483,14 @@ class Summoning
             return "`".$daughter."`.`level_".$level."`";
         };
         
-        $jointure = "( `".$mother."`.`id` <> `".$daughter."`.`id` ) ";
+        //$jointure = "( `".$mother."`.`id` <> `".$daughter."`.`id` ) ";
         
-        $jointure  .=      "AND ( ";
-        $jointure  .=          "( ".$m(1)." IS NOT NULL AND ".$d(1)." = ".$m(1)." ) ";
-        $jointure  .=          "OR ( ".$m(1)." IS NULL AND ".$d(1)." IS NOT NULL ) ";
-        $jointure  .=      ") ";
+        //$jointure  .=      "AND ( ";
+        $jointure  =        "( ";
+
+        $jointure  .=           "( ".$m(1)." IS NOT NULL AND ".$d(1)." = ".$m(1)." ) ";
+        $jointure  .=           "OR ( ".$m(1)." IS NULL AND ".$d(1)." IS NOT NULL ) ";
+        $jointure  .=       ") ";
         
         for( $i=2; $i <= $ww->depth; $i++ )
         {
@@ -503,8 +509,7 @@ class Summoning
         return $jointure;
     }
     
-    private static function parentsJointure( WoodWiccan $ww, $daughter, $mother, $depth=1 )
-    {
+    private static function parentsJointure( WoodWiccan $ww, $daughter, $mother, $depth=1 ){
         return self::childrenJointure( $ww, $mother, $daughter, $depth );
     }
     
@@ -517,11 +522,17 @@ class Summoning
             return "`".$sister."`.`level_".$level."`";
         };
         
-        $jointure = "( `".$witch."`.`id` <> `".$sister."`.`id` ) ";
-        
+        //$jointure = "( `".$witch."`.`id` <> `".$sister."`.`id` ) ";
+        $jointure   = "";
+        $separator  = "";
+
         for( $i=1; $i < $ww->depth; $i++ )
         {
-            $jointure  .=  "AND ( ";
+            $jointure  .=  $separator;
+            $separator  = "AND ";
+
+            //$jointure  .=  "AND ( ";
+            $jointure  .=  "( ";
             $jointure  .=      "( ".$w($i)." IS NOT NULL AND ".$w($i+1)." IS NOT NULL AND ".$s($i)." = ".$w($i)." ) ";
             $jointure  .=      "OR ( ".$w($i)." IS NOT NULL AND ".$w($i+1)." IS NULL AND ".$s($i)." IS NOT NULL ) ";
             
@@ -557,22 +568,47 @@ class Summoning
         return $jointure;
     }
     
-    
     static function witches( WoodWiccan $ww, $configuration )
     {
-        if( empty($configuration['id']) 
-                && empty($configuration['url'])
-                && empty($configuration['user']) 
-        ){
-            return [];
-        }
-        
-        $result     = self::witchesRequest($ww, $configuration);
+        $result = [];
+        if( !empty($configuration['url']) )
+        {
+            $result = self::witchesRequest($ww, [ 'url' => $configuration['url'] ]);
 
-        if( $result === false ){
-            return false;
+            foreach( $configuration['url'] as $witchRef => $conditionsItem ){
+                if( in_array( Cairn::DEFAULT_WITCH, array_keys($conditionsItem['entries']) ) )
+                {
+                    foreach( $result as $row ){
+                        if( $row['site'] === $conditionsItem['site'] 
+                            && $row['url'] === $conditionsItem['url'] 
+                        ){
+                            $invokedModule = $row['invoke'];
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+
+        if( $ww->user->connexion && $configuration['user'] ){
+            $result = array_merge(
+                $result, 
+                self::witchesRequest($ww, [ 'user' => $configuration['user'] ])
+            );
+        }
+
+        foreach( $configuration['id'] ?? [] as $key => $config ){
+            if( empty($config['modules']) ||  in_array($invokedModule, $config['modules']) ){
+                $result = array_merge(
+                    $result, 
+                    self::witchesRequest($ww, [ 'id' => [ $key => $config ] ]) 
+                );
+            }
         }
         
+        // $result     = self::witchesRequest($ww, $configuration);
+
         return self::witchesInstanciate($ww, $configuration, $result);
     }
     
