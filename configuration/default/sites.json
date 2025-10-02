@@ -10,14 +10,14 @@
         "defaultContext": "standard",        
         "witches": {
             "root": {
-                "id": 1,
+                "match": 1,
                 "craft": false,
                 "parents": false,
                 "sisters": false,
                 "children": false
             },
             "arborescence": {
-                "id": 1,
+                "match": 1,
                 "craft": false,
                 "invoke": "arborescence",
                 "parents": false,
@@ -28,7 +28,7 @@
                 }
             },
             "chooseWitch": {
-                "id": 1,
+                "match": 1,
                 "craft": false,
                 "invoke": "chooseWitch",
                 "parents": false,
@@ -39,7 +39,7 @@
                 }
             },            
             "menu": {
-                "id": 10, 
+                "match": 10,
                 "craft": false,
                 "children": {
                     "depth": 1,
@@ -47,7 +47,7 @@
                 }
             },
             "target": {
-                "get": "id", 
+                "match": "id", 
                 "parents": {
                     "depth": 1,
                     "craft": false
@@ -58,23 +58,35 @@
                 }
             }, 
             "mother": {
-                "get": "mother", 
+                "match": "mother", 
                 "craft": false,
-                "module": "view"
+                "conditions": {
+                    "invoke": [
+                        "view"
+                    ]
+                }
             }, 
             "origin": {
-                "get": "origin", 
+                "match": "origin", 
                 "craft": false,
-                "moduleXXX": "witch/clipboard",
+                "conditions": {
+                    "invoke": [
+                        "witch/clipboard"
+                    ]
+                },
                 "children": {
                     "depth": "*",
                     "craft": false
                 }
             }, 
             "destination": {
-                "get": "dest", 
+                "match": "dest", 
                 "craft": false,
-                "moduleXXX": "witch/clipboard",
+                "conditions": {
+                    "invoke": [
+                        "witch/clipboard"
+                    ]
+                },
                 "children": {
                     "depth": 1,
                     "craft": false
@@ -116,7 +128,7 @@
         ], 
         "witches": {
             "home": {
-                "id": 181, 
+                "match": 181,
                 "craft": true,
                 "children": {
                     "depth": "1",
@@ -141,14 +153,14 @@
         "site": "admin",
         "witches": {
             "root": {
-                "id": 180,
+                "match": 180,
                 "craft": false,
                 "parents": false,
                 "sisters": false,
                 "children": false
             },
             "arborescence": {
-                "id": 180,
+                "match": 180,
                 "craft": false,
                 "invoke": "arborescence",
                 "parents": false,
@@ -159,7 +171,7 @@
                 }
             },
             "chooseWitch": {
-                "id": 180,
+                "match": 180,
                 "craft": false,
                 "invoke": "chooseWitch",
                 "parents": false,

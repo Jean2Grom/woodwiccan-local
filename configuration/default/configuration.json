@@ -76,7 +76,7 @@
         },
         "witches": {
             "current": {
-                "url": true, 
+                "match": "url", 
                 "invoke": true,
                 "craft": true,
                 "parents": {
@@ -93,7 +93,7 @@
                 }
             },
             "user": {
-                "user": true,
+                "match": "user", 
                 "children": {
                     "depth": "*",
                     "craft": "*"
