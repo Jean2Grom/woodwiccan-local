@@ -263,7 +263,7 @@ class WitchDataAccess
         
         $witches        = self::summon(
             $ww, 
-            Cairn::prepareConf(
+            Cairn::prepareConfiguration(
                 $website, 
                 [
                     'fetchAncestors' => [
@@ -299,7 +299,7 @@ class WitchDataAccess
         
         $witches = self::summon(
             $ww, 
-            Cairn::prepareConf(
+            Cairn::prepareConfiguration(
                 $website, 
                 [
                     'fetchDescendants' => [
