@@ -75,7 +75,7 @@
             "10": "superadmin"
         },
         "witches": {
-            "current": {
+            "url": {
                 "match": "url", 
                 "invoke": true,
                 "craft": true,

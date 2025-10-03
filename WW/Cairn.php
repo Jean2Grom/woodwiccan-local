@@ -108,7 +108,7 @@ class Cairn
             else 
             {
                 $value = $website->ww->request->param(
-                    $entryConf['get'], 
+                    $entryConf['match'], 
                     'get', 
                     FILTER_VALIDATE_INT
                 );
