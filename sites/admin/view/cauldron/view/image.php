@@ -2,6 +2,8 @@
 
 <div style="display: flex; flex-direction: column;">
     <?=$this->content('name') ?>
-    <img src="<?=$this->file->value() ?>" style="max-width: 100%;" /> 
+    <div>
+        <img src="<?=$this->file->value() ?>" style="max-width: 100%;" /> 
+    </div>
     <?=$this->content('caption') ?>
 </div>
