@@ -61,7 +61,16 @@ const ArborescenceMenu = function( key ){
                 this.open( this.breadcrumb )
             )
             .then(
-                this.scrollToLastLevel()
+                this.container.addEventListener("wheel", (e) => {
+
+                    let diff = this.container.scrollWidth - this.container.offsetWidth;
+                    if( !(this.container.scrollLeft === 0 && e.deltaY < 0) 
+                        && !(this.container.scrollLeft >= diff && e.deltaY > 0)
+                    ){
+                        e.preventDefault();
+                        this.container.scrollLeft += e.deltaY;
+                    }
+                })
             )
             .then(
                 () => {
@@ -107,7 +116,6 @@ const ArborescenceMenu = function( key ){
                             }
 
                             targetedWitch = this.targetLastOpenWitch(e.x);
-
                             if( targetedWitch )
                             {
                                 targetedWitch.classList.add('targeted-witch');
@@ -136,7 +144,15 @@ const ArborescenceMenu = function( key ){
                         }
                     );
                 }
+            )
+            .then(
+                async () => {
+                    //await new Promise((resolve) => setTimeout(resolve, 100));
+                    //this.container.scrollLeft += 1000;
+                    this.scrollToLastLevel();
+                }
             );
+            
 
             return this;            
         },
@@ -145,16 +161,18 @@ const ArborescenceMenu = function( key ){
             let levels      = this.container.querySelectorAll('.arborescence-level');
 
             targetedWitch   =   levels[ 0 ].querySelector('.arborescence-level__witch');
+            
             let threshold   =   levels[ 0 ].offsetLeft;
             threshold       +=  levels[ 0 ].offsetWidth;
+            
+            let position    =   x + this.container.scrollLeft; 
 
             for( let i = 1; i < levels.length; i++) 
             {
 
                 threshold   =   levels[ i ].offsetLeft;
                 threshold   +=  levels[ i ].offsetWidth;
-
-                if( x > threshold )
+                if( position > threshold )
                 {
                     let selectedTarget = levels[ i ].querySelector('.arborescence-level__witch.selected');
                     
@@ -566,8 +584,8 @@ const ArborescenceMenu = function( key ){
         scrollToLastLevel: async function()
         {
             if( this.container && this.container.lastChild ){
-                //this.container.lastChild.scrollIntoView();
-                this.container.lastChild.scrollIntoView({ behavior: "smooth", block: "center", inline: "end" });
+                //this.container.lastChild.scrollIntoView({ behavior: "smooth", block: "start", inline: "end" });
+                this.container.lastChild.scrollIntoView({ behavior: "smooth", inline: "end" });
             }
         },
         toggle: async function( target )
