@@ -336,7 +336,7 @@ class WitchHandler
         }
         
         if( $reorder ){
-            $mother->reorderDaughters();
+            $mother->daughters = self::reorderWitches( $mother->daughters );
         }
 
         return;

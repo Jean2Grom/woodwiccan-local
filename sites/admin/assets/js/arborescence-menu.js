@@ -145,14 +145,7 @@ const ArborescenceMenu = function( key ){
                     );
                 }
             )
-            .then(
-                async () => {
-                    //await new Promise((resolve) => setTimeout(resolve, 100));
-                    //this.container.scrollLeft += 1000;
-                    this.scrollToLastLevel();
-                }
-            );
-            
+            .then( this.scrollToLastLevel() );
 
             return this;            
         },
@@ -487,6 +480,8 @@ const ArborescenceMenu = function( key ){
             }
 
             this.container.append( arborescenceLevelDom );
+
+            this.scrollToLastLevel();
 
             return true;
         }, 

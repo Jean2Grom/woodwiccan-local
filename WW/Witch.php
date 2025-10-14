@@ -251,12 +251,29 @@ class Witch
      * Daughter witches manipulation
      * @return self
      */
-    function reorderDaughters(): self
+    function reorderDaughters( array $idOrder ): false|int
     {
-        $daughters                  = $this->daughters;
-        $this->daughters            = Handler::reorderWitches( $daughters );
+        $params     = [];
+        $conditions = [];
+        $priority   = 0;
+        $interval   = 100;
+        foreach( array_reverse($idOrder) as $id )
+        {
+            $daughter           =   $this->daughter( $id );
+            $daughter->priority =   $priority;
+            $priority           +=  $interval;
+
+            $params[]       = [ 'priority' => $priority ];
+            $conditions[]   = [ 'id' => $id ];
+        }
+
+        $return = DataAccess::updates($this->ww, $params,  $conditions);
+
+        if( $return ){
+            $this->daughters = Handler::reorderWitches( $this->daughters );
+        }
         
-        return $this;
+        return $return;
     }
     
     
@@ -788,11 +805,14 @@ class Witch
     }
     
     
-    function moveTo( self $witch ): bool
+    function moveTo( self $witch, array $order=[] ): bool
     {
         $this->ww->db->begin();
         try {
             $this->innerTransactionMoveTo( $witch );
+            if( $order ){
+                $this->reorderDaughters( $order );
+            }
         } 
         catch( \Exception $e ) 
         {
@@ -857,11 +877,19 @@ class Witch
         return;
     }
 
-    function copyTo( self $witch )
+    function copyTo( self $witch, array $order=[] )
     {
         $this->ww->db->begin();
         try {
             $newWitch = $this->innerTransactionCopyTo( $witch );
+            if( $order ){
+                foreach( $order as $key => $orderId ){
+                    if( $orderId === $this->id ){
+                        $order[ $key ] = $newWitch->id;
+                    }
+                }
+                $witch->reorderDaughters( $order );
+            }
         } 
         catch( \Exception $e ) 
         {
