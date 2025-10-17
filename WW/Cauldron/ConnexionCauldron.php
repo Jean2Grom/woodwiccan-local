@@ -60,28 +60,7 @@ class ConnexionCauldron extends Cauldron
     {
         $this->position();
 
-        if( $this->depth > $this->ww->cauldronDepth ){
-            DataAccess::increaseDepth( $this->ww );
-        }
-        
-        if( !$this->exist() )
-        {
-            Handler::writeProperties($this); 
-            $result = DataAccess::insert($this); 
-            
-            if( $result ){
-                $this->id = (int) $result;
-            }
-        }
-        else 
-        {
-            $properties = $this->properties;
-
-            Handler::writeProperties($this);
-            $result = DataAccess::update( $this, array_diff_assoc($this->properties, $properties) );
-        }
-        
-        if( $result === false ){
+        if( !Handler::save($this) ){
             return false;
         }
         

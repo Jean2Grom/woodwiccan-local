@@ -172,6 +172,30 @@ class WitchDataAccess
         return $ww->db->insertQuery($query, $params);
     }
     
+    static function insert( WoodWiccan $ww, array $params )
+    {
+        $query = "";
+        $query  .=  "INSERT INTO `witch` ";
+        
+        $separator = "( ";
+        foreach( array_keys($params) as $field )
+        {
+            $query  .=  $separator."`".$field."` ";
+            $separator = ", ";
+        }
+        $query  .=  ") VALUES ";
+        
+        $separator = "( ";
+        foreach( array_keys($params) as $field )
+        {
+            $query  .=  $separator.":".$field." ";
+            $separator = ", ";
+        }
+        $query  .=  ") ";
+        
+        return $ww->db->insertQuery($query, $params);
+    }
+    
     static function increasePlateformDepth( WoodWiccan $ww ): int
     {
         $ww->cache->delete( 'system', 'depth' );

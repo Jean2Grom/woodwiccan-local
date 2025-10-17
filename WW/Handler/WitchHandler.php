@@ -29,19 +29,9 @@ class WitchHandler
         $witch->properties = $data;
         
         self::readProperties( $witch );
-
-        $witch->position    = [];
         
-        $i = 1;
-        while( isset($data['level_'.$i]) )
-        {
-            $witch->position[$i] = (int) $data['level_'.$i];
-            $i++;
-        }
-        $witch->depth       = $i - 1; 
-                
-        if( $witch->depth == 0 ){
-            $witch->mother = false;
+        if( $witch->depth === 0 ){
+            $witch->mother = null;
         }
         
         return $witch;
@@ -50,39 +40,131 @@ class WitchHandler
 
     /**
      * Update Object properties based of object var "properties"
+     * @var Witch $witch
      * @return void
      */
     static function readProperties( Witch $witch ): void
     {
-        if( isset($witch->properties['id']) ){
+        $witch->id = null;
+        if( isset($witch->properties['id']) 
+            && ctype_digit(strval($witch->properties['id'])) 
+        ){
             $witch->id = (int) $witch->properties['id'];
         }
-        
+
+        $witch->name = null;
         if( isset($witch->properties['name']) ){
             $witch->name = $witch->properties['name'];
         }
         
+        $witch->data = null;
+        if( isset($witch->properties['data']) ){
+            $witch->data = $witch->properties['data'];
+        }
+
+        $witch->site = null;
+        if( isset($witch->properties['site']) ){
+            $witch->site = $witch->properties['site'];
+        }
+
+        $witch->url = null;
+        if( isset($witch->properties['url']) ){
+            $witch->url = $witch->properties['url'];
+        }
+
+        $witch->statusLevel = 0;
+        $witch->status      = null;
+        if( isset($witch->properties['status']) 
+            && ctype_digit(strval($witch->properties['status'])) 
+        ){
+            $witch->statusLevel = (int) $witch->properties['status'];
+        }
+        
+        $witch->invoke = null;
+        if( isset($witch->properties['invoke']) ){
+            $witch->invoke = $witch->properties['invoke'];
+        }
+        
+        $witch->cauldronId = null;
+        if( isset($witch->properties['cauldron']) 
+            && ctype_digit(strval($witch->properties['cauldron'])) 
+        ){
+            $witch->cauldronId = (int) $witch->properties['cauldron'];
+        }
+
+        if( $witch->cauldronId !== $witch->cauldron?->id ){
+            $witch->cauldron   = null;
+        }
+
+        $witch->cauldronPriority = null;
+        if( isset($witch->properties['cauldron_priority']) 
+            && ctype_digit(strval($witch->properties['cauldron_priority'])) 
+        ){
+            $witch->cauldronPriority = (int) $witch->properties['cauldron_priority'];
+        }
+        
+        $witch->context = null;
+        if( isset($witch->properties['context']) ){
+            $witch->context = $witch->properties['context'];
+        }
+        
+        $witch->datetime = null;
         if( isset($witch->properties['datetime']) ){
             $witch->datetime = new ExtendedDateTime($witch->properties['datetime']);
         }
         
-        if( isset($witch->properties['site']) ){
-            $witch->site = $witch->properties['site'];
-        }
-        
-        $witch->status = null;
-        if( isset($witch->properties['status']) ){
-            $witch->statusLevel = (int) $witch->properties['status'];
-        }
-        
-        if( isset($witch->properties['cauldron']) ){
-            $witch->cauldronId = (int) $witch->properties['cauldron'];
+        $witch->priority = 0;
+        if( isset($witch->properties['priority']) 
+            && ctype_digit(strval($witch->properties['priority'])) 
+        ){
+            $witch->priority = (int) $witch->properties['priority'];
         }
 
-        if( isset($witch->properties['cauldron_priority']) ){
-            $witch->cauldronPriority = (int) $witch->properties['cauldron_priority'];
+        $witch->position = [];
+        for( $i=1; $i<=$witch->ww->depth; $i++ ){
+            if( isset($witch->properties[ 'level_'.$i ]) 
+                && ctype_digit( strval($witch->properties[ 'level_'.$i ]) ) 
+            ){
+                $witch->position[ $i ] = (int) $witch->properties[ 'level_'.$i ];
+            }
         }
+        $witch->depth = count( $witch->position );
         
+        return;
+    }
+
+
+    /**
+     * Update var "properties" (database direct fields) based on Object current state 
+     * @var Witch $witch
+     * @return void
+     */
+    static function writeProperties( Witch $witch ): void
+    {
+        $id = null;
+        if( isset($witch->id) && is_int($witch->id) ){
+            $id = $witch->id;
+        }
+
+        $witch->properties = [
+            'id'                => $id,
+            'name'              => $witch->name ?? null,
+            'data'              => $witch->data ?? null,
+            'site'              => $witch->site ?? null,
+            'url'               => $witch->url ?? null,
+            'status'            => $witch->status ?? 0,
+            'invoke'            => $witch->invoke ?? null,
+            'cauldron'          => $witch->cauldron?->id ?? $witch->cauldronId ?? null,
+            'cauldron_priority' => $witch->cauldronPriority ?? 0,
+            'context'           => $witch->context ?? null,
+            'datetime'          => $witch->datetime?->format('Y-m-d H:i:s') ?? null,
+            'priority'          => $witch->priority ?? 0,
+        ];
+
+        for( $i=1; $i<=$witch->ww->depth; $i++ ){
+            $witch->properties[ 'level_'.$i ] = $witch->position($i);
+        }
+
         return;
     }
 
@@ -428,5 +510,42 @@ class WitchHandler
             'cauldron'          => null, 
             'cauldron_priority' => 0
         ]);
+    }
+
+
+    static function save( Witch $witch ): bool
+    {
+        if( !$witch->exist() )
+        {
+            self::writeProperties($witch); 
+
+            $params = $witch->properties;
+            if( isset($params['id']) ){
+                unset($params['id']);
+            }
+
+            if( !$result = DataAccess::insert($witch->ww, $params) ){
+                return false;
+            }
+
+            $witch->id = (int) $result;
+        }
+        else 
+        {
+            $properties = $witch->properties;
+
+            self::writeProperties($witch);
+
+            $params = array_diff_assoc($witch->properties, $properties);
+            if( isset($params['id']) ){
+                unset($params['id']);
+            }
+
+            if( count($params) ){
+                DataAccess::update( $witch->ww, $params, ['id' => $witch->id] );
+            }
+        }
+        
+        return true;
     }
 }

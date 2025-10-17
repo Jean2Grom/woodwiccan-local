@@ -35,36 +35,36 @@ class Witch
         "datetime",
         "priority",
     ];
-    public $properties     = [];
-    
-    public $id;
-    public $name;
-    public $datetime;
-    
-    public int $statusLevel = 0;
-    public ?string $status  = null;
-    
-    public Website|string|null $site = null;
-    
-    public $depth           = 0;
-    public $position        = [];
-    public $modules         = [];
-    
-    /** @var ?self */
-    public $mother;
-    /** @var ?self[] */
-    public $sisters;
-    /** @var ?self[] */
-    public $daughters = null;
 
-    public $cauldronId;
-    public $cauldronPriority;
+    public array $properties  = [];
     
-    /**
-     * @var ?Cauldron
-     */
-    public ?Cauldron $cauldron = null;
+    public ?int $id                     = null;
+    public ?string $name                = null;
+    public ?string $data                = null;
+    public Website|string|null $site    = null;
+    public ?string $url                 = null;
+    public ?string $status              = null;
+    public ?string $invoke              = null;
+    public ?Cauldron $cauldron          = null;
+    public ?int $cauldronPriority       = null;
+    public ?string $context             = null;
+    public ?\DateTime $datetime         = null;
+    public ?int $priority               = null;
     
+    public int $statusLevel     = 0;
+    public ?int $cauldronId     = null;
+    public int $depth           = 0;
+    public ?array $position     = null;
+    public array $modules       = [];
+    
+    public ?self $mother        = null;
+
+    /** @var ?self[] */
+    public ?array $sisters      = null;
+
+    /** @var ?self[] */
+    public ?array $daughters    = null;
+
     /** 
      * WoodWiccan container class to allow whole access to Kernel
      * @var WoodWiccan
@@ -203,7 +203,6 @@ class Witch
         return $this->mother;
     }
     
-        
     /**
      * Sister witches manipulation
      * @return array
@@ -221,29 +220,42 @@ class Witch
     /**
      * Read Sister witches (get them if needed), 
      * return mother witch or false if witch is root
-     * @return mixed
+     * @return ?array
      */
-    function sisters( ?int $id=null ): mixed
+    function sisters(): ?array
     {
-        if( is_null($this->id) ){
-            return false;
-        }
-        
-        if( is_null($this->sisters) && $this->mother() ){
-            foreach( DataAccess::fetchDescendants($this->ww, $this->mother()->id, true) as $sisterWitch ){
-                Handler::addSister( $this, $sisterWitch );
-            }
-        }
-        elseif( is_null($this->sisters) ){
-            $this->sisters = false;
-        }
-        
-        if( !$id ){
+        if( isset($this->sisters) ){
             return $this->sisters;
         }
+
+        if( !$this->mother() ){
+            return [];
+        }
         
-        return  $this->sisters[ $id ] 
-                    ?? Handler::instanciate($this->ww, [ 'name' => "ABSTRACT 404 WITCH", 'invoke' => '404' ]);
+        foreach( $this->mother()->daughters() as $sister ){
+            if( $sister !== $this ){
+                Handler::addSister( $this, $sister );
+            }
+        }
+
+        return $this->sisters;
+    }
+
+
+    /**
+     * Read Sister witches (get them if needed), 
+     * return mother witch or false if witch is root
+     * @return mixed
+     */
+    function sister( int $id ): mixed
+    {
+        if( !$this->sisters() 
+            || !isset($this->sisters[ $id ])
+        ){
+            return Handler::instanciate($this->ww, [ 'name' => "ABSTRACT 404 WITCH", 'invoke' => '404' ]);
+        }
+        
+        return  $this->sisters[ $id ];
     }
     
     
@@ -616,7 +628,7 @@ class Witch
             return false;
         }
         
-        if( $this->depth == $this->ww->depth ){
+        if( $this->depth === $this->ww->depth ){
             Handler::addLevel($this->ww);
         }
         
@@ -672,6 +684,7 @@ class Witch
             $params[ "level_".$level ] = $levelPosition;
         }
         
+        // TODO use Handler method, get rid of 
         $newWitchId = DataAccess::create($this->ww, $params);
         if( !$newWitchId ){
             return false;
@@ -769,9 +782,10 @@ class Witch
      */
     function isParent( self $potentialDescendant ): bool
     {
-        $potentialDescendantPasition = $potentialDescendant->position;
         foreach( $this->position as $level => $levelPosition ){
-            if( empty($potentialDescendantPasition[ $level ]) ||  $potentialDescendantPasition[ $level ] != $levelPosition ){
+            if( !$potentialDescendant->position($level) 
+                ||  $potentialDescendant->position($level) != $levelPosition 
+            ){
                 return false;
             }
         }
@@ -827,11 +841,11 @@ class Witch
     
     private function innerTransactionMoveTo( self $witch, array $urlSiteRewrite=[] )
     {
-        $position = $witch->position;
+        $position = $witch->position();
         
         $depth = count($position);
         
-        if( $depth == $this->ww->depth + 1 ){
+        if( $depth === $this->ww->depth + 1 ){
             Handler::addLevel($this->ww);
         }
         
@@ -865,7 +879,7 @@ class Witch
         $daughters      = $this->daughters();
         DataAccess::update($this->ww, $params, ['id' => $this->id]);
         $this->position = $newPosition;
-        $this->depth    = count( $this->position );
+        $this->depth    = count( $this->position ?? [] );
 
         if( !empty($daughters) ){
             foreach( $daughters as $daughterWitch )
@@ -998,6 +1012,91 @@ class Witch
         return $this->site;
     }
     
+
+
+
+    function save( bool $transactionMode=true ): bool
+    {
+        if( !$transactionMode ){
+            return $this->saveAction();
+        }
+
+        $this->ww->db->begin();
+        try {
+            if( !$this->saveAction() )
+            {
+                $this->ww->db->rollback();
+                return false;
+            }
+        } 
+        catch( \Exception $e ) 
+        {
+            $this->ww->log->error($e->getMessage());
+            $this->ww->db->rollback();
+            return false;
+        }
+        $this->ww->db->commit();
+
+        return true;
+    }
+
+    protected function saveAction(): bool
+    {
+        $this->position();
+
+        if( $this->depth > $this->ww->cauldronDepth ){
+            DataAccess::increasePlateformDepth( $this->ww );
+        }
+        
+        if( !Handler::save($this) ){
+            return false;
+        }
+
+        $result = true;
+        foreach( $this->daughters() as $daughter ){
+            $result = $result && $daughter->save( false );
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return ?int|int[]
+     */
+    function position( ?int $level=null )
+    {
+        if( is_null($this->position) ){
+            $this->generatePosition();
+        }
+
+        if( !$level ){
+            return $this->position;
+        }
+
+        return $this->position[ $level ] ?? null;
+    }
+
+    /**
+     * Generate the "position" attribute
+     */
+    private function generatePosition(): void
+    {
+        if( !$this->mother )
+        {
+            $this->position = [];
+            $this->depth    = 0;
+        }
+        else 
+        {
+            $this->position = $this->mother->position();
+            $newIndex       = DataAccess::getNewDaughterIndex( $this->ww, $this->position ?? [] );
+            $this->depth    = $this->mother->depth + 1;
+            
+            $this->position[ $this->depth ] = $newIndex;
+        }
+
+        return;
+    }
 
 
 }

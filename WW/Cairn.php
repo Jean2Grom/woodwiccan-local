@@ -432,7 +432,7 @@ class Cairn
     {
         foreach( $this->witches as $witch )
         {
-            if( $witch->position === $position ){
+            if( $witch->position() === $position ){
                 return $witch;
             }
             $witchBuffer    = $witch;
@@ -440,7 +440,7 @@ class Cairn
             while( $continue && $witchBuffer )
             {
                 $continue = false;
-                foreach( $witchBuffer->position as $level => $value ){
+                foreach( $witchBuffer->position() as $level => $value ){
                     if( !isset($position[ $level ]) || $position[ $level ] != $value )
                     {
                         $witchBuffer    = $witchBuffer->mother;
@@ -449,7 +449,7 @@ class Cairn
                     }
                 }
                 
-                if( $witchBuffer && $witchBuffer->position == $position ){
+                if( $witchBuffer && $witchBuffer->position() == $position ){
                     return $witchBuffer;
                 }
                 elseif( $continue ){
@@ -457,13 +457,13 @@ class Cairn
                 }                
                 
                 foreach( $witchBuffer->daughters as $daughter ){
-                    if( $daughter->position == $position ){
+                    if( $daughter->position() == $position ){
                         return $daughter;
                     }
                     else
                     {
                         $level = $witchBuffer->depth + 1;
-                        if( $daughter->position[ $level ] == $position[ $level ] ) 
+                        if( $daughter->position( $level ) === $position[ $level ] ) 
                         {
                             $witchBuffer    = $daughter;
                             $continue       = true;
@@ -472,7 +472,7 @@ class Cairn
                     }
                 }
                 
-                if( $witchBuffer->position == $position ){
+                if( $witchBuffer->position() == $position ){
                     return $witchBuffer;
                 }
             }
