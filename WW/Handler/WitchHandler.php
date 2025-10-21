@@ -152,7 +152,7 @@ class WitchHandler
             'data'              => $witch->data ?? null,
             'site'              => $witch->site ?? null,
             'url'               => $witch->url ?? null,
-            'status'            => $witch->status ?? 0,
+            'status'            => $witch->statusLevel ?? 0,
             'invoke'            => $witch->invoke ?? null,
             'cauldron'          => $witch->cauldron?->id ?? $witch->cauldronId ?? null,
             'cauldron_priority' => $witch->cauldronPriority ?? 0,
@@ -232,16 +232,19 @@ class WitchHandler
 
         $minIndice      = null;
         $returnedUrl    = null;
-        foreach( $urlArray as $key => $url )
-        {
+        foreach( $urlArray as $key => $url ){
             if( is_null($minIndice) || $indices[ $key ] < $minIndice )
             {
-                $minIndice = $indices[ $key ];
-                if( $minIndice === 0 ){
-                    $returnedUrl = $url;
-                }
-                else {
-                    $returnedUrl = $url.'-'.($minIndice + 1);
+                $minIndice      = $indices[ $key ];
+                $returnedUrl    = $url;
+
+                if( $minIndice > 0 )
+                {
+                    if( $url !== "" ){
+                        $returnedUrl .= '-';
+                    }
+
+                    $returnedUrl .= ($minIndice + 1);
                 }
             }
         }
@@ -501,19 +504,13 @@ class WitchHandler
         return $witches;    
     }
 
-    static function removeCauldron( Witch $witch )
-    {
-        $witch->cauldron     = null;
-        $witch->cauldronId   = null;
-        
-        return $witch->edit([
-            'cauldron'          => null, 
-            'cauldron_priority' => 0
-        ]);
-    }
 
-
-    static function save( Witch $witch ): bool
+    /**
+     * Save witch in BDD
+     * @param Witch $witch 
+     * @return ?bool true for success, false for failure, null for no effect
+     */
+    static function save( Witch $witch ): ?bool
     {
         if( !$witch->exist() )
         {
@@ -529,23 +526,42 @@ class WitchHandler
             }
 
             $witch->id = (int) $result;
+
+            return true;
         }
-        else 
-        {
-            $properties = $witch->properties;
 
-            self::writeProperties($witch);
+        $properties         = $witch->properties;
+        $exitingProperties  = array_keys($properties);
 
-            $params = array_diff_assoc($witch->properties, $properties);
-            if( isset($params['id']) ){
-                unset($params['id']);
+        self::writeProperties($witch);
+
+        $params = [];
+        foreach( $witch->properties as $key => $value ){
+            if( !in_array($key, $exitingProperties)
+                || $value !== $properties[ $key ] 
+            ){
+                $params[ $key ] = $value;
             }
+        }
 
-            if( count($params) ){
-                DataAccess::update( $witch->ww, $params, ['id' => $witch->id] );
-            }
+        if( isset($params['id']) ){
+            unset($params['id']);
         }
         
-        return true;
+        if( count($params) === 0 ){
+            return null;
+        }
+
+        $result = DataAccess::update( 
+            $witch->ww, 
+            $params, 
+            [ 'id' => $witch->id ] 
+        );
+
+        if( $result === 0 ){
+            return null;
+        }
+
+        return (bool) $result;
     }
 }

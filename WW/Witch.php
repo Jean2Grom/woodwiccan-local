@@ -510,108 +510,154 @@ class Witch
         
         return $module->getResult() ?? "";
     }
-        
+    
     
     /**
      * Update Witch
-     * @param array $params
-     * @return int|false
+     * @param array $inputs
+     * @return self
      */
-    function edit( array $params ): int|false
+    function edit( array $inputs ): self
     {
-        foreach( $params as $field => $value ){
-            if( !in_array($field, self::FIELDS) ){
-                unset($params[ $field ]);
+        $exitingInputs  = array_keys($inputs);
+
+        if( in_array('name', $exitingInputs)
+            && !empty($name = trim( (string) $inputs['name'] )) 
+        ){
+            $this->name     = $name;
+        }
+        
+        if( in_array('data', $exitingInputs) )
+        {
+            $this->data = null;
+            if( $data = trim( (string) $inputs['data'] ) ){
+                $this->data = $data;
             }
         }
         
-        // Name cannot be set to empty string
-        if( !empty($params['name']) ){
-            $params['name']   = trim($params['name']);
+        if( in_array('site', $exitingInputs) )
+        {
+            $this->site = null;
+            if( (is_object( $inputs['site'] ) 
+                    && is_a( $inputs['site'], 'WW\Website' ))
+                || !empty($inputs['site']) 
+            ){
+                $this->site = trim( (string) $inputs['site']);
+            }
         }
         
-        if( empty($params['name']) ){
-            unset($params['name']);
+        if( in_array('status', $exitingInputs) )
+        {
+            $this->statusLevel  = (int) $inputs['status'];
+            $this->status       = null;
         }
         
-        $paramsKeyArray = array_keys($params);
+        if( in_array('invoke', $exitingInputs) )
+        {
+            $this->invoke = null;
+            if( $invoke = trim( (string) $inputs['invoke'] ) ){
+                $this->invoke = $invoke;
+            }
+        }
         
-        // If invoke is set to null
-        if( in_array('invoke', $paramsKeyArray) && is_null($params['invoke']) )
+        if( in_array('cauldron', $exitingInputs) )
         {
-            //$params['site'] = null;
-            $params['url']  = null;
+            $this->cauldronId = null;
+            if( isset($inputs['cauldron']) 
+                && ctype_digit(strval($inputs['cauldron'])) 
+            ){
+                $this->cauldronId = (int) $inputs['cauldron'];
+            }
+
+            if( $this->cauldronId !== $this->cauldron?->id ){
+                $this->cauldron   = null;
+            }
         }
-        // If invoke is not set but is actually null
-        elseif( !in_array('invoke', $paramsKeyArray) && is_null($this->properties['invoke']) )
-        {
-            //$params['site'] = null;
-            $params['url']  = null;
+
+        if( in_array('cauldron_priority', $exitingInputs) ){
+            $this->cauldronPriority = (int) $inputs['cauldron_priority'];
         }
-        // If site is set to null
-        elseif( in_array('site', $paramsKeyArray) && empty($params['site']) )
+
+        if( in_array('context', $exitingInputs) )
         {
-            $params['site']     = null;
-            $params['url']      = null;
-            $params['invoke']   = null;
+            $this->context = null;
+            if( $context = trim( (string) $inputs['context'] ) ){
+                $this->context = $context;
+            }
         }
-        // If site is not set but is actually null
-        elseif( !in_array('site', $paramsKeyArray) && is_null($this->properties['site']) )
+
+        if( in_array('datetime', $exitingInputs) )
         {
-            $params['site']     = null;
-            $params['url']      = null;
-            $params['invoke']   = null;
+            if( is_object( $inputs['datetime'] ) 
+                    && is_a( $inputs['datetime'], '\DateTime' ) ){
+                $this->datetime = $inputs['datetime'];
+            }
+            else {
+                $this->datetime = new \DateTime( $inputs['datetime'] );
+            }
         }
-        // Invoke and site are valid and URL update is required
-        elseif( in_array('url', $paramsKeyArray) )
-        {
-            $site       = $params['site'] ?? $this->properties['site'];
+
+        if( in_array('priority', $exitingInputs) ){
+            $this->priority = (int) $inputs['priority'];
+        }
+        
+        if( isset($inputs['url']) 
+            && !empty($this->invoke) 
+            && !empty($this->site) 
+        ){
+            $this->url = Handler::checkUrls( 
+                $this->ww, 
+                $this->site, 
+                [Tools::urlCleanupString( $inputs['url'] )], 
+                $this->id 
+            );
+        }
+        elseif(  
+            in_array('url', $exitingInputs)
+            && !empty($this->invoke) 
+            && !empty($this->site) 
+        ){
             $urlArray   = [];
-            
-            // If url is set to a value (ie not null)
-            if( !is_null($params['url']) ){
-                $urlArray[] = Tools::urlCleanupString( $params['url'] );
-            }
-            else 
-            {
-                $rootUrl    = ""; 
-                if( $this->mother() ){
-                    $rootUrl    = $this->mother()->getClosestUrl( $site );
-                }
-                
-                if( !empty($rootUrl) ){
-                    $rootUrl .= '/';
-                }
-                else {
-                    $urlArray[] = '';
-                }
-                
-                $rootUrl    .=  Tools::cleanupString($params['name'] ?? $this->name);
-                $urlArray[] =   $rootUrl;                
+            $rootUrl    = ""; 
+            if( $this->mother() ){
+                $rootUrl    = $this->mother()->getClosestUrl( $this->site );
             }
             
-            if( !empty($urlArray) ){
-                $params['url'] = Handler::checkUrls( $this->ww, $site, $urlArray, $this->id );
+            if( !empty($rootUrl) ){
+                $rootUrl .= '/';
             }
-        }
-        
-        if( empty($params) ){
-            return false;
-        }
-        
-        $updateResult = DataAccess::update($this->ww, $params, ['id' => $this->id]);
-        
-        if( $updateResult === false ){
-            return false;
-        }
-        
-        foreach( $params as $field => $value ){
-            $this->properties[$field] = $value;
+            else {
+                $urlArray[] = '';
+            }
+            
+            $rootUrl    .=  Tools::cleanupString( $this->name );
+            $urlArray[] =   $rootUrl;                
+            
+            $this->url = Handler::checkUrls( 
+                $this->ww, 
+                $this->site, 
+                $urlArray, 
+                $this->id 
+            );
         }
 
-        Handler::readProperties( $this );
+        if(
+            isset( $this->url )  
+            && (!isset( $this->invoke ) || !isset( $this->site ))
+        ){
+            $this->url = null;
+        }
 
-        return $updateResult;
+        if(  
+            isset( $this->invoke )
+            && (!isset( $this->invoke ) || !isset( $this->site ))
+        ){
+            $this->invoke = null;
+        }
+
+
+
+        return $this;
     }
     
     /**
@@ -1012,10 +1058,12 @@ class Witch
         return $this->site;
     }
     
-
-
-
-    function save( bool $transactionMode=true ): bool
+    /**
+     * Save witch in BDD
+     * @param bool $transactionMode : set to false to escape transactional mode
+     * @return ?bool true for success, false for failure, null for no effect
+     */
+    function save( bool $transactionMode=true ): ?bool
     {
         if( !$transactionMode ){
             return $this->saveAction();
@@ -1023,7 +1071,9 @@ class Witch
 
         $this->ww->db->begin();
         try {
-            if( !$this->saveAction() )
+            $result = $this->saveAction();
+
+            if( $result === false )
             {
                 $this->ww->db->rollback();
                 return false;
@@ -1037,27 +1087,21 @@ class Witch
         }
         $this->ww->db->commit();
 
-        return true;
+        return $result;
     }
 
-    protected function saveAction(): bool
+    /**
+     * Action to encapsulate in try/catch bock
+     */
+    protected function saveAction()
     {
         $this->position();
 
         if( $this->depth > $this->ww->cauldronDepth ){
-            DataAccess::increasePlateformDepth( $this->ww );
+            DataAccess::increasePlateformDepth($this->ww);
         }
         
-        if( !Handler::save($this) ){
-            return false;
-        }
-
-        $result = true;
-        foreach( $this->daughters() as $daughter ){
-            $result = $result && $daughter->save( false );
-        }
-
-        return $result;
+        return Handler::save($this);
     }
 
     /**

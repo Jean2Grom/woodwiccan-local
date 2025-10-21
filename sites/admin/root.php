@@ -18,27 +18,29 @@ switch( $action = Tools::filterAction(
         $daughters  = $witch->daughters();
         foreach( $priorities as $witchId => $witchPriority )
         {
-            $editResult = $daughters[ $witchId ]->edit([ 'priority' => $witchPriority ]);
+            $editResult = $daughters[ $witchId ]->edit([ 
+                'priority' => $witchPriority 
+            ])->save();
             
             if( $editResult === false ){
-                $errors[] = "La priorité de <strong>".$daughters[ $witchId ]->name."</strong> n'a pas été mise à jour.";
+                $errors[] = "<strong>".$daughters[ $witchId ]->name."</strong> priority update failed";
             }
-            elseif( $editResult > 0 ) {
-                $success[] = "La priorité de <strong>".$daughters[ $witchId ]->name."</strong> a été mise à jour.";
+            elseif( $editResult ) {
+                $success[] = "<strong>".$daughters[ $witchId ]->name."</strong> priority updated";
             }
         }
-                
+        
         if( empty($errors) && empty($success) ){
             $this->ww->user->addAlert([
                 'level'     =>  'warning',
-                'message'   =>  "Aucune modification des priorités"
+                'message'   =>  "No priority update"
             ]);
         }
         elseif( !empty($errors) && !empty($success) ){
             $this->ww->user->addAlerts([
                 [
                     'level'     =>  'warning',
-                    'message'   =>  "Des erreurs sont survenues"
+                    'message'   =>  "Some errors occured"
                 ],
                 [
                     'level'     =>  'error',
@@ -54,7 +56,7 @@ switch( $action = Tools::filterAction(
             $this->ww->user->addAlerts([
                 [
                     'level'     =>  'error',
-                    'message'   =>  "Une erreur est survenue, les priorités n'ont pas été mise à jour."
+                    'message'   =>  "Errors occured"
                 ],
                 [
                     'level'     =>  'notice',
@@ -66,7 +68,7 @@ switch( $action = Tools::filterAction(
             $this->ww->user->addAlerts([
                 [
                     'level'     =>  'success',
-                    'message'   =>  "Les priorités ont été mises à jour."
+                    'message'   =>  "Priorities has been updated"
                 ],
                 [
                     'level'     =>  'notice',

@@ -940,7 +940,10 @@ class Cauldron implements CauldronContentInterface
         }
         unset($this->witches[ $witchToRemoveKey ]);
         
-        WitchHandler::removeCauldron( $witch );
+        $witch->edit([
+            'cauldron'          => null, 
+            'cauldron_priority' => 0
+        ])->save();
 
         if( !$this->witches ){
             $this->delete();
