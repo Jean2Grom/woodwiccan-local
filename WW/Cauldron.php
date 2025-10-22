@@ -8,7 +8,6 @@ use WW\Cauldron\Recipe;
 use WW\DataAccess\CauldronDataAccess as DataAccess;
 use WW\Handler\CauldronHandler as Handler;
 use WW\Handler\IngredientHandler;
-use WW\Handler\WitchHandler;
 use WW\Trait\PropertiesAccessTrait;
 
 class Cauldron implements CauldronContentInterface
@@ -564,7 +563,7 @@ class Cauldron implements CauldronContentInterface
         return true;
     }
 
-    function readInputs( mixed $inputs=null ): self
+    function edit( ?array $inputs=null ): self
     {
         $params = $inputs ?? $this->ww->request->inputs();
         
@@ -709,11 +708,11 @@ class Cauldron implements CauldronContentInterface
                 );
 
                 if( !empty($contentParams['content']) ){
-                    $content->readInputs( $contentParams );
+                    $content->edit( $contentParams );
                 }
             }
             else {
-                $content->readInputs( $contentParams );
+                $content->edit( $contentParams );
             }
 
             if( $content->isIngredient() && !in_array($content, $this->ingredients) ){

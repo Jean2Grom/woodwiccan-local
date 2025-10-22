@@ -17,7 +17,7 @@ class ConnexionCauldron extends Cauldron
         ];
     }
 
-    function readInputs( mixed $inputs=null ): self
+    function edit( ?array $inputs=null ): self
     {
         if( is_null($this->content) ){
             $this->generateContent();
@@ -48,9 +48,9 @@ class ConnexionCauldron extends Cauldron
             $formattedInputs['content']['pass_hash'] ?? []
         );
 
-        $this->content('email')->readInputs( $formattedInputs['content']['email'] );
-        $this->content('login')->readInputs( $formattedInputs['content']['login'] );
-        $this->content('pass_hash')->readInputs( $formattedInputs['content']['pass_hash'] );
+        $this->content('email')->edit( $formattedInputs['content']['email'] );
+        $this->content('login')->edit( $formattedInputs['content']['login'] );
+        $this->content('pass_hash')->edit( $formattedInputs['content']['pass_hash'] );
 
         return $this;
     }

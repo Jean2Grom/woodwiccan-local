@@ -166,21 +166,21 @@ abstract class Ingredient implements CauldronContentInterface
         return true;
     }
 
-    function readInputs( mixed $input ): self 
+    function edit( ?array $inputs ): self 
     {
-        if( !empty($input['name']) ){
-            $this->name = htmlspecialchars($input['name']);
+        if( !empty($inputs['name']) ){
+            $this->name = htmlspecialchars($inputs['name']);
         }
 
-        if( isset($input['priority']) && is_int($input['priority']) ){
-            $this->priority = $input['priority'];
+        if( isset($inputs['priority']) && is_int($inputs['priority']) ){
+            $this->priority = $inputs['priority'];
         }
 
-        return $this->readInput( $input['value'] );
+        return $this->readInput( $inputs['value'] );
     }
 
-    function readInput( mixed $input ): self {        
-        return $this->set( $input );
+    function readInput( mixed $inputs ): self {        
+        return $this->set( $inputs );
     }
 
     function isIngredient(): bool {

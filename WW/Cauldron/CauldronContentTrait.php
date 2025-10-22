@@ -41,7 +41,7 @@ trait CauldronContentTrait
     }
 
 
-    function edit( ?string $filename=null, ?array $params=null )
+    function form( ?string $filename=null, ?array $params=null )
     {
         if( !$filename ){
             $filename = strtolower( $this->type );
