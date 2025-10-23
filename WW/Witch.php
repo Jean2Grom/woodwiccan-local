@@ -197,7 +197,7 @@ class Witch
         }
         
         if( is_null($this->mother) ){
-            Handler::setMother( $this, DataAccess::fetchAncestors($this->ww, $this->id, true) );
+            Handler::setMother( $this, Handler::fetchAncestors($this) );
         }
         
         return $this->mother;
@@ -258,37 +258,6 @@ class Witch
         return  $this->sisters[ $id ];
     }
     
-    
-    /**
-     * Daughter witches manipulation
-     * @return self
-     */
-    function reorderDaughters( array $idOrder ): false|int
-    {
-        $params     = [];
-        $conditions = [];
-        $priority   = 0;
-        $interval   = 100;
-        foreach( array_reverse($idOrder) as $id )
-        {
-            $daughter           =   $this->daughter( $id );
-            $daughter->priority =   $priority;
-            $priority           +=  $interval;
-
-            $params[]       = [ 'priority' => $priority ];
-            $conditions[]   = [ 'id' => $id ];
-        }
-
-        $return = DataAccess::updates($this->ww, $params,  $conditions);
-
-        if( $return ){
-            $this->daughters = Handler::reorderWitches( $this->daughters );
-        }
-        
-        return $return;
-    }
-    
-    
     /**
      * Daughter witches manipulation
      * @return array
@@ -321,7 +290,7 @@ class Witch
         $this->daughters = [];
         Handler::addDaughters( 
             $this, 
-            DataAccess::fetchDescendants($this->ww, $this->id, true) 
+            Handler::fetchDescendants($this)
         );
         
         return $this->daughters;
@@ -485,7 +454,7 @@ class Witch
         {
             $this->ww->debug( "Try to reach unnamed module");
             return false;
-        }        
+        }
         
         if( !isset($this->modules[ $moduleInvoked ]) ){
             $this->invoke( $moduleInvoked );
@@ -539,7 +508,7 @@ class Witch
         {
             $this->site = null;
             if( (is_object( $inputs['site'] ) 
-                    && is_a( $inputs['site'], 'WW\Website' ))
+                    && is_a( $inputs['site'], Website::class ))
                 || !empty($inputs['site']) 
             ){
                 $this->site = trim( (string) $inputs['site']);
@@ -782,7 +751,7 @@ class Witch
         if( $fetchDescendants ){
             Handler::addDaughters( 
                 $this, 
-                DataAccess::fetchDescendants($this->ww, $this->id, true) 
+                Handler::fetchDescendants($this)
             );
         }
         
@@ -871,7 +840,7 @@ class Witch
         try {
             $this->innerTransactionMoveTo( $witch );
             if( $order ){
-                $this->reorderDaughters( $order );
+                Handler::setPriorities($this, $order);
             }
         } 
         catch( \Exception $e ) 
@@ -948,7 +917,7 @@ class Witch
                         $order[ $key ] = $newWitch->id;
                     }
                 }
-                $witch->reorderDaughters( $order );
+                Handler::setPriorities($witch, $order);
             }
         } 
         catch( \Exception $e ) 

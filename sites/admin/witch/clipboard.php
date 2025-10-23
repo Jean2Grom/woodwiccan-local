@@ -1,5 +1,6 @@
 <?php /** @var WW\Module $this */
 
+use WW\Handler\WitchHandler;
 use WW\Tools;
 
 if( !$this->witch('origin') || !$this->witch('destination') )
@@ -75,8 +76,23 @@ switch( $action = Tools::filterAction(
                 ]);
             }
         }
-        elseif( $orderedIds ){
-            if( !$this->witch('destination')->reorderDaughters( $orderedIds ) ){
+        elseif( !$orderedIds ){
+            $this->ww->user->addAlert([
+                'level'     =>  'warning',
+                'message'   =>  "No impact"
+            ]);
+        }
+        else 
+        {
+            $reorder = WitchHandler::setPriorities($this->witch('destination'), $orderedIds);
+
+            if( $reorder === 0 ){
+                $this->ww->user->addAlert([
+                    'level'     =>  'warning',
+                    'message'   =>  "No impact"
+                ]);
+            }
+            elseif( !$reorder ){
                 $this->ww->user->addAlert([
                     'level'     =>  'error',
                     'message'   =>  "Error, reorder canceled"
@@ -88,12 +104,6 @@ switch( $action = Tools::filterAction(
                     'message'   =>  "Witches reordered"
                 ]);
             }
-        }
-        else {
-            $this->ww->user->addAlert([
-                'level'     =>  'warning',
-                'message'   =>  "No impact"
-            ]);
         }
     break;
 

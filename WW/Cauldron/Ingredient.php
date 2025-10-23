@@ -157,7 +157,7 @@ abstract class Ingredient implements CauldronContentInterface
         return $result !== false;
     }
 
-    function delete(): bool
+    function delete(): ?bool
     {
         if( $this->exist() ){
             return DataAccess::delete( $this ) !== false;
@@ -176,11 +176,11 @@ abstract class Ingredient implements CauldronContentInterface
             $this->priority = $inputs['priority'];
         }
 
-        return $this->readInput( $inputs['value'] );
+        return $this->input( $inputs['value'] );
     }
 
-    function readInput( mixed $inputs ): self {        
-        return $this->set( $inputs );
+    function input( mixed $input ): self {        
+        return $this->set( $input );
     }
 
     function isIngredient(): bool {

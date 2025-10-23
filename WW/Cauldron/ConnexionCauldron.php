@@ -102,7 +102,7 @@ class ConnexionCauldron extends Cauldron
     }
 
 
-    protected function deleteAction(): bool
+    protected function deleteAction(): ?bool
     {
         $result = true;
 
@@ -128,11 +128,7 @@ class ConnexionCauldron extends Cauldron
             return false;
         }
         
-        if( $this->exist() ){
-            return DataAccess::delete( $this ) !== false;
-        }
-        
-        return true;
+        return Handler::delete( $this );
     }
 
     protected function generateContent(): void

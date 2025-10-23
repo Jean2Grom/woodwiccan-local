@@ -273,74 +273,6 @@ class WitchDataAccess
         return $ww->db->selectQuery($query, $params);
     }
     
-    static function fetchAncestors( WoodWiccan $ww, int $witchId, bool $toRoot=true, mixed $sitesRestriction=null )
-    {
-        $depth = 1;
-        if( $toRoot ){
-            $depth = '*';
-        }
-        
-        $website = clone $ww->website;
-        if( $sitesRestriction ){
-            $website->sitesRestrictions  = $sitesRestriction;
-        }
-        
-        $witches        = self::summon(
-            $ww, 
-            Cairn::prepareConfiguration(
-                $website, 
-                [
-                    'fetchAncestors' => [
-                        'match' => $witchId,
-                        'craft' => false,
-                        'parents' => [
-                            'depth' => $depth,
-                            'craft' => false,
-                        ]
-                    ]
-                ]
-            ) 
-        );
-        
-        if( empty($witches['fetchAncestors']) ){
-            return false;
-        }
-        
-        return $witches['fetchAncestors']->mother;
-    }
-    
-    static function fetchDescendants(  WoodWiccan $ww, int $witchId, bool $completeSubtree=true, ?array $sitesRestriction=null ): array
-    {
-        $depth = 1;
-        if( $completeSubtree ){
-            $depth = '*';
-        }
-
-        $website = clone $ww->website;
-        if( $sitesRestriction ){
-            $website->sitesRestrictions  = $sitesRestriction;
-        }
-        
-        $witches = self::summon(
-            $ww, 
-            Cairn::prepareConfiguration(
-                $website, 
-                [
-                    'fetchDescendants' => [
-                        'match' => $witchId,
-                        'craft' => false,
-                        'children' => [
-                            'depth' => $depth,
-                            'craft' => false,
-                        ]
-                    ]
-                ]
-            ) 
-        );
-        
-        return $witches['fetchDescendants']->daughters ?? [];
-    }
-    
     static function delete( WoodWiccan $ww, array $witchesToDeleteIds ): bool
     {
         if( empty($witchesToDeleteIds) ){
@@ -362,7 +294,7 @@ class WitchDataAccess
     }
 
     
-    static function summon( WoodWiccan $ww, $configuration )
+    static function summon( WoodWiccan $ww, array $configuration )
     {
         $result         = [];
         $invokedModule  = false;
@@ -417,7 +349,7 @@ class WitchDataAccess
     }
 
 
-    private static function witchesRequest( WoodWiccan $ww, $configuration )
+    private static function witchesRequest( WoodWiccan $ww, array $configuration )
     {
         // Determine the list of fields in select part of query
         $query = "";

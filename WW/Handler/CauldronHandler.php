@@ -6,6 +6,7 @@ use WW\Cauldron;
 use WW\Cauldron\Ingredient;
 use WW\DataAccess\CauldronDataAccess AS DataAccess;
 use WW\Witch;
+use WW\DataAccess\WitchDataAccess;
 
 class CauldronHandler
 {
@@ -537,6 +538,52 @@ class CauldronHandler
         }
 
         return $cauldron->position;
+    }
+
+    /**
+     * 
+     */
+    static function delete( Cauldron $cauldron )
+    {
+        if( empty($cauldron->id) ){
+            return null;
+        }
+        
+        $witchUpdateResult = WitchDataAccess::update(
+            $cauldron->ww, 
+            ['cauldron' => null], 
+            ['cauldron' => $cauldron->id]
+        );
+
+        if( $witchUpdateResult === false ){
+            return false;
+        }
+
+        $result = DataAccess::delete( $cauldron->ww, ['id' => $cauldron->id] );
+
+        if( $result === 0 ){
+            return null;
+        }
+
+        return (bool) $result;
+    }
+
+    /**
+     * 
+     */
+    static function updateTargetID( WoodWiccan $ww, int $oldTargetID, int $newTargetID ): ?bool
+    {
+        $result = DataAccess::update(
+            $ww, 
+            ['target' => $newTargetID], 
+            ['target' => $oldTargetID]
+        );
+
+        if( $result === 0 ){
+            return null;
+        }
+
+        return (bool) $result;
     }
 
 }

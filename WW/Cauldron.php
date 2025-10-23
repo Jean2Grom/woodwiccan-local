@@ -3,12 +3,11 @@ namespace WW;
 
 use WW\Cauldron\CauldronContentInterface;
 use WW\Cauldron\CauldronContentTrait;
+use WW\Trait\PropertiesAccessTrait;
 use WW\Cauldron\Ingredient;
 use WW\Cauldron\Recipe;
-use WW\DataAccess\CauldronDataAccess as DataAccess;
 use WW\Handler\CauldronHandler as Handler;
 use WW\Handler\IngredientHandler;
-use WW\Trait\PropertiesAccessTrait;
 
 class Cauldron implements CauldronContentInterface
 {
@@ -95,7 +94,7 @@ class Cauldron implements CauldronContentInterface
         }
 
         if( $this->content($name) ){
-            if( is_a($this->content( $name ), __CLASS__) ){
+            if( is_a($this->content( $name ), self::class) ){
                 return $this->content( $name );
             }
             else {
@@ -467,7 +466,7 @@ class Cauldron implements CauldronContentInterface
         return $result;
     }
 
-    function delete( bool $transactionMode=true ): bool
+    function delete( bool $transactionMode=true ): ?bool
     {
         if( $this->target?->draft === $this ){
             $this->target->draft = null;
@@ -476,10 +475,12 @@ class Cauldron implements CauldronContentInterface
         if( !$transactionMode ){
             return $this->deleteAction();
         }
-        $this->ww->db->begin();
 
+        $this->ww->db->begin();
         try {
-            if( !$this->deleteAction() )
+            $result = $this->deleteAction();
+
+            if( $result === false )
             {
                 $this->ww->db->rollback();
                 return false;
@@ -491,26 +492,25 @@ class Cauldron implements CauldronContentInterface
             $this->ww->db->rollback();
             return false;
         }
-
         $this->ww->db->commit();
-        return true;
+
+        return $result;
     }
 
-    protected function deleteAction(): bool
+    protected function deleteAction(): ?bool
     {
         $result = true;
-
         foreach( $this->ingredients as $ingredient ){
-            $result = $result && $ingredient->delete();
+            $result = $result && ($ingredient->delete() !== false);
         }
 
         foreach( $this->children as $child ) 
         {
-            if( !is_a($child, __CLASS__) ){
+            if( !is_a($child, self::class) ){
                 continue;
             }
 
-            $result = $result && $child->delete( false );
+            $result = $result && ( $child->delete(false) !== false );
         }
 
         if( $result === false ){
@@ -522,17 +522,13 @@ class Cauldron implements CauldronContentInterface
             return false;
         }
         
-        if( $this->exist() ){
-            return DataAccess::delete( $this ) !== false;
-        }
-        
-        return true;
+        return Handler::delete( $this );
     }
   
     function add( CauldronContentInterface $content ): bool
     {
         // Cauldron case
-        if( is_a($content, __CLASS__) ){
+        if( is_a($content, self::class) ){
             return $this->addCauldron( $content );
         }
 
@@ -918,8 +914,9 @@ class Cauldron implements CauldronContentInterface
         {
             $this->status = null;
             $this->save( false );
+
             if( $this->targetID ){
-                DataAccess::updateTargetID( $this->ww, $this->targetID, $this->id );
+                Handler::updateTargetID( $this->ww, $this->targetID, $this->id );
             }
         }
 

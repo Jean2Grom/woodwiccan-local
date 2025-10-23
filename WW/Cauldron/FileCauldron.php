@@ -34,7 +34,7 @@ class FileCauldron extends Cauldron
         return true;
     }
 
-    protected function deleteAction(): bool
+    protected function deleteAction(): ?bool
     {
         $this->pendingRemoveFiles[] = $this->content('storage-path')->value();
 

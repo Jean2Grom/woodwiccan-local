@@ -1,7 +1,6 @@
 <?php 
 namespace WW\Handler;
 
-use WW\Cauldron;
 use WW\WoodWiccan;
 use WW\Witch;
 use WW\DataAccess\WitchDataAccess as DataAccess;
@@ -564,4 +563,86 @@ class WitchHandler
 
         return (bool) $result;
     }
+
+    /**
+     * Get ancestors from BDD (make a request)
+     * 
+     * @param Witch $witch
+     * @return Witch|false
+     */
+    static function fetchAncestors( Witch $witch ): Witch|false
+    {
+        $conf = [
+            "match"     => ['id'    => $witch->id],
+            "entries"   => ['fetch' => false],
+            "modules"   => [],
+            "craft"     => false,
+            "parents"   => [
+                "depth"    => '*',
+                "craft"    => false,
+            ],
+            "sisters"   => false,
+            "children"  => false,
+        ];
+        
+        $witches = DataAccess::summon( $witch->ww, [$conf] );
+
+        return $witches['fetch']?->mother ?? false;
+    }
+
+    /**
+     * Get descendants from BDD (make a request)
+     * 
+     * @param Witch $witch
+     * @return Witch[]
+     */
+    static function fetchDescendants( Witch $witch ): array
+    {
+        $conf = [
+            "match"     => ['id'    => $witch->id],
+            "entries"   => ['fetch' => false],
+            "modules"   => [],
+            "craft"     => false,
+            "parents"   => false,
+            "sisters"   => false,
+            "children"  => [
+                "depth"     => '*',
+                "craft"     => false,
+            ],
+        ];
+
+        $witches = DataAccess::summon( $witch->ww, [$conf] );
+
+        return $witches['fetch']?->daughters ?? [];
+    }
+
+
+    static function setPriorities( Witch $witch, array $idOrder ): false|int
+    {
+        $params     = [];
+        $conditions = [];
+        $priority   = 0;
+        $interval   = 100;
+        foreach( array_reverse($idOrder) as $id )
+        {
+            $daughter           =   $witch->daughter( $id );
+            $daughter->priority =   $priority;
+            $priority           +=  $interval;
+
+            $params[]       = [ 'priority' => $priority ];
+            $conditions[]   = [ 'id' => $id ];
+        }
+
+        $return = DataAccess::updates($witch->ww, $params,  $conditions);
+
+        if( $return === false ){
+            return false;
+        }
+        elseif( $return ){
+            $witch->daughters = self::reorderWitches( $witch->daughters );
+        }
+        
+        return $return;
+    }
+
 }
