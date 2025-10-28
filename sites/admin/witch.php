@@ -500,13 +500,14 @@ switch( $action = Tools::filterAction(
             break;
         }
         
-        $newWitchData   = [
+        $params   = [
             'name'          =>  $this->witch("target")->name,
             'data'          =>  $this->witch("target")->data,
             'cauldron'      =>  $this->witch("target")->cauldronId 
         ];
         
-        $newWitch = $witch->createDaughter( $newWitchData );
+        $newWitch = $witch->newDaughter( $params );
+        $newWitch->save();
         
         if( !$newWitch )
         {

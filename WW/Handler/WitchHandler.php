@@ -140,13 +140,8 @@ class WitchHandler
      */
     static function writeProperties( Witch $witch ): void
     {
-        $id = null;
-        if( isset($witch->id) && is_int($witch->id) ){
-            $id = $witch->id;
-        }
-
         $witch->properties = [
-            'id'                => $id,
+            // 'id'                => $id,
             'name'              => $witch->name ?? null,
             'data'              => $witch->data ?? null,
             'site'              => $witch->site ?? null,
@@ -156,10 +151,18 @@ class WitchHandler
             'cauldron'          => $witch->cauldron?->id ?? $witch->cauldronId ?? null,
             'cauldron_priority' => $witch->cauldronPriority ?? 0,
             'context'           => $witch->context ?? null,
-            'datetime'          => $witch->datetime?->format('Y-m-d H:i:s') ?? null,
+            // 'datetime'          => $witch->datetime?->format('Y-m-d H:i:s') ?? null,
             'priority'          => $witch->priority ?? 0,
         ];
 
+        if( isset($witch->id) && is_int($witch->id) ){
+            $witch->properties['id'] = $witch->id;
+        }
+
+        if( $dateTime = $witch->datetime?->format('Y-m-d H:i:s') ){
+            $witch->properties['dateTime'] = $dateTime;
+        }
+        
         for( $i=1; $i<=$witch->ww->depth; $i++ ){
             $witch->properties[ 'level_'.$i ] = $witch->position($i);
         }
@@ -362,11 +365,12 @@ class WitchHandler
     }
 
     /**
-     * Mother witch manipulation
+     * Witch's mother manipulation
      * @param Witch $descendant
      * @param Witch $mother
+     * @return Witch $descendant
      */
-    static function setMother(  Witch $descendant, Witch $mother )
+    static function setMother( Witch $descendant, Witch $mother ): Witch
     {
         self::unsetMother( $descendant );
 
@@ -375,14 +379,15 @@ class WitchHandler
             self::addDaughter( $mother, $descendant );
         }
         
-        return;
+        return $descendant;
     }
     
     /**
-     * Mother witch manipulation
+     * Witch's mother manipulation
      * @param Witch $witch
+     * @return Witch 
      */
-    static function unsetMother( Witch $witch )
+    static function unsetMother( Witch $witch ): Witch
     {
         if( !empty($witch->mother) && !empty($witch->mother->daughters[ $witch->id ]) ){
             unset($witch->mother->daughters[ $witch->id ]);
@@ -390,11 +395,11 @@ class WitchHandler
         
         $witch->mother = null;
         
-        return;
+        return $witch;
     }
     
     /**
-     * Daughter witches manipulation
+     * Witch's daughter manipulation 
      * @param Witch $mother
      * @param Witch $daughter
      */
@@ -403,11 +408,12 @@ class WitchHandler
     }
     
     /**
-     * Daughter witches manipulation
+     * Witch's daughters manipulation 
      * @param Witch $mother
-     * @param Witch $daughter
+     * @param Witch[] $daughter
+     * @return Witch $mother
      */
-    static function addDaughters( Witch $mother, array $daughters )
+    static function addDaughters( Witch $mother, array $daughters ): Witch
     {
         $reorder = false;
         foreach( $daughters as $daughter ){
@@ -423,12 +429,12 @@ class WitchHandler
             $mother->daughters = self::reorderWitches( $mother->daughters );
         }
 
-        return;
+        return $mother;
     }
     
 
     /**
-     * Daughter witches manipulation
+     * Witch's daughter manipulation 
      * @param Witch $mother
      * @param Witch $daughter
      * @return Witch
@@ -485,6 +491,9 @@ class WitchHandler
         return $witch;
     }
 
+    /**
+     * 
+     */
     static function search( WoodWiccan $ww, array $params )
     {
         $result = DataAccess::search( $ww, $params );
@@ -616,7 +625,9 @@ class WitchHandler
         return $witches['fetch']?->daughters ?? [];
     }
 
-
+    /**
+     * 
+     */
     static function setPriorities( Witch $witch, array $idOrder ): false|int
     {
         $params     = [];
@@ -644,5 +655,39 @@ class WitchHandler
         
         return $return;
     }
+
+    /**
+     * Generate the "position" attribute
+     */
+    static function position( Witch $witch ): void
+    {
+        // Case ROOT
+        if( !$witch->mother )
+        {
+            $witch->position = [];
+            $witch->depth    = 0;
+        }
+        else 
+        {
+            $witch->position = $witch->mother->position();
+            $witch->depth    = $witch->mother->depth + 1;
+
+            if( $witch->depth > $witch->ww->depth )
+            {
+                self::addLevel($witch->ww);
+                $witch->position[ $witch->depth ] = 1;
+            }
+            else {
+                $witch->position[ $witch->depth ] = DataAccess::getNewDaughterIndex( 
+                    $witch->ww, 
+                    $witch->position ?? [] 
+                );
+            }
+        }
+
+        return;
+    }
+
+    
 
 }

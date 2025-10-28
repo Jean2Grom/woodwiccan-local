@@ -619,97 +619,30 @@ class Witch
 
         if(  
             isset( $this->invoke )
-            && (!isset( $this->invoke ) || !isset( $this->site ))
+            && (!isset( $this->url ) || !isset( $this->site ))
         ){
             $this->invoke = null;
         }
 
-
-
         return $this;
     }
     
+
     /**
-     * Add a new witch daughter 
+     * Add a new daughter 
      * @param array $params 
-     * @return self|false 
+     * @return self
      */
-    function createDaughter( array $params ): self|false
+    function newDaughter( array $params ): self
     {
-        // Name cannot be set to empty string 
-        $params['name'] = trim( $params['name'] ?? "" );
+        $witch      = new self();
+        $witch->ww  = $this->ww;
         
-        if( empty($params['name']) ){
-            return false;
-        }
-        
-        if( $this->depth === $this->ww->depth ){
-            Handler::addLevel($this->ww);
-        }
-        
-        $newDaughterPosition                        = $this->position;
-        $newDaughterPosition[ ($this->depth + 1) ]  = DataAccess::getNewDaughterIndex($this->ww, $this->position);
-        
-        if( !isset($params['site']) )
-        {
-            $params['site'] = $this->site;
+        Handler::addDaughter( $this, $witch->edit( $params ) );
 
-            if( !isset($params['status']) ){
-                $params['status'] = $this->statusLevel;
-            }    
-        }
-
-        if( empty($params['site']) )
-        {
-            $params['url']      = null;
-            $params['invoke']   = null;
-        }
-        elseif( empty($params['invoke']) ){
-            $params['url']      = null;
-        }        
-        else
-        {
-            $urlArray   = [];
-            
-            // If url is set to a value (ie not null)
-            if( $params['url'] ?? false ){
-                $urlArray[] = Tools::urlCleanupString( $params['url'] );
-            }
-            else 
-            {
-                $rootUrl    = $this->getClosestUrl( $params['site'] );
-                
-                if( !empty($rootUrl) ){
-                    $rootUrl .= '/';
-                }
-                else {
-                    $urlArray[] = '';
-                }
-                
-                $rootUrl    .=  Tools::cleanupString($params['name']);
-                $urlArray[] =   $rootUrl;                
-            }
-
-            if( !empty($urlArray) ){
-                $params['url'] = Handler::checkUrls( $this->ww, $params['site'], $urlArray, $this->id );
-            }
-        }        
-        
-        foreach( $newDaughterPosition as $level => $levelPosition ){
-            $params[ "level_".$level ] = $levelPosition;
-        }
-        
-        // TODO use Handler method, get rid of 
-        $newWitchId = DataAccess::create($this->ww, $params);
-        if( !$newWitchId ){
-            return false;
-        }
-
-        $params['id'] = $newWitchId;
-
-        return Handler::instanciate( $this->ww, $params );
+        return $witch;
     }
-        
+    
     
     /**
      * Get closest ancestor url for a given site
@@ -833,16 +766,52 @@ class Witch
         return call_user_func([$website, $method], $this->url, $queryParams ?? null);
     }
     
+
+    function updateRelativesUrls( self $destination )
+    {
+        if( !$previousUrl = $this->mother()?->getClosestUrl() ){
+            return;
+        }
+        $previousUrl .= '/';
+
+        $destinationUrl = $destination->getClosestUrl( $this->site );
+        if( $destinationUrl ){
+            $destinationUrl .= '/';
+        }
+
+        $this->replaceUrls( $previousUrl, $destinationUrl );
+
+        return;
+    }
     
+    private function replaceUrls( string $search, string $replace )
+    {
+        if( str_starts_with($this->url ?? "", $search) )
+        {
+            $url = $replace.substr( $this->url, strlen($search) );
+            $this->url = $url;
+        }
+
+        foreach( $this->daughters() as $daughter ){
+            $daughter->replaceUrls( $search, $replace );
+        }
+        
+        return;
+    }
+
+
     function moveTo( self $witch, array $order=[] ): bool
     {
         $this->ww->db->begin();
         try {
+            $this->updateRelativesUrls( $witch );
             $this->innerTransactionMoveTo( $witch );
+            $this->saveAction();
+
             if( $order ){
                 Handler::setPriorities($this, $order);
             }
-        } 
+        }
         catch( \Exception $e ) 
         {
             $this->ww->log->error($e->getMessage());
@@ -854,53 +823,16 @@ class Witch
         return true;        
     }
     
-    private function innerTransactionMoveTo( self $witch, array $urlSiteRewrite=[] )
+    private function innerTransactionMoveTo( self $witch )
     {
-        $position = $witch->position();
-        
-        $depth = count($position);
-        
-        if( $depth === $this->ww->depth + 1 ){
-            Handler::addLevel($this->ww);
-        }
-        
-        $newPosition                    = $position;
-        $newPosition[ ($depth + 1) ]    = DataAccess::getNewDaughterIndex($this->ww, $position);
-        
-        $params = [];
-        for( $i=1; $i <= $this->ww->depth; $i++ ){
-            $params[ "level_".$i ] = NULL;
-        }
-        
-        foreach( $newPosition as $level => $levelPosition ){
-            $params[ "level_".$level ] = $levelPosition;
-        }
+        $this->daughters();
 
-        if( $this->mother() && !empty($this->properties['url']) && !empty($this->properties['site']) )
-        {
-            $previousUrl = $this->mother()->getClosestUrl();
-            if( str_starts_with($this->url, $previousUrl) )
-            {
-                $url            = substr( $this->url, strlen($previousUrl) );
-                $destinationUrl = $urlSiteRewrite[ $this->site ] ?? $witch->getClosestUrl( $this->site );
-                $params['url']  = $destinationUrl.$url;
-                if( substr($params['url'], 0, 1) === '/' && substr($params['url'], 1, 1) === '/' ){
-                    $params['url']  = substr($params['url'], 1);
-                }
-                $urlSiteRewrite[ $this->site ] = $params['url'];
-            }
-        }
-        
-        $daughters      = $this->daughters();
-        DataAccess::update($this->ww, $params, ['id' => $this->id]);
-        $this->position = $newPosition;
-        $this->depth    = count( $this->position ?? [] );
+        $this->mother   = $witch;
+        $this->position = null;
+        $this->depth    = $witch->depth + 1;
 
-        if( !empty($daughters) ){
-            foreach( $daughters as $daughterWitch )
-            {
-                $daughterWitch->innerTransactionMoveTo( $this, $urlSiteRewrite );
-            }
+        foreach( $this->daughters as $daughter ){
+            $daughter->innerTransactionMoveTo( $this );
         }
         
         return;
@@ -958,7 +890,9 @@ class Witch
             }
         }
         
-        $newWitch   = $witch->createDaughter( $params );
+        $newWitch = $witch->newDaughter( $params );
+        $newWitch->save();
+
         $daughters  = $this->daughters();
         
         if( !empty($daughters) ){
@@ -1065,12 +999,35 @@ class Witch
     protected function saveAction()
     {
         $this->position();
+        $this->daughters();
 
-        if( $this->depth > $this->ww->cauldronDepth ){
-            DataAccess::increasePlateformDepth($this->ww);
+        $updated    = false;
+        $result     = Handler::save( $this );
+
+        if( $result === false ){
+            return false;
         }
-        
-        return Handler::save($this);
+        elseif( $result ){
+            $updated = true;
+        }
+
+        foreach( $this->daughters as $daughter ) 
+        {
+            $daughterSave = $daughter->save( false );
+
+            if( $daughterSave === false ){
+                return false;
+            }
+            elseif( $result ){
+                $updated = true;
+            }
+        }
+
+        if( $updated === false ){
+            return null;
+        }
+
+        return $result;
     }
 
     /**
@@ -1079,7 +1036,7 @@ class Witch
     function position( ?int $level=null )
     {
         if( is_null($this->position) ){
-            $this->generatePosition();
+            Handler::position( $this );
         }
 
         if( !$level ){
@@ -1087,28 +1044,6 @@ class Witch
         }
 
         return $this->position[ $level ] ?? null;
-    }
-
-    /**
-     * Generate the "position" attribute
-     */
-    private function generatePosition(): void
-    {
-        if( !$this->mother )
-        {
-            $this->position = [];
-            $this->depth    = 0;
-        }
-        else 
-        {
-            $this->position = $this->mother->position();
-            $newIndex       = DataAccess::getNewDaughterIndex( $this->ww, $this->position ?? [] );
-            $this->depth    = $this->mother->depth + 1;
-            
-            $this->position[ $this->depth ] = $newIndex;
-        }
-
-        return;
     }
 
 

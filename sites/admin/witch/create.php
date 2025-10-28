@@ -160,7 +160,8 @@ switch( $action = Tools::filterAction(
             $params['cauldron'] = $newCauldron->id;
         }
 
-        $newWitch = $destWitch->createDaughter( $params );
+        $newWitch = $destWitch->newDaughter( $params );
+        $newWitch->save();
 
         if( !$newWitch ){
             $this->ww->user->addAlert([
@@ -182,7 +183,6 @@ switch( $action = Tools::filterAction(
             $url = "view";
         }
 
-        $this->ww->db->commit();
         header( 'Location: '.$this->ww->website->getFullUrl($url, [ 'id' => $newWitch->id ]) );
         exit();
     break;    
