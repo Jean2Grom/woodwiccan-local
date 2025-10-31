@@ -637,8 +637,11 @@ class Witch
         $witch      = new self();
         $witch->ww  = $this->ww;
         
-        Handler::addDaughter( $this, $witch->edit( $params ) );
+        $this->daughters();
 
+        $this->daughters[]  = $witch->edit( $params );
+        $witch->mother      = $this;
+        
         return $witch;
     }
     
@@ -891,7 +894,6 @@ class Witch
         
         return $newWitch;
     }
-    
 
     /**
      * Cauldron witch content, store it in the Cairn (if exists, only read it)

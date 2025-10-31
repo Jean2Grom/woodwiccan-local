@@ -390,8 +390,8 @@ class WitchHandler
      */
     static function unsetMother( Witch $witch ): Witch
     {
-        if( !empty($witch->mother) && !empty($witch->mother->daughters[ $witch->id ]) ){
-            unset($witch->mother->daughters[ $witch->id ]);
+        if( $key = array_search($witch, $witch->mother->daughters) ){
+            unset($witch->mother->daughters[ $key ]);
         }
         
         $witch->mother = null;

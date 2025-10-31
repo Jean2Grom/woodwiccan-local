@@ -129,6 +129,10 @@ class Cairn
             $sisters    = $conf[ $index ]['sisters']    ?? false;
             $children   = $conf[ $index ]['children']   ?? false;
 
+            $prevConditions = ($conf[ $index ] ?? false)?  
+                ($conf[ $index ]['conditions'] ?? false): 
+                null;
+
             $conf[ $index ] = [
                 'match'         => $match,
                 'entries'       => array_merge(
@@ -145,6 +149,11 @@ class Cairn
                 'sisters'   => $arboConf( $sisters, $entryConf['sisters'] ?? false ),
                 'children'  => $arboConf( $children, $entryConf['children'] ?? false ),
             ];
+
+            $conditions = $entryConf['conditions'] ?? false;
+            if( $conditions !== false && $prevConditions !== false ){
+                $conf[ $index ]['conditions'] = array_merge_recursive( ($prevConditions ?? []), $conditions );
+            }
         }
 
         foreach( $conf as $index => $confItem ){

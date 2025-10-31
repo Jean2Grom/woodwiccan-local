@@ -346,7 +346,6 @@ class WitchDataAccess
         if( $leftJoin )
         {
             $query  .= "LEFT JOIN `witch` AS `ref_witch` ";
-            //$query  .=  "ON ( ";
             $query  .=  "ON  `w`.`id` <> `ref_witch`.`id` AND ";
 
             $separator = "";
@@ -391,8 +390,12 @@ class WitchDataAccess
 
         $separator = "WHERE ( ";
 
+        $replacementConditionArray = ['w'];
+        if( $leftJoin ){
+            $replacementConditionArray[] = 'ref_witch';
+        }
 
-        foreach( ['ref_witch', 'w'] as $replacement )
+        foreach( $replacementConditionArray as $replacement )
         {
             $query      .=  $separator;
             $separator  =   "OR ";

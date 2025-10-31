@@ -79,10 +79,8 @@ $this->addJsFile('context-standard.js');
 
                                 <?php if( $this->witch("target") ): ?>
                                     &nbsp;:
-                                <?php elseif( $this->witch("mother") ): ?>
-                                    from&nbsp;:
+                                    <?=$this->witch("target")?>
                                 <?php endif; ?>
-                                <?=$this->witch("target").$this->witch("mother")?>
                             </a>
                         </div>
                     <?php endif; ?>
