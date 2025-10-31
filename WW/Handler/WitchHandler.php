@@ -1,6 +1,7 @@
 <?php 
 namespace WW\Handler;
 
+use WW\Cauldron;
 use WW\WoodWiccan;
 use WW\Witch;
 use WW\DataAccess\WitchDataAccess as DataAccess;
@@ -417,7 +418,7 @@ class WitchHandler
     {
         $reorder = false;
         foreach( $daughters as $daughter ){
-            if( is_object($daughter) && get_class($daughter) === "WW\\Witch" )
+            if( is_object($daughter) && get_class($daughter) === Witch::class )
             {
                 $mother->daughters[ $daughter->id ] = $daughter;
                 $daughter->mother                   = $mother;
@@ -527,6 +528,9 @@ class WitchHandler
             $params = $witch->properties;
             if( isset($params['id']) ){
                 unset($params['id']);
+            }
+            if( isset($params['datetime']) ){
+                unset($params['datetime']);
             }
 
             if( !$result = DataAccess::insert($witch->ww, $params) ){
@@ -688,6 +692,58 @@ class WitchHandler
         return;
     }
 
+    /**
+     * 
+     */
+    static function listDescendantsWitches( Witch $witch ): array
+    {
+        $return = [ $witch ];
+        foreach( $witch->daughters ?? [] as $daughter ){
+            $return = array_merge(
+                $return,
+                self::listDescendantsWitches( $daughter )
+            );
+        }
+
+        return $return;
+    }
     
+    static function delete( Witch $witch ): bool
+    {
+        $descendants =  self::listDescendantsWitches( $witch );
+        
+
+        $deleteIds = [];
+        foreach( $descendants as $w )
+        {
+            $deleteIds[] = $w->id;
+
+            if( $w->hasCauldron() )
+            {
+                if( !$w->cauldron()->witches() ){
+                    continue;
+                }
+
+                $witchToRemoveKey = array_search($witch, $w->cauldron()->witches());
+
+                if( $witchToRemoveKey === false ){
+                    continue;
+                }
+                unset($w->cauldron()->witches[ $witchToRemoveKey ]);
+                
+                if( !$w->cauldron()->witches ){
+                    $w->cauldron()->delete();
+                }
+
+                //$witch->cauldron()->removeWitch( $witch );
+            }
+        }        
+                
+        return DataAccess::delete($witch->ww, $deleteIds);
+
+    }
+
+
+
 
 }

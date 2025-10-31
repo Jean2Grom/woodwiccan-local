@@ -2,7 +2,6 @@
 namespace WW;
 
 use WW\Handler\WitchHandler as Handler;
-use WW\DataAccess\WitchDataAccess as DataAccess;
 
 use WW\Handler\CauldronHandler;
 use WW\Trait\PropertiesAccessTrait;
@@ -688,23 +687,7 @@ class Witch
             );
         }
         
-        $deleteIds = array_keys($this->daughters ?? []);
-        foreach( $this->daughters ?? [] as $daughter ){
-            if( !$daughter->delete(false) ){
-                return false;
-            }
-        }
-        
-        if( $this->hasCauldron() ){
-            $this->cauldron()->removeWitch( $this );
-        }
-        
-        
-        if( $fetchDescendants ){
-            $deleteIds[] = $this->id;
-        }
-        
-        return DataAccess::delete($this->ww, $deleteIds);
+        return Handler::delete( $this );
     }    
     
     /**
@@ -806,7 +789,7 @@ class Witch
         try {
             $this->updateRelativesUrls( $witch );
             $this->innerTransactionMoveTo( $witch );
-            $this->saveAction();
+            $this->save( false );
 
             if( $order ){
                 Handler::setPriorities($this, $order);
@@ -834,7 +817,7 @@ class Witch
         foreach( $this->daughters as $daughter ){
             $daughter->innerTransactionMoveTo( $this );
         }
-        
+
         return;
     }
 
@@ -842,7 +825,19 @@ class Witch
     {
         $this->ww->db->begin();
         try {
-            $newWitch = $this->innerTransactionCopyTo( $witch );
+
+            if( $previousUrl = $this->mother()?->getClosestUrl() )
+            {
+                $previousUrl .= '/';
+
+                if( $destinationUrl = $witch->getClosestUrl( $this->site ) ){
+                    $destinationUrl .= '/';
+                }
+            }
+            
+            $newWitch = $this->innerTransactionCopyTo( $witch, $previousUrl, $destinationUrl );
+            $newWitch->save( false );
+
             if( $order ){
                 foreach( $order as $key => $orderId ){
                     if( $orderId === $this->id ){
@@ -863,48 +858,41 @@ class Witch
         return $newWitch;        
     }
 
-    private function innerTransactionCopyTo( self $witch, array $urlSiteRewrite=[] )
+    private function innerTransactionCopyTo( self $witch, ?string $previousUrl=null, ?string $destinationUrl=null )
     {
-        $excludeFields = [ "id", "datetime" ];
-        $params = [
-            "status"            => $this->statusLevel,
-            "cauldron"          => $this->cauldronId,
-            "cauldron_priority" => 0,
-        ];
+        Handler::writeProperties( $this );
 
-        foreach( self::FIELDS as $field ){
-            if( !in_array($field, $excludeFields) && !in_array($field, array_keys($params)) ){
-                $params[ $field ] = $this->$field;
+        $excludeFields = ['id', 'datetime'];
+        for( $i=1; $i<=$this->ww->depth; $i++ ){
+            $excludeFields[] = 'level_'.$i;
+        }
+
+        $params = [];
+        foreach( $this->properties as $key => $value ){
+            if( !in_array($key, $excludeFields) ){
+                $params[ $key ] = $value;
             }
         }
-        
-        if( $this->mother() && !empty($params['url']) && !empty($params['site']) )
-        {
-            $previousUrl = $this->mother()->getClosestUrl();
-            if( str_starts_with($params['url'], $previousUrl) )
-            {
-                $url            = substr( $params['url'], strlen($previousUrl) );
-                $destinationUrl = $urlSiteRewrite[ $this->site ] ?? $witch->getClosestUrl( $this->site );
-                $params['url']  = $destinationUrl.$url;
-                $urlSiteRewrite[ $this->site ] = $params['url'];
-            }
-        }
-        
-        $newWitch = $witch->newDaughter( $params );
-        $newWitch->save();
 
-        $daughters  = $this->daughters();
+        if( !empty($destinationUrl) 
+            && !is_null($destinationUrl) 
+            && !empty($params['url']) 
+            && str_starts_with($params['url'], $previousUrl) 
+        ){
+            $url = $destinationUrl.substr( $params['url'], strlen($previousUrl) );
+            $params['url'] = $url;
+        }
+
+        $newWitch   = $witch->newDaughter( $params );
         
-        if( !empty($daughters) ){
-            foreach( $daughters as $daughterWitch )
-            {
-                $daughterWitch->innerTransactionCopyTo( $newWitch, $urlSiteRewrite );
-            }
+        foreach( $this->daughters() ?? [] as $daughterWitch ){
+            $daughterWitch->innerTransactionCopyTo( $newWitch, $previousUrl, $destinationUrl );
         }
         
         return $newWitch;
     }
     
+
     /**
      * Cauldron witch content, store it in the Cairn (if exists, only read it)
      * @return ?Cauldron
@@ -1011,7 +999,7 @@ class Witch
             $updated = true;
         }
 
-        foreach( $this->daughters as $daughter ) 
+        foreach( $this->daughters ?? [] as $daughter ) 
         {
             $daughterSave = $daughter->save( false );
 
