@@ -242,29 +242,27 @@ class Cairn
     private static function getChildrenCraftData( Witch $witch, mixed $craftLevel )
     {
         $cauldronsConf = [];
-        if( !empty($witch->daughters) ){
-            foreach( $witch->daughters as $daughterWitch )
-            {
-                if( $daughterWitch->hasCauldron() ){
-                    $cauldronsConf[] = $daughterWitch->cauldronId;
-                }
-
-                if( $craftLevel == "*" ){
-                    $craftSubLevel = $craftLevel;
-                }
-                else 
-                {
-                    $craftSubLevel = $craftLevel - 1;
-                    if( $craftSubLevel == 0 ){
-                        continue;
-                    }
-                }
-                
-                $cauldronsConf = array_merge_recursive(
-                    $cauldronsConf, 
-                    self::getChildrenCraftData($daughterWitch, $craftSubLevel) 
-                );
+        foreach( $witch->daughters ?? [] as $daughterWitch )
+        {
+            if( $daughterWitch->hasCauldron() ){
+                $cauldronsConf[] = $daughterWitch->cauldronId;
             }
+
+            if( $craftLevel == "*" ){
+                $craftSubLevel = $craftLevel;
+            }
+            else 
+            {
+                $craftSubLevel = $craftLevel - 1;
+                if( $craftSubLevel == 0 ){
+                    continue;
+                }
+            }
+            
+            $cauldronsConf = array_merge_recursive(
+                $cauldronsConf, 
+                self::getChildrenCraftData($daughterWitch, $craftSubLevel) 
+            );
         }
         
         return $cauldronsConf;
@@ -465,7 +463,7 @@ class Cairn
                     continue;
                 }                
                 
-                foreach( $witchBuffer->daughters as $daughter ){
+                foreach( $witchBuffer->daughters ?? [] as $daughter ){
                     if( $daughter->position() == $position ){
                         return $daughter;
                     }
@@ -518,18 +516,15 @@ class Cairn
 
     private function recursiveSearchById( Witch $witch, int $id ): ?Witch
     {
-        if( in_array($id, array_keys($witch->daughters())) ){
-            return $witch->daughters[ $id ];
-        }
-
-        foreach( $witch->daughters() as $daugther )
-        {
-            $result =  $this->recursiveSearchById( $daugther, $id );
-            if( $result ){
-                return $result;
+        foreach( $witch->daughters ?? [] as $daughter ){
+            if( $id === $daughter->id ){
+                return $daughter;
+            }
+            elseif( $search = $this->recursiveSearchById( $daughter, $id ) ){
+                return $search;
             }
         }
-
+        
         return null;
     }
 

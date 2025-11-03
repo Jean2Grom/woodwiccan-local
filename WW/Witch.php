@@ -257,20 +257,16 @@ class Witch
         return  $this->sisters[ $id ];
     }
     
+
     /**
      * Daughter witches manipulation
      * @return array
      */
-    function listDaughtersIds(): array
-    {
-        $list = [];
-        if( !empty($this->daughters) ){
-            $list = array_keys($this->daughters);
-        }
-        
-        return $list;
+    function listDaughtersIds(): array {
+        return array_keys($this->daughters ?? []);
     }
     
+
     /**
      * Get Daughters witches (get them if needed), 
      * return daughter witchs array 
@@ -278,22 +274,21 @@ class Witch
      */
     function daughters(): array
     {
-        if( isset($this->daughters) ){
+        if( !is_null($this->daughters) ){
             return $this->daughters;
         }
 
-        if( is_null($this->id) ){
-            return [];
-        }
-        
         $this->daughters = [];
-        Handler::addDaughters( 
-            $this, 
-            Handler::fetchDescendants($this)
-        );
+        if( !is_null($this->id) ){
+            Handler::addDaughters( 
+                $this, 
+                Handler::fetchDescendants($this)
+            );
+        }
         
         return $this->daughters;
     }
+    
     
     /**
      * Read Daughter witches (get them if needed), 
@@ -674,20 +669,15 @@ class Witch
     /**
      * Delete witch if it's not the root,
      * Delete all descendants and their associated cauldron if this is their only witch association
-     * @param bool $fetchDescendants
      * @return bool
      */
-    function delete( bool $fetchDescendants=true ): bool
+    function delete( ): bool
     {
-        if( is_null($this->id) || $this->mother() === false || $this->depth == 0 ){
+        if( is_null($this->id) // Not saved
+            || $this->depth == 0 // WW Root witch
+            || $this->mother() === false // Realtive root witch
+        ){
             return false;
-        }
-        
-        if( $fetchDescendants ){
-            Handler::addDaughters( 
-                $this, 
-                Handler::fetchDescendants($this)
-            );
         }
         
         return Handler::delete( $this );

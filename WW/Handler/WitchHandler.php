@@ -1,7 +1,6 @@
 <?php 
 namespace WW\Handler;
 
-use WW\Cauldron;
 use WW\WoodWiccan;
 use WW\Witch;
 use WW\DataAccess\WitchDataAccess as DataAccess;
@@ -277,36 +276,35 @@ class WitchHandler
     /**
      * Reorder a witch array based on priority
      * @param array $witchesList
-     * @return array
+     * @return Witch[]
      */
     static function reorderWitches( array $witchesList ): array
     {
-        $orderedWitchesIds = [];
-        $refMaxPossiblrPriority = 1;
-        for( $i=1; $i <= self::MAX_INT_ID_LENGTH; $i++ ){
-            $refMaxPossiblrPriority = $refMaxPossiblrPriority*10;
-        }
-
-        foreach( $witchesList as $witchItem ) 
+        $prioritiesArray = [];
+        foreach( $witchesList as $witch )
         {
-            $priority = $refMaxPossiblrPriority - $witchItem->priority;
-            
-            for( $i=strlen($priority); $i <= self::MAX_INT_ID_LENGTH; $i++ ){
-                $priority = "0".$priority;
+            $priority   = $witch->priority ?? 0;
+            $name       = $witch->name ?? "";
+
+            $prioritiesArray[ $priority ]           = $prioritiesArray[ $priority ] ?? [];
+            $prioritiesArray[ $priority ][ $name ]  = $prioritiesArray[ $priority ][ $name ] ?? [];
+
+            $prioritiesArray[ $priority ][ $name ][]    = $witch;
+        }
+        krsort($prioritiesArray);
+
+        $return = [];
+        foreach( $prioritiesArray as $priority => $alphaOrderArray )
+        {
+            ksort($alphaOrderArray);
+            foreach( $alphaOrderArray as $name => $witches ){
+                foreach( $witches as $witch ){
+                    $return[] = $witch;
+                }
             }
-            
-            $orderIndex = $priority."__".mb_strtolower($witchItem->name)."__".$witchItem->id;
-            $orderedWitchesIds[ $orderIndex ] = $witchItem->id;
         }
         
-        ksort($orderedWitchesIds);
-        
-        $orderedWitches = [];
-        foreach( $orderedWitchesIds as $orderedWitchId ){
-            $orderedWitches[ $orderedWitchId ] = $witchesList[ $orderedWitchId ];
-        }
-        
-        return $orderedWitches;
+        return $return;
     }
 
     /**
@@ -376,7 +374,7 @@ class WitchHandler
         self::unsetMother( $descendant );
 
         $descendant->mother = $mother;
-        if( !in_array($descendant->id, array_keys($mother->daughters ?? [])) ){
+        if( !in_array($descendant, $mother->daughters) ){
             self::addDaughter( $mother, $descendant );
         }
         
@@ -390,12 +388,7 @@ class WitchHandler
      */
     static function unsetMother( Witch $witch ): Witch
     {
-        if( $key = array_search($witch, $witch->mother->daughters) ){
-            unset($witch->mother->daughters[ $key ]);
-        }
-        
-        $witch->mother = null;
-        
+        self::removeDaughter( $witch->mother, $witch );
         return $witch;
     }
     
@@ -416,13 +409,16 @@ class WitchHandler
      */
     static function addDaughters( Witch $mother, array $daughters ): Witch
     {
+        $mother->daughters = $mother->daughters ?? [];
+        
         $reorder = false;
         foreach( $daughters as $daughter ){
-            if( is_object($daughter) && get_class($daughter) === Witch::class )
-            {
-                $mother->daughters[ $daughter->id ] = $daughter;
-                $daughter->mother                   = $mother;
-                $reorder                            = true;
+            if( is_object($daughter) 
+                && get_class($daughter) === Witch::class 
+            ){
+                $mother->daughters[]    = $daughter;
+                $daughter->mother       = $mother;
+                $reorder                = true;
             }
         }
         
@@ -442,11 +438,11 @@ class WitchHandler
      */
     static function removeDaughter( Witch $mother, Witch $daughter ): Witch
     {
-        if( !empty($mother->daughters[ $daughter->id ]) ){
-            unset($mother->daughters[ $daughter->id ]);
+        if( $key = array_search($daughter, $mother->daughters) ){
+            unset($mother->daughters[ $key ]);
         }
-        
-        if( $daughter->mother->id == $mother->id ){
+
+        if( $daughter->mother === $mother ){
             $daughter->mother = null;
         }
         
@@ -698,7 +694,7 @@ class WitchHandler
     static function listDescendantsWitches( Witch $witch ): array
     {
         $return = [ $witch ];
-        foreach( $witch->daughters ?? [] as $daughter ){
+        foreach( $witch->daughters() as $daughter ){
             $return = array_merge(
                 $return,
                 self::listDescendantsWitches( $daughter )
@@ -712,7 +708,6 @@ class WitchHandler
     {
         $descendants =  self::listDescendantsWitches( $witch );
         
-
         $deleteIds = [];
         foreach( $descendants as $w )
         {
@@ -734,16 +729,11 @@ class WitchHandler
                 if( !$w->cauldron()->witches ){
                     $w->cauldron()->delete();
                 }
-
-                //$witch->cauldron()->removeWitch( $witch );
             }
         }        
-                
+        
         return DataAccess::delete($witch->ww, $deleteIds);
-
     }
-
-
 
 
 }
