@@ -60,11 +60,15 @@ class Module
         
         $this->maxStatus = 0;
         foreach( $this->ww->user->policies as $policy ){
-            if( $policy["module"] == $this->name || $policy["module"] == '*' ){
-                if( $policy["status"] == '*' ){
-                    $this->maxStatus = false;
+            if( $policy["module"] === $this->name 
+                || $policy["module"] === '*' 
+            ){
+                if( $policy["status"] === '*' 
+                ){
+                    $this->maxStatus = null;
+                    break;
                 }
-                elseif( $this->maxStatus !== false && $policy["status"] > $this->maxStatus ){
+                elseif( $policy["status"] > $this->maxStatus ){
                     $this->maxStatus = (int) $policy["status"];
                 }
             }

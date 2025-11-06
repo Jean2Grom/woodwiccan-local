@@ -3,6 +3,7 @@ namespace WW;
 
 use WW\DataAccess\WitchDataAccess;
 use WW\Handler\CauldronHandler;
+use WW\Handler\WitchHandler;
 
 /**
  * Class that handles witch summoning and modules invocation
@@ -580,5 +581,66 @@ class Cairn
         }
         
         return $return;
+    }
+
+
+    static function tree( Witch $witch, array $restrictions=[], ?int $currentId=null, ?array $hrefCallBack=null ): array
+    {
+                // Test site restrictions
+        if( (   is_array($restrictions['site'] ?? null)
+                && !is_null($witch->site)  
+                && !in_array($witch->site, $restrictions['site']) )
+                // Test status restrictions
+            || (is_numeric($restrictions['status'] ?? null) 
+                && $witch->statusLevel > $restrictions['status'] )
+        ){
+            return [];
+        }
+
+        $path = false;
+        if( !is_null($currentId) && $currentId == $witch->id ){
+            $path = true;
+        }
+        
+        $daughtersTrees = [];
+        foreach( WitchHandler::reorderWitches($witch->daughters ?? []) as $daughter )
+        {
+                    // Test site restrictions
+            if( (   is_array($restrictions['site'] ?? null)
+                    && !is_null($daughter->site)  
+                    && !in_array($daughter->site, $restrictions['site']) )
+                    // Test status restrictions
+                || (is_numeric($restrictions['status'] ?? null) 
+                    && $daughter->statusLevel > $restrictions['status'] )
+            ){
+                continue;
+            }
+
+            $subTree = self::tree( $daughter, $restrictions, $currentId, $hrefCallBack );
+
+            if( $subTree['path'] ){
+                $path = true;
+            }
+
+            $daughtersTrees[] = $subTree;
+        }
+
+        $site = $witch->site? (string) $witch->site: "";
+        $tree   = [ 
+            'id'                => $witch->id ?? uniqid('new_'),
+            'name'              => $witch->name,
+            'site'              => $site,
+            'description'       => $witch->data,
+            'cauldron'          => $witch->hasCauldron(),
+            'invoke'            => $witch->hasInvoke(),
+            'daughters'         => $daughtersTrees,
+            'path'              => $path,
+        ];
+
+        if( $hrefCallBack ){
+            $tree['href'] = call_user_func( $hrefCallBack, $witch );
+        }
+        
+        return $tree;
     }
 }

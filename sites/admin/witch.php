@@ -466,7 +466,7 @@ switch( $action = Tools::filterAction(
             'message'   =>  "Cauldron added to witch"
         ]);
 
-        header( 'Location: '.$this->ww->website->getFullUrl('view', [ 'id' => $witch->id ])."#tab-cauldron-part" );
+        header( 'Location: '.$this->ww->website->getFullUrl('view', [ 'id' => $witch->id ]) );
         exit();
     break;
     
@@ -523,7 +523,7 @@ switch( $action = Tools::filterAction(
             'message'   =>  "New cauldron's witch created"
         ]);
         
-        header( 'Location: '.$this->ww->website->getFullUrl('view', [ 'id' => $newWitch->id ])."#tab-cauldron-part" );
+        header( 'Location: '.$this->ww->website->getFullUrl('view', [ 'id' => $newWitch->id ]) );
         exit();
     break;
     

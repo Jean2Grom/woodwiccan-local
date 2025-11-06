@@ -5,11 +5,9 @@ use WW\WoodWiccan;
 use WW\Witch;
 use WW\DataAccess\WitchDataAccess as DataAccess;
 use WW\Datatype\ExtendedDateTime;
-
+ 
 class WitchHandler
 {
-    const MAX_INT_ID_LENGTH = 10;
-
     /**
      * Witch factory class, implements witch whith data provided
      * @param WoodWiccan $ww
@@ -305,62 +303,6 @@ class WitchHandler
         }
         
         return $return;
-    }
-
-    /**
-     * 
-     */
-    static function recursiveTree( Witch $witch, $sitesRestrictions=false, ?int $currentId=null, $maxStatus=false, ?array $hrefCallBack=null )
-    {
-        if( !is_null($witch->site) 
-            && is_array($sitesRestrictions)
-            && !in_array($witch->site, $sitesRestrictions) ){
-            return false;
-        }
-
-        $path       = false;
-        if( !is_null($currentId) && $currentId == $witch->id ){
-            $path = true;
-        }
-        
-        $daughters  = [];
-        if( $witch->id ){
-            foreach( $witch->daughters() as $daughterWitch )
-            {
-                if( $maxStatus !== false && $daughterWitch->statusLevel > $maxStatus ){
-                    continue;
-                }
-
-                $subTree        = self::recursiveTree( $daughterWitch, $sitesRestrictions, $currentId, $maxStatus, $hrefCallBack );
-                if( $subTree === false ){
-                    continue;
-                }
-
-                if( $subTree['path'] ){
-                    $path = true;
-                }
-
-                $daughters[ $subTree['id'] ]    = $subTree;
-            }
-        }
-
-        $tree   = [ 
-            'id'                => $witch->id,
-            'name'              => $witch->name,
-            'site'              => (string) $witch->site ?? "",
-            'description'       => $witch->data,
-            'cauldron'          => $witch->hasCauldron(),
-            'invoke'            => $witch->hasInvoke(),
-            'daughters'         => $daughters,
-            'daughters_orders'  => array_keys( $daughters ),
-            'path'              => $path,
-        ];
-
-        if( $hrefCallBack ){
-            $tree['href'] = call_user_func( $hrefCallBack, $witch );
-        }
-        
-        return $tree;
     }
 
     /**
