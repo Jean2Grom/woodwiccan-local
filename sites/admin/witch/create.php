@@ -38,7 +38,7 @@ foreach( $sites as $site ){
 
 $status = [ "global" => $this->ww->configuration->read("global", "status") ];
 foreach( $websitesList as $site => $website ){
-    $status[ $site ] = $website->status;
+    $status[ $site ] = $website->status();
 }
 
 $modules = [];

@@ -64,24 +64,19 @@ class Witch
     /** @var ?self[] */
     public ?array $daughters    = null;
 
-    /** 
-     * WoodWiccan container class to allow whole access to Kernel
-     * @var WoodWiccan
-     */
+    /**  WoodWiccan container class to allow whole access to Kernel */
     public WoodWiccan $ww;
-    
-    
-    /**
-     * Name reading
-     * @return string
-     */
-    public function __toString(): string {
-        return ($this->id)? $this->name: "";
-    }
     
 
     /**
-     * property reading, 
+     * Name reading
+     */
+    public function __toString(): string {
+        return $this->name ?? "";
+    }
+
+    /**
+     * Magic function is dedicated to property reading, 
      * if not property is found it try to read cauldron content
      * @var string $name
      */
@@ -116,22 +111,24 @@ class Witch
         return !empty($this->id);
     }
     
-    
     /**
      * Resolve status label with Website generation
      * @return ?string status label
      */
     function status(): ?string
     {
+        if( is_null($this->status) ){
+            $this->status = $this->site()?->status( $this->statusLevel );
+        }
+        
         if( is_null($this->status) )
         {
-            $statusList     = $this->site()?->status ?? $this->ww->configuration->read('global', "status");
+            $statusList     = $this->ww->configuration->read('global', 'status');
             $this->status   = $statusList[ $this->statusLevel ] ?? null;
         }
         
         return $this->status;
     }
-    
     
     /**
      * Determine if the witch is associated with a cauldron (ie a content)
@@ -149,7 +146,6 @@ class Witch
         return !empty($this->properties[ 'invoke' ]);
     }
     
-        
     /**
      * Mother witch test
      * @param self $potentialDaughter
@@ -239,8 +235,7 @@ class Witch
 
         return $this->sisters;
     }
-
-
+    
     /**
      * Read Sister witches (get them if needed), 
      * return mother witch or false if witch is root
@@ -256,16 +251,6 @@ class Witch
         
         return  $this->sisters[ $id ];
     }
-    
-
-    /**
-     * Daughter witches manipulation
-     * @return array
-     */
-    function listDaughtersIds(): array {
-        return array_keys($this->daughters ?? []);
-    }
-    
 
     /**
      * Get Daughters witches (get them if needed), 
@@ -289,27 +274,25 @@ class Witch
         return $this->daughters;
     }
     
-    
     /**
      * Read Daughter witches (get them if needed), 
      * return mother witch or false if witch is root
-     * @return self
+     * @param int $id 
+     * @return ?self
      */
-    function daughter( int $id ): self
+    function daughter( int $id ): ?self
     {
-        $daughters  = $this->daughters();
-        $return     = $daughters[ $id ] ?? null;
-
-        if( !$return ){
-            $return = Handler::instanciate(
-                $this->ww, 
-                [ 'name' => "ABSTRACT 404 WITCH", 'invoke' => '404' ]
-            );
+        foreach( $this->daughters() as $daughter ){
+            if( $daughter->id === $id ){
+                return $daughter;
+            }
         }
 
-        return  $return;
+        return Handler::instanciate(
+            $this->ww, 
+            [ 'name' => "ABSTRACT 404 WITCH", 'invoke' => '404' ]
+        );
     }
-    
     
     /**
      * Invoke the module 
@@ -456,7 +439,6 @@ class Witch
         
         return $this->modules[ $moduleInvoked ];
     }
-    
 
     /**
      * Read witch module result, invoke it if needed
@@ -473,7 +455,6 @@ class Witch
         
         return $module->getResult() ?? "";
     }
-    
     
     /**
      * Update Witch
@@ -620,7 +601,6 @@ class Witch
 
         return $this;
     }
-    
 
     /**
      * Add a new daughter 
@@ -639,7 +619,6 @@ class Witch
         
         return $witch;
     }
-    
     
     /**
      * Get closest ancestor url for a given site
@@ -664,7 +643,6 @@ class Witch
         
         return $url;
     }
-    
     
     /**
      * Delete witch if it's not the root,
@@ -697,8 +675,6 @@ class Witch
         return $this->cauldron()->removeWitch( $this );
     }
     
-
-        
     /**
      * Test if witch is a descendant
      * @param self $potentialDescendant
@@ -716,7 +692,6 @@ class Witch
         
         return true;
     }
-    
     
     /**
      * Generate this witch url, 
@@ -799,6 +774,9 @@ class Witch
         return true;        
     }
     
+    /**
+     * Action to encapsulate in try/catch bock
+     */
     private function innerTransactionMoveTo( self $witch )
     {
         $this->daughters();
@@ -851,6 +829,9 @@ class Witch
         return $newWitch;        
     }
 
+    /**
+     * Action to encapsulate in try/catch bock
+     */
     private function innerTransactionCopyTo( self $witch, ?string $previousUrl=null, ?string $destinationUrl=null )
     {
         Handler::writeProperties( $this );
@@ -905,7 +886,6 @@ class Witch
         return $this->cauldron;
     }
     
-
     /**
      * witch website
      * @return ?Website

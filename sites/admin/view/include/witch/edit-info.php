@@ -55,7 +55,7 @@
                 <select name="witch-status[<?=$site ?>]" 
                         id="witch-status-<?=$site ?>"  
                         data-init="<?=$witch->statusLevel ?>">
-                    <?php foreach(  $website->status as $statusKey => $statusLabel ): ?>
+                    <?php foreach( $website->status() as $statusKey => $statusLabel ): ?>
                         <option <?=($witch->statusLevel === $statusKey)? 'selected': '' ?>
                                 value="<?=$statusKey ?>"><?=$statusLabel ?></option>
                     <?php endforeach; ?>

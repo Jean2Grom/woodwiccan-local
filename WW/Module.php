@@ -54,9 +54,9 @@ class Module
         }
         
         $this->config = array_replace_recursive( 
-                            $this->ww->website->modules['*'] ?? [],
-                            $this->ww->website->modules[ $this->name ] ?? []
-                        );
+            $this->ww->website->modules['*'] ?? [],
+            $this->ww->website->modules[ $this->name ] ?? []
+        );
         
         $this->maxStatus = 0;
         foreach( $this->ww->user->policies as $policy ){

@@ -27,8 +27,9 @@ class Website
     public $modulesList;
     private $rootUrl;
     
-    public $modules;
-    public $status;
+    public array $modules;
+    
+    public ?array $status = null;
     
     public bool $debug;    
     public $extensions;
@@ -37,24 +38,16 @@ class Website
     
     public $defaultContext;
     
-    /**
-     * Layout class that handle display
-     * @var Context
-     */    
+    /** Layout class that handle display */    
     public Context $context;
     
-    /**
-     * class that handles witch summoning and modules invocation
-     * @var Cairn
-     */
+    /** Class that handles witch summoning and modules invocation */
     public Cairn $cairn;
     
-    /** 
-     * WoodWiccan container class to allow whole access to Kernel
-     * @var WoodWiccan
-     */
+    /** WoodWiccan container class to allow whole access to Kernel */
     public WoodWiccan $ww;
     
+
     function __construct( WoodWiccan $ww, string $name, ?string $siteAccess=null )
     {
         $this->ww               = $ww;
@@ -69,21 +62,17 @@ class Website
             $this->ww->debug->toResume("URL site is acceded by: \"".$this->site."\"", 'WEBSITE');
         }
         
+        $this->heritages    = $this->ww->configuration->getSiteHeritage( $this->name );
+        $this->modules      = $this->ww->configuration->readSiteMergedVar('modules', $this) ?? [];
+        $witchesConf        = $this->ww->configuration->readSiteMergedVar('witches', $this) ?? [];
         
-        $this->heritages        = $this->ww->configuration->getSiteHeritage( $this->name );
-        $this->heritages[]      = "global";
-        
-        $this->modules              = $this->ww->configuration->readSiteMergedVar('modules', $this) ?? [];
-        $witchesConf                = $this->ww->configuration->readSiteMergedVar('witches', $this) ?? [];
-        
-        $this->debug                = (bool) $this->ww->configuration->readSiteVar('debug', $this);
-        $this->status               = $this->ww->configuration->readSiteVar('status', $this);
-        $defaultContext             = $this->ww->configuration->readSiteVar('defaultContext', $this);
+        $this->debug        = (bool) $this->ww->configuration->readSiteVar('debug', $this);
+        $defaultContext     = $this->ww->configuration->readSiteVar('defaultContext', $this);
         if( !empty($defaultContext) ){
-            $this->defaultContext       = $defaultContext;
+            $this->defaultContext = $defaultContext;
         }
         
-        $this->sitesRestrictions    = [ $this->site ];
+        $this->sitesRestrictions = [ $this->site ];
         foreach( $this->manage ?? [] as $adminisratedSite )
         {
             if( $adminisratedSite == '*' )
@@ -97,13 +86,13 @@ class Website
         
         $this->currentAccess    = $siteAccess ?? array_values($this->access ?? [])[0] ?? '';
         $firstSlashPosition     = strpos($this->currentAccess, '/');
-        $this->baseUri          = ($firstSlashPosition !== false)? substr( $this->currentAccess, $firstSlashPosition ): '';
-        $this->urlPath          = Tools::urlCleanupString( substr( $this->ww->request->access, strlen($this->currentAccess) ) );
+
+        $this->baseUri  = ($firstSlashPosition !== false)? substr($this->currentAccess, $firstSlashPosition): '';
+        $this->urlPath  = Tools::urlCleanupString(substr( $this->ww->request->access, strlen($this->currentAccess) ));
         
         foreach( $this->modules as $moduleName => $moduleConf ){
             foreach( $moduleConf['witches'] ?? [] as $moduleWitchName => $moduleWitchConf ){
-                if( empty($witchesConf[ $moduleWitchName ]) )
-                {
+                if( empty($witchesConf[ $moduleWitchName ]) ){
                     $witchesConf[ $moduleWitchName ] = array_replace_recursive( 
                         $moduleWitchConf, 
                         [ 'module' => $moduleName ] 
@@ -129,6 +118,22 @@ class Website
         return $this->ww->configuration->readSiteVar($name, $this);
     }
     
+    /**
+     * 
+     */
+    function status( ?string $level=null ): null|string|array
+    {
+        if( !$this->status ){
+            $this->status = $this->ww->configuration->readSiteVar('status', $this);
+        }
+
+        if( isset($level) ){
+            return $this->status[ $level ] ?? null;
+        }
+
+        return $this->status ?? [];
+    }
+
     function getCairn(): Cairn {
         return $this->cairn;
     }

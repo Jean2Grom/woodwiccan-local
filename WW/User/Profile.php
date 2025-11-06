@@ -51,12 +51,12 @@ class Profile
             $statusLabels = $ww->configuration->read("global", "status");
         }
         elseif( $ww->website->name === $profile->site ){
-            $statusLabels = $ww->website->status;
+            $statusLabels = $ww->website->status();
         }
         else
         {
-            $website = new Website( $ww, $profile->site );
-            $statusLabels = $website->status;
+            $website        = new Website( $ww, $profile->site );
+            $statusLabels   = $website->status();
         }
         
         foreach( $data['policies'] as $policyData )
