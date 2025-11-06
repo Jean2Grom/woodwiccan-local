@@ -140,16 +140,9 @@ class WitchDataAccess
         
         return $ww->db->updateQuery( $query, $params, true );
     }
-    
-    static function create( WoodWiccan $ww, array $params )
-    {
-        if( isset($params['id']) ){
-            unset($params['id']);
-        }
-        if( isset($params['datetime']) ){
-            unset($params['datetime']);
-        }
         
+    static function insert( WoodWiccan $ww, array $params )
+    {
         $query = "";
         $query  .=  "INSERT INTO `witch` ";
         
@@ -249,74 +242,6 @@ class WitchDataAccess
         return $ww->db->selectQuery($query, $params);
     }
     
-    static function fetchAncestors( WoodWiccan $ww, int $witchId, bool $toRoot=true, mixed $sitesRestriction=null )
-    {
-        $depth = 1;
-        if( $toRoot ){
-            $depth = '*';
-        }
-        
-        $website = clone $ww->website;
-        if( $sitesRestriction ){
-            $website->sitesRestrictions  = $sitesRestriction;
-        }
-        
-        $witches        = self::summon(
-            $ww, 
-            Cairn::prepareConfiguration(
-                $website, 
-                [
-                    'fetchAncestors' => [
-                        'match' => $witchId,
-                        'craft' => false,
-                        'parents' => [
-                            'depth' => $depth,
-                            'craft' => false,
-                        ]
-                    ]
-                ]
-            ) 
-        );
-        
-        if( empty($witches['fetchAncestors']) ){
-            return false;
-        }
-        
-        return $witches['fetchAncestors']->mother;
-    }
-    
-    static function fetchDescendants(  WoodWiccan $ww, int $witchId, bool $completeSubtree=true, ?array $sitesRestriction=null ): array
-    {
-        $depth = 1;
-        if( $completeSubtree ){
-            $depth = '*';
-        }
-
-        $website = clone $ww->website;
-        if( $sitesRestriction ){
-            $website->sitesRestrictions  = $sitesRestriction;
-        }
-        
-        $witches = self::summon(
-            $ww, 
-            Cairn::prepareConfiguration(
-                $website, 
-                [
-                    'fetchDescendants' => [
-                        'match' => $witchId,
-                        'craft' => false,
-                        'children' => [
-                            'depth' => $depth,
-                            'craft' => false,
-                        ]
-                    ]
-                ]
-            ) 
-        );
-        
-        return $witches['fetchDescendants']->daughters ?? [];
-    }
-    
     static function delete( WoodWiccan $ww, array $witchesToDeleteIds ): bool
     {
         if( empty($witchesToDeleteIds) ){
@@ -338,7 +263,7 @@ class WitchDataAccess
     }
 
     
-    static function summon( WoodWiccan $ww, $configuration )
+    static function summon( WoodWiccan $ww, array $configuration )
     {
         $result         = [];
         $invokedModule  = false;
@@ -393,7 +318,7 @@ class WitchDataAccess
     }
 
 
-    private static function witchesRequest( WoodWiccan $ww, $configuration )
+    private static function witchesRequest( WoodWiccan $ww, array $configuration )
     {
         // Determine the list of fields in select part of query
         $query = "";
@@ -421,7 +346,6 @@ class WitchDataAccess
         if( $leftJoin )
         {
             $query  .= "LEFT JOIN `witch` AS `ref_witch` ";
-            //$query  .=  "ON ( ";
             $query  .=  "ON  `w`.`id` <> `ref_witch`.`id` AND ";
 
             $separator = "";
@@ -466,8 +390,12 @@ class WitchDataAccess
 
         $separator = "WHERE ( ";
 
+        $replacementConditionArray = ['w'];
+        if( $leftJoin ){
+            $replacementConditionArray[] = 'ref_witch';
+        }
 
-        foreach( ['ref_witch', 'w'] as $replacement )
+        foreach( $replacementConditionArray as $replacement )
         {
             $query      .=  $separator;
             $separator  =   "OR ";

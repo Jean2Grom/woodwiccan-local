@@ -57,15 +57,6 @@
                     "craft": true
                 }
             }, 
-            "mother": {
-                "match": "mother", 
-                "craft": false,
-                "conditions": {
-                    "invoke": [
-                        "view"
-                    ]
-                }
-            }, 
             "origin": {
                 "match": "origin", 
                 "craft": false,

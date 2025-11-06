@@ -32,7 +32,7 @@
                     <?php foreach( $witch->daughters() as $daughter ): ?>
                         <tr>
                             <td>
-                                <a href="<?=$witch->ww->website->getUrl("view?id=".$daughter->id) ?>">
+                                <a href="<?=$witch->ww->website->getUrl("view", [ 'id' => $daughter->id ]) ?>">
                                     <?php if( $daughter->hasCauldron() && $daughter->hasInvoke() ): ?>
                                         <i class="fa fa-hat-wizard"></i>
                                     <?php elseif( $daughter->hasCauldron() ): ?>
@@ -47,7 +47,7 @@
                                 <span class="text-center"><?=$daughter->status() ?? "" ?></span>
                             </td>
                             <td class="full">
-                                <a href="<?=$witch->ww->website->getUrl("view?id=".$daughter->id."#tab-cauldron-part") ?>"
+                                <a href="<?=$witch->ww->website->getUrl("view", [ 'id' => $daughter->id ]) ?>"
                                    class="text-center">
                                     <?php if( !$daughter->hasCauldron() ): ?>
                                         <em class="hover-hide">no</em>

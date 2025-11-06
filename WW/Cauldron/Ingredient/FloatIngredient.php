@@ -33,7 +33,7 @@ class FloatIngredient extends Ingredient
         return $this;
     }
 
-    function readInput( mixed $input ): self {
+    function input( mixed $input ): self {
         return $this->set( (float) $input );
     }
 

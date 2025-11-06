@@ -38,7 +38,7 @@ $this->ww->website->context->addJsFile('cauldron/file-edit.js');
     <input  type="hidden" 
             name="<?=$input.'[file][type]'?>" 
             value="ww-file" />
-    <?php $this->content('file')->edit( 
+    <?php $this->content('file')->form( 
             null, 
             [ 'input' => $input.'[file]' ]
         ); ?>

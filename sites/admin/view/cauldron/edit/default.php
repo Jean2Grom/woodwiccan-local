@@ -38,7 +38,7 @@
                 value="<?=$content->type ?>" 
                 type="hidden" 
             />
-            <?php $content->edit( 
+            <?php $content->form( 
                 null, 
                 [ 'input' => $contentInput ]
             ); ?>

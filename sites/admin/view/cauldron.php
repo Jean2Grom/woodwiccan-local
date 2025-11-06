@@ -47,7 +47,7 @@ $this->addJsFile('triggers.js');
         <?php endif; ?>
     </p>
     
-    <?php $cauldron->draft()->edit(); ?>
+    <?php $cauldron->draft()->form(); ?>
 
 </form>
 

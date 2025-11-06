@@ -229,7 +229,7 @@ class UserDataAccess
                 if( !empty($row['id']) )
                 {
                     $positionWitch  = WitchHandler::instanciate($ww, $row);
-                    $position       = $positionWitch->position;
+                    $position       = $positionWitch->position();
                 }
 
                 $policies[ $row['policy_id'] ] = [
@@ -338,7 +338,7 @@ class UserDataAccess
                 if( !empty($row['id']) )
                 {
                     $positionWitch  = WitchHandler::instanciate($ww, $row);
-                    $position       = $positionWitch->position;
+                    $position       = $positionWitch->position();
                 }
 
                 $profilesData[ $userProfileId ]['policies'][ $userPolicyId ] = [

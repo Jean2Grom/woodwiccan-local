@@ -223,7 +223,7 @@ class CauldronDataAccess
         return $jointure;
     }
 
-    static function increaseDepth( WoodWiccan $ww ): int
+    static function addLevel( WoodWiccan $ww ): int
     {
         $ww->cache->delete( 'system', 'depth-cauldron' );
         $newLevelDepth = self::getDepth($ww, false) + 1;
@@ -270,20 +270,13 @@ class CauldronDataAccess
         return $max + 1;
     }
 
-    static function insert( Cauldron $cauldron )
+    static function insert( WoodWiccan $ww, array $params )
     {
-        if( isset($cauldron->properties['id']) ){
-            unset($cauldron->properties['id']);
-        }
-        if( isset($cauldron->properties['datetime']) ){
-            unset($cauldron->properties['datetime']);
-        }
-        
         $query = "";
         $query  .=  "INSERT INTO `cauldron` ";
         
         $separator = "( ";
-        foreach( array_keys($cauldron->properties) as $field )
+        foreach( array_keys($params) as $field )
         {
             $query  .=  $separator."`".$field."` ";
             $separator = ", ";
@@ -291,66 +284,62 @@ class CauldronDataAccess
         $query  .=  ") VALUES ";
         
         $separator = "( ";
-        foreach( array_keys($cauldron->properties) as $field )
+        foreach( array_keys($params) as $field )
         {
             $query  .=  $separator.":".$field." ";
             $separator = ", ";
         }
         $query  .=  ") ";
         
-        return $cauldron->ww->db->insertQuery($query, $cauldron->properties);
+        return $ww->db->insertQuery($query, $params);
     }
 
-    static function update( Cauldron $cauldron, array $params )
+    static function update( WoodWiccan $ww, array $params, array $conditions )
     {
-        if( count($params) === 0 ){
-            return 0;
-        }
-        
         $query = "";
         $query  .=  "UPDATE `cauldron` ";
         
-        $separator = "SET ";
-        foreach( array_keys($params) as $field )
+        $bindParams         = [];
+        $paramQueryElement  = [];
+        foreach( $params as $field => $value )
         {
-            $query      .=  $separator.'`'.$cauldron->ww->db->escape_string($field)."` = :".$field." ";
-            $separator  =  ", ";
+            $key                    = "param__".$field;
+            $bindParams[ $key ]     = $value;
+            $paramQueryElement[]    = '`'.$ww->db->escape_string($field)."` = :".$key." ";
         }
-        
-        $query  .=  "WHERE `id` = :id ";
+        $query  .=  "SET ".implode( ", ", $paramQueryElement );
 
-        return $cauldron->ww->db->updateQuery( $query, array_replace($params, [ 'id' => $cauldron->id ]) );
+        $condQueryElement  = [];
+        foreach( $conditions as $field => $value )
+        {
+            $key                    = "cond__".$field;
+            $bindParams[ $key ]     = $value;
+            $condQueryElement[]    = '`'.$ww->db->escape_string($field)."` = :".$key." ";
+        }
+        $query  .=  "WHERE ".implode( "AND ", $condQueryElement );
+        
+        return $ww->db->updateQuery( $query, $bindParams );
     }
 
-    static function delete( Cauldron $cauldron )
+    static function delete( WoodWiccan $ww, array $conditions )
     {
-        if( empty($cauldron->id) ){
-            return false;
-        }
-        
-        $witchUpdateResult = WitchDataAccess::update($cauldron->ww, ['cauldron' => null], ['cauldron' => $cauldron->id]);
-
-        if( $witchUpdateResult === false ){
+        if( empty($conditions) ){
             return false;
         }
 
         $query = "";
         $query  .=  "DELETE FROM `cauldron` ";
-        $query  .=  "WHERE `id` = :id ";
+        
+        $separator = "WHERE ";
+        foreach( array_keys($conditions) as $field )
+        {
+            $query      .=  $separator.'`'.$ww->db->escape_string($field)."` = :".$field." ";
+            $separator  =  "AND ";
+        }
 
-        return $cauldron->ww->db->deleteQuery( $query,  ['id' => $cauldron->id] );
+        return $ww->db->deleteQuery( $query,  $conditions );
     }
-
-    static function updateTargetID( WoodWiccan $ww, int $oldTargetID, int $newTargetID )
-    {
-        $query = "";
-        $query  .=  "UPDATE `cauldron` ";
-        $query  .=  "SET `taget` = :new ";
-        $query  .=  "WHERE `taget` = :old ";
-
-        return $ww->db->updateQuery( $query, ['old' => $oldTargetID, 'new' => $newTargetID] );
-    }
-
+    
     static function getStorageStructure( WoodWiccan $ww )
     {
         $query = "";

@@ -5,8 +5,8 @@ use WW\WoodWiccan;
 use WW\Cauldron;
 use WW\Cauldron\Ingredient;
 use WW\DataAccess\CauldronDataAccess AS DataAccess;
-use WW\Datatype\ExtendedDateTime;
 use WW\Witch;
+use WW\DataAccess\WitchDataAccess;
 
 class CauldronHandler
 {
@@ -164,10 +164,10 @@ class CauldronHandler
             $cauldron = new $class();
         }
         else {
-            $cauldron       = new Cauldron();
+            $cauldron = new Cauldron();
         }
         
-        $cauldron->ww   = $ww;
+        $cauldron->ww = $ww;
         
         foreach( Cauldron::FIELDS as $field ){
             $cauldron->properties[ $field ] = $data[ $field ] ?? null;
@@ -183,33 +183,40 @@ class CauldronHandler
     }  
 
 
+
     /**
      * Update  Object current state based on var "properties" (database direct fields) 
      * @var Cauldron $cauldron
-     * @var bool $excludePostition
      * @return void
      */
-    static function readProperties( Cauldron $cauldron, bool $excludePostition=false ): void
+    static function readProperties( Cauldron $cauldron ): void
     {
         $cauldron->id = null;
-        if( isset($cauldron->properties['id']) && ctype_digit(strval($cauldron->properties['id'])) ){
+        if( isset($cauldron->properties['id']) 
+            && ctype_digit(strval($cauldron->properties['id'])) 
+        ){
             $cauldron->id = (int) $cauldron->properties['id'];
         }
         
-        $cauldron->status = null;
-        if( isset($cauldron->properties['status']) ){
-            $cauldron->status = $cauldron->properties['status'];
-        }
-        
         $cauldron->targetID = null;
-        if( isset($cauldron->properties['target']) && ctype_digit(strval($cauldron->properties['target'])) ){
+        if( isset($cauldron->properties['target']) 
+            && ctype_digit(strval($cauldron->properties['target'])) 
+        ){
             $cauldron->targetID = (int) $cauldron->properties['target'];
         }
-        
+
         if( $cauldron->targetID !== $cauldron->target?->id ){
             $cauldron->target   = null;
         }
 
+        $cauldron->status = null;
+        if( isset($cauldron->properties['status']) 
+            && in_array( $cauldron->properties['status'], 
+                [Cauldron::STATUS_PUBLISHED, Cauldron::STATUS_DRAFT, Cauldron::STATUS_ARCHIVED] )
+        ){
+            $cauldron->status = $cauldron->properties['status'];
+        }        
+        
         $cauldron->name = null;
         if( isset($cauldron->properties['name']) ){
             $cauldron->name = $cauldron->properties['name'];
@@ -228,30 +235,21 @@ class CauldronHandler
         }
 
         $cauldron->priority = 0;
-        if( isset($cauldron->properties['priority']) ){
+        if( isset($cauldron->properties['priority']) 
+            && ctype_digit(strval( $cauldron->properties['priority'] )) 
+        ){
             $cauldron->priority = (int) $cauldron->properties['priority'];
         }
         
-        $cauldron->datetime = null;
-        if( isset($cauldron->properties['datetime']) ){
-            $cauldron->datetime = new ExtendedDateTime($cauldron->properties['datetime']);
-        }
-
-        if( $excludePostition ){
-            return;
-        }
-        
         $cauldron->position    = [];
-        
-        $i = 1;
-        while( 
-            isset($cauldron->properties[ 'level_'.$i ]) 
-            && ctype_digit(strval( $cauldron->properties['level_'.$i] )) 
-        ){
-            $cauldron->position[ $i ] = (int) $cauldron->properties[ 'level_'.$i ];
-            $i++;
+        for( $i=1; $i<=$cauldron->ww->cauldronDepth; $i++ ){
+            if( isset($cauldron->properties[ 'level_'.$i ]) 
+                && ctype_digit(strval( $cauldron->properties['level_'.$i] )) 
+            ){
+                $cauldron->position[ $i ] = (int) $cauldron->properties[ 'level_'.$i ];
+            }
         }
-        $cauldron->depth = $i - 1; 
+        $cauldron->depth = count( $cauldron->position ); 
         
         return;
     }
@@ -264,63 +262,35 @@ class CauldronHandler
      */
     static function writeProperties( Cauldron $cauldron ): void
     {
-        $cauldron->properties= [];
-
+        $id = null;
         if( isset($cauldron->id) && is_int($cauldron->id) ){
-            $cauldron->properties['id'] = $cauldron->id;
-        }        
+            $id = $cauldron->id;
+        }
         
+        $status = null;
         if( in_array( $cauldron->status, 
             [Cauldron::STATUS_PUBLISHED, Cauldron::STATUS_DRAFT, Cauldron::STATUS_ARCHIVED] )
         ){
-            $cauldron->properties['status'] = $cauldron->status;
-        }
-        
-        if( $cauldron->target ){
-            $cauldron->properties['target'] = $cauldron->target->id;
-        }
-        elseif( $cauldron->targetID ){
-            $cauldron->properties['target'] = $cauldron->targetID;
-        }
-        else {
-            $cauldron->properties['target'] = null;
-        }
-        
-        if( isset($cauldron->name) ){
-            $cauldron->properties['name'] = $cauldron->name;
-        }
-        
-        if( isset($cauldron->recipe) ){
-            $cauldron->properties['recipe'] = $cauldron->recipe;
-        }
-        
-        if( isset($cauldron->data) )
-        {
-            $jsonData = json_encode( $cauldron->data );
-
-            if( $jsonData ){
-                $cauldron->properties['data'] = $jsonData;
-            }
+            $status = $cauldron->status;
         }
 
-        $cauldron->properties['priority'] = $cauldron->priority ?? 0;
-        
-        if( isset($cauldron->datetime) ){
-            $cauldron->properties['datetime'] = $cauldron->datetime->format('Y-m-d H:i:s');
+        $data = null;
+        if( isset($cauldron->data) && $jsonData = json_encode( $cauldron->data ) ){
+            $data = $jsonData;
         }
 
-        $i = 1;
-        while( 
-            $cauldron->levelPosition($i) 
-            && ctype_digit(strval( $cauldron->levelPosition($i) )) 
-        ){
-            $cauldron->properties[ 'level_'.$i ] = $cauldron->levelPosition($i);
-            $i++;
-        }
-        $cauldron->depth = $i - 1; 
-        
-        for( $j=$i; $j<=$cauldron->ww->cauldronDepth; $j++ ){
-            $cauldron->properties[ 'level_'.$j ] = null;
+        $cauldron->properties= [
+            'id'        => $id,
+            'target'    => $cauldron->target?->id ?? $cauldron->targetID ?? null,
+            'status'    => $status,
+            'name'      => $cauldron->name ?? null,
+            'recipe'    => $cauldron->recipe ?? null,
+            'data'      => $data,
+            'priority'  => $cauldron->priority ?? 0,
+        ];
+
+        for( $i=1; $i<=$cauldron->ww->cauldronDepth; $i++ ){
+            $cauldron->properties[ 'level_'.$i ] = $cauldron->position($i);
         }
 
         return;
@@ -506,5 +476,114 @@ class CauldronHandler
         return WitchHandler::search( $cauldron->ww, [ 'cauldron' => $cauldron->id ]);
     }
 
+
+    static function save( Cauldron $cauldron ): bool
+    {
+        if( $cauldron->depth > $cauldron->ww->cauldronDepth ){
+            DataAccess::addLevel( $cauldron->ww );
+        }
+        
+        if( !$cauldron->exist() )
+        {
+            self::writeProperties($cauldron); 
+
+            $params = $cauldron->properties;
+            if( isset($params['id']) ){
+                unset($params['id']);
+            }
+
+            if( !$result = DataAccess::insert($cauldron->ww, $params) ){
+                return false;
+            }
+
+            $cauldron->id = (int) $result;
+        }
+        else
+        {
+            $properties = $cauldron->properties;
+
+            self::writeProperties($cauldron);
+
+            $params = array_diff_assoc($cauldron->properties, $properties);
+            if( isset($params['id']) ){
+                unset($params['id']);
+            }
+
+            if( count($params) ){
+                DataAccess::update( $cauldron->ww, $params, ['id' => $cauldron->id] );
+            }
+        }
+        
+        return true;
+    }
+
+
+    /**
+     * Generate the "position" attribute
+     */
+    static function position( Cauldron $cauldron ): array
+    {
+        if( !$cauldron->parent )
+        {
+            $cauldron->position = [];
+            $cauldron->depth    = 0;
+        }
+        else 
+        {
+            $cauldron->position = $cauldron->parent->position();
+            $newIndex           = DataAccess::getNewPosition( $cauldron->parent );
+            $cauldron->depth    = $cauldron->parent->depth + 1;
+            
+            $cauldron->position[ $cauldron->depth ] = $newIndex;
+        }
+
+        return $cauldron->position;
+    }
+
+    /**
+     * 
+     */
+    static function delete( Cauldron $cauldron )
+    {
+        if( empty($cauldron->id) ){
+            return null;
+        }
+        
+        $witchUpdateResult = WitchDataAccess::update(
+            $cauldron->ww, 
+            ['cauldron' => null], 
+            ['cauldron' => $cauldron->id]
+        );
+
+        if( $witchUpdateResult === false ){
+            return false;
+        }
+
+        $result = DataAccess::delete( $cauldron->ww, ['id' => $cauldron->id] );
+
+        if( $result === 0 ){
+            return null;
+        }
+
+        return (bool) $result;
+    }
+
+    /**
+     * 
+     */
+    static function updateTargetID( WoodWiccan $ww, int $oldTargetID, int $newTargetID ): ?bool
+    {
+        $result = DataAccess::update(
+            $ww, 
+            ['target' => $newTargetID], 
+            ['target' => $oldTargetID]
+        );
+
+        if( $result === 0 ){
+            return null;
+        }
+
+        return (bool) $result;
+    }
 
 }

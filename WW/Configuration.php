@@ -128,11 +128,8 @@ class Configuration
     
     function readSiteVar( string $variable, ?Website $website=null )
     {
-        if( !$website ){
-            $website = $this->ww->website;
-        }
-        
-        foreach( $website->heritages as $section )
+        $ws = $website ?? $this->ww->website;
+        foreach( $ws->heritages as $section )
         {
             $value = $this->read($section, $variable);
             
@@ -146,12 +143,9 @@ class Configuration
     
     function readSiteMergedVar( string $variable, ?Website $website=null )
     {
-        if( !$website ){
-            $website = $this->ww->website;
-        }
-        
         $return = null;
-        foreach( array_reverse($website->heritages) as $section )
+        $ws     = $website ?? $this->ww->website;
+        foreach( array_reverse($ws->heritages) as $section )
         {
             $value = $this->read($section, $variable);
             
@@ -187,30 +181,34 @@ class Configuration
     
     /**
      * Reccursive function for reading heritages configuration cascades
-     * 
      * @param string $siteName : configuration name of site to ckeck
-     * @return array : ordered list of sites that are herited from
+     * @return array ordered list of sites that are herited from
      */
     function getSiteHeritage( string $siteName ): array
     {
-        $heritages      = $this->read( $siteName, "heritages" );
-        
-        if( !$heritages ){
-            return [ $siteName ];
-        }
-        
         $return = [ $siteName ];
-        foreach( $heritages as $siteHeritagesItem )
+        foreach( $this->read($siteName, 'heritages') ?? [] as $heritedSiteName )
         {
-            $return[] = $siteHeritagesItem;                
-            foreach( $this->getSiteHeritage($siteHeritagesItem) as  $subSiteHeritagesItem ){
-                $return[] = $subSiteHeritagesItem;                
+            if( !in_array($heritedSiteName, $return) ){
+                $return[] = $heritedSiteName;
+            }
+
+            foreach( $this->getSiteHeritage($heritedSiteName) as $heritedSubSiteName ){
+                if( !in_array($heritedSubSiteName, $return) 
+                    && $heritedSubSiteName !== 'global'
+                ){
+                    $return[] = $heritedSubSiteName;
+                }
             }
         }
+        $return[] = 'global';
         
-        return array_unique($return);
+        return $return;
     }
 
+    /**
+     * 
+     */
     function recipes(): array
     {
         if( $this->recipes ){

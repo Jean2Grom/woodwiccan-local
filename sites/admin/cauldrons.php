@@ -9,18 +9,18 @@ $obj = new class {
     public function href( Cauldron $cauldron )
     {
         $witchId = $cauldron->witches()[0]?->id;        
-        return $this->baseUrl.($witchId? '?id='.$witchId."#tab-cauldron-part": "");
+        return $this->baseUrl.($witchId? '?id='.$witchId: "");
     }
 };
 
 $obj->baseUrl       = $this->ww->website->getUrl("view");
 
-$tree       = [1 => recursiveTree( 
+$tree = recursiveTree( 
     CauldronHandler::fetch($this->ww, [1])[1], 
     $this->ww->website->sitesRestrictions, 
     1, 
     [$obj, "href"]  
-)];
+);
 $breadcrumb = [ 1 ];
 
 function recursiveTree( Cauldron $cauldron, array|bool $sitesRestrictions=false, ?int $currentId=null, ?array $hrefCallBack=null )
@@ -40,20 +40,23 @@ function recursiveTree( Cauldron $cauldron, array|bool $sitesRestrictions=false,
             continue;
         }
 
-        $daughters[ $content->id ] = $content->isCauldron()? 
-                                        recursiveTree( $content, $sitesRestrictions, $currentId, $hrefCallBack ):
-                                        [
-                                            'id'                => $content->type." ".$content->id,
-                                            'name'              => $content->name,
-                                            'description'       => $content->type,
-                                            'cauldron'          => false,
-                                            'invoke'            => true,
-                                            'daughters'         => [],
-                                            'daughters_orders'  => [],
-                                            'path'              => false,            
-                                        ];
+        if( $content->isCauldron() ){
+            $subTree = recursiveTree( $content, $sitesRestrictions, $currentId, $hrefCallBack );
+        }
+        else {
+            $subTree = [
+                'id'                => $content->type." ".( $content->id ?? uniqid('new_') ),
+                'name'              => $content->name,
+                'description'       => $content->type,
+                'cauldron'          => false,
+                'invoke'            => true,
+                'daughters'         => [],
+                'path'              => false,            
+            ];
+        }
 
-        $path = $path || $daughters[ $content->id ]['path'];                                            
+        $daughters[]    = $subTree;
+        $path           = $path || $subTree['path'];
     }
     
     $cauldronIcon   = true;
@@ -76,7 +79,6 @@ function recursiveTree( Cauldron $cauldron, array|bool $sitesRestrictions=false,
         'cauldron'          => $cauldronIcon,
         'invoke'            => $invokeIcon,
         'daughters'         => $daughters,
-        'daughters_orders'  => array_keys( $daughters ),
         'path'              => $path,
     ];
 

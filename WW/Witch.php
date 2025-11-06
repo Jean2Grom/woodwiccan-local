@@ -2,7 +2,6 @@
 namespace WW;
 
 use WW\Handler\WitchHandler as Handler;
-use WW\DataAccess\WitchDataAccess as DataAccess;
 
 use WW\Handler\CauldronHandler;
 use WW\Trait\PropertiesAccessTrait;
@@ -35,54 +34,49 @@ class Witch
         "datetime",
         "priority",
     ];
-    public $properties     = [];
-    
-    public $id;
-    public $name;
-    public $datetime;
-    
-    public int $statusLevel = 0;
-    public ?string $status  = null;
-    
-    public Website|string|null $site = null;
-    
-    public $depth           = 0;
-    public $position        = [];
-    public $modules         = [];
-    
-    /** @var ?self */
-    public $mother;
-    /** @var ?self[] */
-    public $sisters;
-    /** @var ?self[] */
-    public $daughters = null;
 
-    public $cauldronId;
-    public $cauldronPriority;
+    public array $properties  = [];
     
-    /**
-     * @var ?Cauldron
-     */
-    public ?Cauldron $cauldron = null;
+    public ?int $id                     = null;
+    public ?string $name                = null;
+    public ?string $data                = null;
+    public Website|string|null $site    = null;
+    public ?string $url                 = null;
+    public ?string $status              = null;
+    public ?string $invoke              = null;
+    public ?Cauldron $cauldron          = null;
+    public ?int $cauldronPriority       = null;
+    public ?string $context             = null;
+    public ?\DateTime $datetime         = null;
+    public ?int $priority               = null;
     
-    /** 
-     * WoodWiccan container class to allow whole access to Kernel
-     * @var WoodWiccan
-     */
+    public int $statusLevel     = 0;
+    public ?int $cauldronId     = null;
+    public int $depth           = 0;
+    public ?array $position     = null;
+    public array $modules       = [];
+    
+    public ?self $mother        = null;
+
+    /** @var ?self[] */
+    public ?array $sisters      = null;
+
+    /** @var ?self[] */
+    public ?array $daughters    = null;
+
+    /**  WoodWiccan container class to allow whole access to Kernel */
     public WoodWiccan $ww;
     
-    
-    /**
-     * Name reading
-     * @return string
-     */
-    public function __toString(): string {
-        return ($this->id)? $this->name: "";
-    }
-    
 
     /**
-     * property reading, 
+     * Name reading
+     */
+    public function __toString(): string {
+        return $this->name ?? "";
+    }
+
+    /**
+     * Magic function is dedicated to property reading, 
      * if not property is found it try to read cauldron content
      * @var string $name
      */
@@ -117,22 +111,24 @@ class Witch
         return !empty($this->id);
     }
     
-    
     /**
      * Resolve status label with Website generation
      * @return ?string status label
      */
     function status(): ?string
     {
+        if( is_null($this->status) ){
+            $this->status = $this->site()?->status( $this->statusLevel );
+        }
+        
         if( is_null($this->status) )
         {
-            $statusList     = $this->site()?->status ?? $this->ww->configuration->read('global', "status");
+            $statusList     = $this->ww->configuration->read('global', 'status');
             $this->status   = $statusList[ $this->statusLevel ] ?? null;
         }
         
         return $this->status;
     }
-    
     
     /**
      * Determine if the witch is associated with a cauldron (ie a content)
@@ -150,7 +146,6 @@ class Witch
         return !empty($this->properties[ 'invoke' ]);
     }
     
-        
     /**
      * Mother witch test
      * @param self $potentialDaughter
@@ -197,13 +192,12 @@ class Witch
         }
         
         if( is_null($this->mother) ){
-            Handler::setMother( $this, DataAccess::fetchAncestors($this->ww, $this->id, true) );
+            Handler::setMother( $this, Handler::fetchAncestors($this) );
         }
         
         return $this->mother;
     }
     
-        
     /**
      * Sister witches manipulation
      * @return array
@@ -221,76 +215,43 @@ class Witch
     /**
      * Read Sister witches (get them if needed), 
      * return mother witch or false if witch is root
-     * @return mixed
+     * @return ?array
      */
-    function sisters( ?int $id=null ): mixed
+    function sisters(): ?array
     {
-        if( is_null($this->id) ){
-            return false;
-        }
-        
-        if( is_null($this->sisters) && $this->mother() ){
-            foreach( DataAccess::fetchDescendants($this->ww, $this->mother()->id, true) as $sisterWitch ){
-                Handler::addSister( $this, $sisterWitch );
-            }
-        }
-        elseif( is_null($this->sisters) ){
-            $this->sisters = false;
-        }
-        
-        if( !$id ){
+        if( isset($this->sisters) ){
             return $this->sisters;
         }
+
+        if( !$this->mother() ){
+            return [];
+        }
         
-        return  $this->sisters[ $id ] 
-                    ?? Handler::instanciate($this->ww, [ 'name' => "ABSTRACT 404 WITCH", 'invoke' => '404' ]);
+        foreach( $this->mother()->daughters() as $sister ){
+            if( $sister !== $this ){
+                Handler::addSister( $this, $sister );
+            }
+        }
+
+        return $this->sisters;
     }
-    
     
     /**
-     * Daughter witches manipulation
-     * @return self
+     * Read Sister witches (get them if needed), 
+     * return mother witch or false if witch is root
+     * @return mixed
      */
-    function reorderDaughters( array $idOrder ): false|int
+    function sister( int $id ): mixed
     {
-        $params     = [];
-        $conditions = [];
-        $priority   = 0;
-        $interval   = 100;
-        foreach( array_reverse($idOrder) as $id )
-        {
-            $daughter           =   $this->daughter( $id );
-            $daughter->priority =   $priority;
-            $priority           +=  $interval;
-
-            $params[]       = [ 'priority' => $priority ];
-            $conditions[]   = [ 'id' => $id ];
-        }
-
-        $return = DataAccess::updates($this->ww, $params,  $conditions);
-
-        if( $return ){
-            $this->daughters = Handler::reorderWitches( $this->daughters );
+        if( !$this->sisters() 
+            || !isset($this->sisters[ $id ])
+        ){
+            return Handler::instanciate($this->ww, [ 'name' => "ABSTRACT 404 WITCH", 'invoke' => '404' ]);
         }
         
-        return $return;
+        return  $this->sisters[ $id ];
     }
-    
-    
-    /**
-     * Daughter witches manipulation
-     * @return array
-     */
-    function listDaughtersIds(): array
-    {
-        $list = [];
-        if( !empty($this->daughters) ){
-            $list = array_keys($this->daughters);
-        }
-        
-        return $list;
-    }
-    
+
     /**
      * Get Daughters witches (get them if needed), 
      * return daughter witchs array 
@@ -298,19 +259,17 @@ class Witch
      */
     function daughters(): array
     {
-        if( isset($this->daughters) ){
+        if( !is_null($this->daughters) ){
             return $this->daughters;
         }
 
-        if( is_null($this->id) ){
-            return [];
-        }
-        
         $this->daughters = [];
-        Handler::addDaughters( 
-            $this, 
-            DataAccess::fetchDescendants($this->ww, $this->id, true) 
-        );
+        if( !is_null($this->id) ){
+            Handler::addDaughters( 
+                $this, 
+                Handler::fetchDescendants($this)
+            );
+        }
         
         return $this->daughters;
     }
@@ -318,23 +277,22 @@ class Witch
     /**
      * Read Daughter witches (get them if needed), 
      * return mother witch or false if witch is root
-     * @return self
+     * @param int $id 
+     * @return ?self
      */
-    function daughter( int $id ): self
+    function daughter( int $id ): ?self
     {
-        $daughters  = $this->daughters();
-        $return     = $daughters[ $id ] ?? null;
-
-        if( !$return ){
-            $return = Handler::instanciate(
-                $this->ww, 
-                [ 'name' => "ABSTRACT 404 WITCH", 'invoke' => '404' ]
-            );
+        foreach( $this->daughters() as $daughter ){
+            if( $daughter->id === $id ){
+                return $daughter;
+            }
         }
 
-        return  $return;
+        return Handler::instanciate(
+            $this->ww, 
+            [ 'name' => "ABSTRACT 404 WITCH", 'invoke' => '404' ]
+        );
     }
-    
     
     /**
      * Invoke the module 
@@ -473,7 +431,7 @@ class Witch
         {
             $this->ww->debug( "Try to reach unnamed module");
             return false;
-        }        
+        }
         
         if( !isset($this->modules[ $moduleInvoked ]) ){
             $this->invoke( $moduleInvoked );
@@ -481,7 +439,6 @@ class Witch
         
         return $this->modules[ $moduleInvoked ];
     }
-    
 
     /**
      * Read witch module result, invoke it if needed
@@ -498,190 +455,170 @@ class Witch
         
         return $module->getResult() ?? "";
     }
-        
     
     /**
      * Update Witch
-     * @param array $params
-     * @return int|false
+     * @param array $inputs
+     * @return self
      */
-    function edit( array $params ): int|false
+    function edit( array $inputs ): self
     {
-        foreach( $params as $field => $value ){
-            if( !in_array($field, self::FIELDS) ){
-                unset($params[ $field ]);
+        $exitingInputs  = array_keys($inputs);
+
+        if( in_array('name', $exitingInputs)
+            && !empty($name = trim( (string) $inputs['name'] )) 
+        ){
+            $this->name     = $name;
+        }
+        
+        if( in_array('data', $exitingInputs) )
+        {
+            $this->data = null;
+            if( $data = trim( (string) $inputs['data'] ) ){
+                $this->data = $data;
             }
         }
         
-        // Name cannot be set to empty string
-        if( !empty($params['name']) ){
-            $params['name']   = trim($params['name']);
+        if( in_array('site', $exitingInputs) )
+        {
+            $this->site = null;
+            if( (is_object( $inputs['site'] ) 
+                    && is_a( $inputs['site'], Website::class ))
+                || !empty($inputs['site']) 
+            ){
+                $this->site = trim( (string) $inputs['site']);
+            }
         }
         
-        if( empty($params['name']) ){
-            unset($params['name']);
+        if( in_array('status', $exitingInputs) )
+        {
+            $this->statusLevel  = (int) $inputs['status'];
+            $this->status       = null;
         }
         
-        $paramsKeyArray = array_keys($params);
+        if( in_array('invoke', $exitingInputs) )
+        {
+            $this->invoke = null;
+            if( $invoke = trim( (string) $inputs['invoke'] ) ){
+                $this->invoke = $invoke;
+            }
+        }
         
-        // If invoke is set to null
-        if( in_array('invoke', $paramsKeyArray) && is_null($params['invoke']) )
+        if( in_array('cauldron', $exitingInputs) )
         {
-            //$params['site'] = null;
-            $params['url']  = null;
+            $this->cauldronId = null;
+            if( isset($inputs['cauldron']) 
+                && ctype_digit(strval($inputs['cauldron'])) 
+            ){
+                $this->cauldronId = (int) $inputs['cauldron'];
+            }
+
+            if( $this->cauldronId !== $this->cauldron?->id ){
+                $this->cauldron   = null;
+            }
         }
-        // If invoke is not set but is actually null
-        elseif( !in_array('invoke', $paramsKeyArray) && is_null($this->properties['invoke']) )
-        {
-            //$params['site'] = null;
-            $params['url']  = null;
+
+        if( in_array('cauldron_priority', $exitingInputs) ){
+            $this->cauldronPriority = (int) $inputs['cauldron_priority'];
         }
-        // If site is set to null
-        elseif( in_array('site', $paramsKeyArray) && empty($params['site']) )
+
+        if( in_array('context', $exitingInputs) )
         {
-            $params['site']     = null;
-            $params['url']      = null;
-            $params['invoke']   = null;
+            $this->context = null;
+            if( $context = trim( (string) $inputs['context'] ) ){
+                $this->context = $context;
+            }
         }
-        // If site is not set but is actually null
-        elseif( !in_array('site', $paramsKeyArray) && is_null($this->properties['site']) )
+
+        if( in_array('datetime', $exitingInputs) )
         {
-            $params['site']     = null;
-            $params['url']      = null;
-            $params['invoke']   = null;
+            if( is_object( $inputs['datetime'] ) 
+                    && is_a( $inputs['datetime'], '\DateTime' ) ){
+                $this->datetime = $inputs['datetime'];
+            }
+            else {
+                $this->datetime = new \DateTime( $inputs['datetime'] );
+            }
         }
-        // Invoke and site are valid and URL update is required
-        elseif( in_array('url', $paramsKeyArray) )
-        {
-            $site       = $params['site'] ?? $this->properties['site'];
+
+        if( in_array('priority', $exitingInputs) ){
+            $this->priority = (int) $inputs['priority'];
+        }
+        
+        if( isset($inputs['url']) 
+            && !empty($this->invoke) 
+            && !empty($this->site) 
+        ){
+            $this->url = Handler::checkUrls( 
+                $this->ww, 
+                $this->site, 
+                [Tools::urlCleanupString( $inputs['url'] )], 
+                $this->id 
+            );
+        }
+        elseif(  
+            in_array('url', $exitingInputs)
+            && !empty($this->invoke) 
+            && !empty($this->site) 
+        ){
             $urlArray   = [];
-            
-            // If url is set to a value (ie not null)
-            if( !is_null($params['url']) ){
-                $urlArray[] = Tools::urlCleanupString( $params['url'] );
-            }
-            else 
-            {
-                $rootUrl    = ""; 
-                if( $this->mother() ){
-                    $rootUrl    = $this->mother()->getClosestUrl( $site );
-                }
-                
-                if( !empty($rootUrl) ){
-                    $rootUrl .= '/';
-                }
-                else {
-                    $urlArray[] = '';
-                }
-                
-                $rootUrl    .=  Tools::cleanupString($params['name'] ?? $this->name);
-                $urlArray[] =   $rootUrl;                
+            $rootUrl    = ""; 
+            if( $this->mother() ){
+                $rootUrl    = $this->mother()->getClosestUrl( $this->site );
             }
             
-            if( !empty($urlArray) ){
-                $params['url'] = Handler::checkUrls( $this->ww, $site, $urlArray, $this->id );
+            if( !empty($rootUrl) ){
+                $rootUrl .= '/';
             }
-        }
-        
-        if( empty($params) ){
-            return false;
-        }
-        
-        $updateResult = DataAccess::update($this->ww, $params, ['id' => $this->id]);
-        
-        if( $updateResult === false ){
-            return false;
-        }
-        
-        foreach( $params as $field => $value ){
-            $this->properties[$field] = $value;
+            else {
+                $urlArray[] = '';
+            }
+            
+            $rootUrl    .=  Tools::cleanupString( $this->name );
+            $urlArray[] =   $rootUrl;                
+            
+            $this->url = Handler::checkUrls( 
+                $this->ww, 
+                $this->site, 
+                $urlArray, 
+                $this->id 
+            );
         }
 
-        Handler::readProperties( $this );
+        if(
+            isset( $this->url )  
+            && (!isset( $this->invoke ) || !isset( $this->site ))
+        ){
+            $this->url = null;
+        }
 
-        return $updateResult;
+        if(  
+            isset( $this->invoke )
+            && (!isset( $this->url ) || !isset( $this->site ))
+        ){
+            $this->invoke = null;
+        }
+
+        return $this;
     }
-    
+
     /**
-     * Add a new witch daughter 
+     * Add a new daughter 
      * @param array $params 
-     * @return self|false 
+     * @return self
      */
-    function createDaughter( array $params ): self|false
+    function newDaughter( array $params ): self
     {
-        // Name cannot be set to empty string 
-        $params['name'] = trim( $params['name'] ?? "" );
+        $witch      = new self();
+        $witch->ww  = $this->ww;
         
-        if( empty($params['name']) ){
-            return false;
-        }
-        
-        if( $this->depth == $this->ww->depth ){
-            Handler::addLevel($this->ww);
-        }
-        
-        $newDaughterPosition                        = $this->position;
-        $newDaughterPosition[ ($this->depth + 1) ]  = DataAccess::getNewDaughterIndex($this->ww, $this->position);
-        
-        if( !isset($params['site']) )
-        {
-            $params['site'] = $this->site;
+        $this->daughters();
 
-            if( !isset($params['status']) ){
-                $params['status'] = $this->statusLevel;
-            }    
-        }
-
-        if( empty($params['site']) )
-        {
-            $params['url']      = null;
-            $params['invoke']   = null;
-        }
-        elseif( empty($params['invoke']) ){
-            $params['url']      = null;
-        }        
-        else
-        {
-            $urlArray   = [];
-            
-            // If url is set to a value (ie not null)
-            if( $params['url'] ?? false ){
-                $urlArray[] = Tools::urlCleanupString( $params['url'] );
-            }
-            else 
-            {
-                $rootUrl    = $this->getClosestUrl( $params['site'] );
-                
-                if( !empty($rootUrl) ){
-                    $rootUrl .= '/';
-                }
-                else {
-                    $urlArray[] = '';
-                }
-                
-                $rootUrl    .=  Tools::cleanupString($params['name']);
-                $urlArray[] =   $rootUrl;                
-            }
-
-            if( !empty($urlArray) ){
-                $params['url'] = Handler::checkUrls( $this->ww, $params['site'], $urlArray, $this->id );
-            }
-        }        
+        $this->daughters[]  = $witch->edit( $params );
+        $witch->mother      = $this;
         
-        foreach( $newDaughterPosition as $level => $levelPosition ){
-            $params[ "level_".$level ] = $levelPosition;
-        }
-        
-        $newWitchId = DataAccess::create($this->ww, $params);
-        if( !$newWitchId ){
-            return false;
-        }
-
-        $params['id'] = $newWitchId;
-
-        return Handler::instanciate( $this->ww, $params );
+        return $witch;
     }
-        
     
     /**
      * Get closest ancestor url for a given site
@@ -707,43 +644,21 @@ class Witch
         return $url;
     }
     
-    
     /**
      * Delete witch if it's not the root,
      * Delete all descendants and their associated cauldron if this is their only witch association
-     * @param bool $fetchDescendants
      * @return bool
      */
-    function delete( bool $fetchDescendants=true ): bool
+    function delete( ): bool
     {
-        if( is_null($this->id) || $this->mother() === false || $this->depth == 0 ){
+        if( is_null($this->id) // Not saved
+            || $this->depth == 0 // WW Root witch
+            || $this->mother() === false // Realtive root witch
+        ){
             return false;
         }
         
-        if( $fetchDescendants ){
-            Handler::addDaughters( 
-                $this, 
-                DataAccess::fetchDescendants($this->ww, $this->id, true) 
-            );
-        }
-        
-        $deleteIds = array_keys($this->daughters ?? []);
-        foreach( $this->daughters ?? [] as $daughter ){
-            if( !$daughter->delete(false) ){
-                return false;
-            }
-        }
-        
-        if( $this->hasCauldron() ){
-            $this->cauldron()->removeWitch( $this );
-        }
-        
-        
-        if( $fetchDescendants ){
-            $deleteIds[] = $this->id;
-        }
-        
-        return DataAccess::delete($this->ww, $deleteIds);
+        return Handler::delete( $this );
     }    
     
     /**
@@ -760,8 +675,6 @@ class Witch
         return $this->cauldron()->removeWitch( $this );
     }
     
-
-        
     /**
      * Test if witch is a descendant
      * @param self $potentialDescendant
@@ -769,16 +682,16 @@ class Witch
      */
     function isParent( self $potentialDescendant ): bool
     {
-        $potentialDescendantPasition = $potentialDescendant->position;
         foreach( $this->position as $level => $levelPosition ){
-            if( empty($potentialDescendantPasition[ $level ]) ||  $potentialDescendantPasition[ $level ] != $levelPosition ){
+            if( !$potentialDescendant->position($level) 
+                ||  $potentialDescendant->position($level) != $levelPosition 
+            ){
                 return false;
             }
         }
         
         return true;
     }
-    
     
     /**
      * Generate this witch url, 
@@ -804,16 +717,52 @@ class Witch
         return call_user_func([$website, $method], $this->url, $queryParams ?? null);
     }
     
+
+    function updateRelativesUrls( self $destination )
+    {
+        if( !$previousUrl = $this->mother()?->getClosestUrl() ){
+            return;
+        }
+        $previousUrl .= '/';
+
+        $destinationUrl = $destination->getClosestUrl( $this->site );
+        if( $destinationUrl ){
+            $destinationUrl .= '/';
+        }
+
+        $this->replaceUrls( $previousUrl, $destinationUrl );
+
+        return;
+    }
     
+    private function replaceUrls( string $search, string $replace )
+    {
+        if( str_starts_with($this->url ?? "", $search) )
+        {
+            $url = $replace.substr( $this->url, strlen($search) );
+            $this->url = $url;
+        }
+
+        foreach( $this->daughters() as $daughter ){
+            $daughter->replaceUrls( $search, $replace );
+        }
+        
+        return;
+    }
+
+
     function moveTo( self $witch, array $order=[] ): bool
     {
         $this->ww->db->begin();
         try {
+            $this->updateRelativesUrls( $witch );
             $this->innerTransactionMoveTo( $witch );
+            $this->save( false );
+
             if( $order ){
-                $this->reorderDaughters( $order );
+                Handler::setPriorities($this, $order);
             }
-        } 
+        }
         catch( \Exception $e ) 
         {
             $this->ww->log->error($e->getMessage());
@@ -825,55 +774,21 @@ class Witch
         return true;        
     }
     
-    private function innerTransactionMoveTo( self $witch, array $urlSiteRewrite=[] )
+    /**
+     * Action to encapsulate in try/catch bock
+     */
+    private function innerTransactionMoveTo( self $witch )
     {
-        $position = $witch->position;
-        
-        $depth = count($position);
-        
-        if( $depth == $this->ww->depth + 1 ){
-            Handler::addLevel($this->ww);
-        }
-        
-        $newPosition                    = $position;
-        $newPosition[ ($depth + 1) ]    = DataAccess::getNewDaughterIndex($this->ww, $position);
-        
-        $params = [];
-        for( $i=1; $i <= $this->ww->depth; $i++ ){
-            $params[ "level_".$i ] = NULL;
-        }
-        
-        foreach( $newPosition as $level => $levelPosition ){
-            $params[ "level_".$level ] = $levelPosition;
+        $this->daughters();
+
+        $this->mother   = $witch;
+        $this->position = null;
+        $this->depth    = $witch->depth + 1;
+
+        foreach( $this->daughters as $daughter ){
+            $daughter->innerTransactionMoveTo( $this );
         }
 
-        if( $this->mother() && !empty($this->properties['url']) && !empty($this->properties['site']) )
-        {
-            $previousUrl = $this->mother()->getClosestUrl();
-            if( str_starts_with($this->url, $previousUrl) )
-            {
-                $url            = substr( $this->url, strlen($previousUrl) );
-                $destinationUrl = $urlSiteRewrite[ $this->site ] ?? $witch->getClosestUrl( $this->site );
-                $params['url']  = $destinationUrl.$url;
-                if( substr($params['url'], 0, 1) === '/' && substr($params['url'], 1, 1) === '/' ){
-                    $params['url']  = substr($params['url'], 1);
-                }
-                $urlSiteRewrite[ $this->site ] = $params['url'];
-            }
-        }
-        
-        $daughters      = $this->daughters();
-        DataAccess::update($this->ww, $params, ['id' => $this->id]);
-        $this->position = $newPosition;
-        $this->depth    = count( $this->position );
-
-        if( !empty($daughters) ){
-            foreach( $daughters as $daughterWitch )
-            {
-                $daughterWitch->innerTransactionMoveTo( $this, $urlSiteRewrite );
-            }
-        }
-        
         return;
     }
 
@@ -881,14 +796,26 @@ class Witch
     {
         $this->ww->db->begin();
         try {
-            $newWitch = $this->innerTransactionCopyTo( $witch );
+
+            if( $previousUrl = $this->mother()?->getClosestUrl() )
+            {
+                $previousUrl .= '/';
+
+                if( $destinationUrl = $witch->getClosestUrl( $this->site ) ){
+                    $destinationUrl .= '/';
+                }
+            }
+            
+            $newWitch = $this->innerTransactionCopyTo( $witch, $previousUrl, $destinationUrl );
+            $newWitch->save( false );
+
             if( $order ){
                 foreach( $order as $key => $orderId ){
                     if( $orderId === $this->id ){
                         $order[ $key ] = $newWitch->id;
                     }
                 }
-                $witch->reorderDaughters( $order );
+                Handler::setPriorities($witch, $order);
             }
         } 
         catch( \Exception $e ) 
@@ -902,46 +829,43 @@ class Witch
         return $newWitch;        
     }
 
-    private function innerTransactionCopyTo( self $witch, array $urlSiteRewrite=[] )
+    /**
+     * Action to encapsulate in try/catch bock
+     */
+    private function innerTransactionCopyTo( self $witch, ?string $previousUrl=null, ?string $destinationUrl=null )
     {
-        $excludeFields = [ "id", "datetime" ];
-        $params = [
-            "status"            => $this->statusLevel,
-            "cauldron"          => $this->cauldronId,
-            "cauldron_priority" => 0,
-        ];
+        Handler::writeProperties( $this );
 
-        foreach( self::FIELDS as $field ){
-            if( !in_array($field, $excludeFields) && !in_array($field, array_keys($params)) ){
-                $params[ $field ] = $this->$field;
+        $excludeFields = ['id', 'datetime'];
+        for( $i=1; $i<=$this->ww->depth; $i++ ){
+            $excludeFields[] = 'level_'.$i;
+        }
+
+        $params = [];
+        foreach( $this->properties as $key => $value ){
+            if( !in_array($key, $excludeFields) ){
+                $params[ $key ] = $value;
             }
         }
-        
-        if( $this->mother() && !empty($params['url']) && !empty($params['site']) )
-        {
-            $previousUrl = $this->mother()->getClosestUrl();
-            if( str_starts_with($params['url'], $previousUrl) )
-            {
-                $url            = substr( $params['url'], strlen($previousUrl) );
-                $destinationUrl = $urlSiteRewrite[ $this->site ] ?? $witch->getClosestUrl( $this->site );
-                $params['url']  = $destinationUrl.$url;
-                $urlSiteRewrite[ $this->site ] = $params['url'];
-            }
+
+        if( !empty($destinationUrl) 
+            && !is_null($destinationUrl) 
+            && !empty($params['url']) 
+            && str_starts_with($params['url'], $previousUrl) 
+        ){
+            $url = $destinationUrl.substr( $params['url'], strlen($previousUrl) );
+            $params['url'] = $url;
         }
+
+        $newWitch   = $witch->newDaughter( $params );
         
-        $newWitch   = $witch->createDaughter( $params );
-        $daughters  = $this->daughters();
-        
-        if( !empty($daughters) ){
-            foreach( $daughters as $daughterWitch )
-            {
-                $daughterWitch->innerTransactionCopyTo( $newWitch, $urlSiteRewrite );
-            }
+        foreach( $this->daughters() ?? [] as $daughterWitch ){
+            $daughterWitch->innerTransactionCopyTo( $newWitch, $previousUrl, $destinationUrl );
         }
         
         return $newWitch;
     }
-    
+
     /**
      * Cauldron witch content, store it in the Cairn (if exists, only read it)
      * @return ?Cauldron
@@ -962,7 +886,6 @@ class Witch
         return $this->cauldron;
     }
     
-
     /**
      * witch website
      * @return ?Website
@@ -998,6 +921,90 @@ class Witch
         return $this->site;
     }
     
+    /**
+     * Save witch in BDD
+     * @param bool $transactionMode : set to false to escape transactional mode
+     * @return ?bool true for success, false for failure, null for no effect
+     */
+    function save( bool $transactionMode=true ): ?bool
+    {
+        if( !$transactionMode ){
+            return $this->saveAction();
+        }
+
+        $this->ww->db->begin();
+        try {
+            $result = $this->saveAction();
+
+            if( $result === false )
+            {
+                $this->ww->db->rollback();
+                return false;
+            }
+        } 
+        catch( \Exception $e ) 
+        {
+            $this->ww->log->error($e->getMessage());
+            $this->ww->db->rollback();
+            return false;
+        }
+        $this->ww->db->commit();
+
+        return $result;
+    }
+
+    /**
+     * Action to encapsulate in try/catch bock
+     */
+    protected function saveAction()
+    {
+        $this->position();
+        $this->daughters();
+
+        $updated    = false;
+        $result     = Handler::save( $this );
+
+        if( $result === false ){
+            return false;
+        }
+        elseif( $result ){
+            $updated = true;
+        }
+
+        foreach( $this->daughters ?? [] as $daughter ) 
+        {
+            $daughterSave = $daughter->save( false );
+
+            if( $daughterSave === false ){
+                return false;
+            }
+            elseif( $result ){
+                $updated = true;
+            }
+        }
+
+        if( $updated === false ){
+            return null;
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return ?int|int[]
+     */
+    function position( ?int $level=null )
+    {
+        if( is_null($this->position) ){
+            Handler::position( $this );
+        }
+
+        if( !$level ){
+            return $this->position;
+        }
+
+        return $this->position[ $level ] ?? null;
+    }
 
 
 }

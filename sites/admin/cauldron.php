@@ -48,7 +48,7 @@ switch( $action = Tools::filterAction(
     ]
 ) ){
     case 'publish':
-        if( $cauldron->draft()->readInputs()->publish() === false ){
+        if( $cauldron->draft()->edit()->publish() === false ){
             $this->ww->user->addAlert([
                 'level'     =>  'error',
                 'message'   =>  "Error, publication canceled"
@@ -67,7 +67,7 @@ switch( $action = Tools::filterAction(
     case 'save-and-return':
         $return = true;
     case 'save':
-        $saved = $cauldron->draft()->readInputs()->save();
+        $saved = $cauldron->draft()->edit()->save();
         
         if( $saved === false )
         {

@@ -3,6 +3,7 @@ namespace WW;
 
 use WW\DataAccess\WitchDataAccess;
 use WW\Handler\CauldronHandler;
+use WW\Handler\WitchHandler;
 
 /**
  * Class that handles witch summoning and modules invocation
@@ -129,6 +130,10 @@ class Cairn
             $sisters    = $conf[ $index ]['sisters']    ?? false;
             $children   = $conf[ $index ]['children']   ?? false;
 
+            $prevConditions = ($conf[ $index ] ?? false)?  
+                ($conf[ $index ]['conditions'] ?? false): 
+                null;
+
             $conf[ $index ] = [
                 'match'         => $match,
                 'entries'       => array_merge(
@@ -145,6 +150,11 @@ class Cairn
                 'sisters'   => $arboConf( $sisters, $entryConf['sisters'] ?? false ),
                 'children'  => $arboConf( $children, $entryConf['children'] ?? false ),
             ];
+
+            $conditions = $entryConf['conditions'] ?? false;
+            if( $conditions !== false && $prevConditions !== false ){
+                $conf[ $index ]['conditions'] = array_merge_recursive( ($prevConditions ?? []), $conditions );
+            }
         }
 
         foreach( $conf as $index => $confItem ){
@@ -233,29 +243,27 @@ class Cairn
     private static function getChildrenCraftData( Witch $witch, mixed $craftLevel )
     {
         $cauldronsConf = [];
-        if( !empty($witch->daughters) ){
-            foreach( $witch->daughters as $daughterWitch )
-            {
-                if( $daughterWitch->hasCauldron() ){
-                    $cauldronsConf[] = $daughterWitch->cauldronId;
-                }
-
-                if( $craftLevel == "*" ){
-                    $craftSubLevel = $craftLevel;
-                }
-                else 
-                {
-                    $craftSubLevel = $craftLevel - 1;
-                    if( $craftSubLevel == 0 ){
-                        continue;
-                    }
-                }
-                
-                $cauldronsConf = array_merge_recursive(
-                    $cauldronsConf, 
-                    self::getChildrenCraftData($daughterWitch, $craftSubLevel) 
-                );
+        foreach( $witch->daughters ?? [] as $daughterWitch )
+        {
+            if( $daughterWitch->hasCauldron() ){
+                $cauldronsConf[] = $daughterWitch->cauldronId;
             }
+
+            if( $craftLevel == "*" ){
+                $craftSubLevel = $craftLevel;
+            }
+            else 
+            {
+                $craftSubLevel = $craftLevel - 1;
+                if( $craftSubLevel == 0 ){
+                    continue;
+                }
+            }
+            
+            $cauldronsConf = array_merge_recursive(
+                $cauldronsConf, 
+                self::getChildrenCraftData($daughterWitch, $craftSubLevel) 
+            );
         }
         
         return $cauldronsConf;
@@ -432,7 +440,7 @@ class Cairn
     {
         foreach( $this->witches as $witch )
         {
-            if( $witch->position === $position ){
+            if( $witch->position() === $position ){
                 return $witch;
             }
             $witchBuffer    = $witch;
@@ -440,7 +448,7 @@ class Cairn
             while( $continue && $witchBuffer )
             {
                 $continue = false;
-                foreach( $witchBuffer->position as $level => $value ){
+                foreach( $witchBuffer->position() as $level => $value ){
                     if( !isset($position[ $level ]) || $position[ $level ] != $value )
                     {
                         $witchBuffer    = $witchBuffer->mother;
@@ -449,21 +457,21 @@ class Cairn
                     }
                 }
                 
-                if( $witchBuffer && $witchBuffer->position == $position ){
+                if( $witchBuffer && $witchBuffer->position() == $position ){
                     return $witchBuffer;
                 }
                 elseif( $continue ){
                     continue;
                 }                
                 
-                foreach( $witchBuffer->daughters as $daughter ){
-                    if( $daughter->position == $position ){
+                foreach( $witchBuffer->daughters ?? [] as $daughter ){
+                    if( $daughter->position() == $position ){
                         return $daughter;
                     }
                     else
                     {
                         $level = $witchBuffer->depth + 1;
-                        if( $daughter->position[ $level ] == $position[ $level ] ) 
+                        if( $daughter->position( $level ) === $position[ $level ] ) 
                         {
                             $witchBuffer    = $daughter;
                             $continue       = true;
@@ -472,7 +480,7 @@ class Cairn
                     }
                 }
                 
-                if( $witchBuffer->position == $position ){
+                if( $witchBuffer->position() == $position ){
                     return $witchBuffer;
                 }
             }
@@ -509,18 +517,15 @@ class Cairn
 
     private function recursiveSearchById( Witch $witch, int $id ): ?Witch
     {
-        if( in_array($id, array_keys($witch->daughters())) ){
-            return $witch->daughters[ $id ];
-        }
-
-        foreach( $witch->daughters() as $daugther )
-        {
-            $result =  $this->recursiveSearchById( $daugther, $id );
-            if( $result ){
-                return $result;
+        foreach( $witch->daughters ?? [] as $daughter ){
+            if( $id === $daughter->id ){
+                return $daughter;
+            }
+            elseif( $search = $this->recursiveSearchById( $daughter, $id ) ){
+                return $search;
             }
         }
-
+        
         return null;
     }
 
@@ -576,5 +581,66 @@ class Cairn
         }
         
         return $return;
+    }
+
+
+    static function tree( Witch $witch, array $restrictions=[], ?int $currentId=null, ?array $hrefCallBack=null ): array
+    {
+                // Test site restrictions
+        if( (   is_array($restrictions['site'] ?? null)
+                && !is_null($witch->site)  
+                && !in_array($witch->site, $restrictions['site']) )
+                // Test status restrictions
+            || (is_numeric($restrictions['status'] ?? null) 
+                && $witch->statusLevel > $restrictions['status'] )
+        ){
+            return [];
+        }
+
+        $path = false;
+        if( !is_null($currentId) && $currentId == $witch->id ){
+            $path = true;
+        }
+        
+        $daughtersTrees = [];
+        foreach( WitchHandler::reorderWitches($witch->daughters ?? []) as $daughter )
+        {
+                    // Test site restrictions
+            if( (   is_array($restrictions['site'] ?? null)
+                    && !is_null($daughter->site)  
+                    && !in_array($daughter->site, $restrictions['site']) )
+                    // Test status restrictions
+                || (is_numeric($restrictions['status'] ?? null) 
+                    && $daughter->statusLevel > $restrictions['status'] )
+            ){
+                continue;
+            }
+
+            $subTree = self::tree( $daughter, $restrictions, $currentId, $hrefCallBack );
+
+            if( $subTree['path'] ){
+                $path = true;
+            }
+
+            $daughtersTrees[] = $subTree;
+        }
+
+        $site = $witch->site? (string) $witch->site: "";
+        $tree   = [ 
+            'id'                => $witch->id ?? uniqid('new_'),
+            'name'              => $witch->name,
+            'site'              => $site,
+            'description'       => $witch->data,
+            'cauldron'          => $witch->hasCauldron(),
+            'invoke'            => $witch->hasInvoke(),
+            'daughters'         => $daughtersTrees,
+            'path'              => $path,
+        ];
+
+        if( $hrefCallBack ){
+            $tree['href'] = call_user_func( $hrefCallBack, $witch );
+        }
+        
+        return $tree;
     }
 }

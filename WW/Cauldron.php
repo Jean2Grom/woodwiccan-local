@@ -3,13 +3,11 @@ namespace WW;
 
 use WW\Cauldron\CauldronContentInterface;
 use WW\Cauldron\CauldronContentTrait;
+use WW\Trait\PropertiesAccessTrait;
 use WW\Cauldron\Ingredient;
 use WW\Cauldron\Recipe;
-use WW\DataAccess\CauldronDataAccess as DataAccess;
 use WW\Handler\CauldronHandler as Handler;
 use WW\Handler\IngredientHandler;
-use WW\Handler\WitchHandler;
-use WW\Trait\PropertiesAccessTrait;
 
 class Cauldron implements CauldronContentInterface
 {
@@ -45,23 +43,22 @@ class Cauldron implements CauldronContentInterface
 
     public array $properties  = [];
 
-    public ?int $id         = null;
-    public ?int $status     = null;
-    public ?int $targetID   = null;
-    public ?string $name    = null;
-
-    /** @var null|string|Recipe */
-    public mixed $recipe;
-    public array $allowed = [];
-
-    public ?\stdClass $data     = null;
-    public ?int $priority       = null;
-    public ?\DateTime $datetime = null;
+    public ?int $id                     = null;
+    public ?self $target                = null;
+    public ?int $status                 = null;
+    public ?string $name                = null;
+    public null|string|Recipe $recipe   = null;
+    public ?\stdClass $data             = null;
+    public ?int $priority               = null;
     
-    public int $depth       = 0;
-    public ?array $position = null;
-
-    public ?self $parent;
+    public ?int $targetID       = null;
+    public array $allowed       = [];
+    public int $depth           = 0;
+    public ?array $position     = null;
+    public ?self $parent        = null;
+    protected ?array $content   = null;
+    public ?array $errors       = null;
+    public ?self $draft         = null;
 
     /** @var self[] */
     public array $children    = [];
@@ -74,13 +71,6 @@ class Cauldron implements CauldronContentInterface
 
     /** @var CauldronContentInterface[] */
     public array $pendingRemoveContents = [];
-
-    protected ?array $content   = null;
-
-    public ?array $errors       = null;
-
-    public ?self $target        = null;
-    public ?self $draft         = null;
 
     /** 
      * WoodWiccan container class to allow whole access to Kernel
@@ -104,7 +94,7 @@ class Cauldron implements CauldronContentInterface
         }
 
         if( $this->content($name) ){
-            if( is_a($this->content( $name ), __CLASS__) ){
+            if( is_a($this->content( $name ), self::class) ){
                 return $this->content( $name );
             }
             else {
@@ -132,41 +122,19 @@ class Cauldron implements CauldronContentInterface
     }
     
     /**
-     * @return array [ $level => $int ]
+     * @return ?int|int[]
      */
-    function position()
+    function position( ?int $level=null )
     {
-        if( !isset($this->position) ){
-            if( is_null($this->parent) )
-            {
-                $this->position = [];
-                $this->depth    = 0;
-            }
-            else
-            {
-                $this->position = $this->parent->position();
-                
-                $newIndex       = DataAccess::getNewPosition( $this->parent );
-                $this->depth    = $this->parent->depth + 1;
-
-                // $newIndex       = 1;
-                // $this->depth    = $this->parent->depth + 1;
-                // foreach( $this->parent->children as $child ){
-                //     if( $child->levelPosition( $this->depth ) >= $newIndex ){
-                //         $newIndex  = $child->levelPosition( $this->depth ) + 1;
-                //     }
-                // }
-                
-                $this->position[ $this->depth ] = $newIndex;
-
-            }
+        if( is_null($this->position) ){
+            Handler::position( $this );
         }
 
-        return $this->position;
-    }
+        if( !$level ){
+            return $this->position;
+        }
 
-    function levelPosition( int $level ){
-        return $this->position()[ $level ] ?? null;
+        return $this->position[ $level ] ?? null;
     }
 
     /**
@@ -382,34 +350,12 @@ class Cauldron implements CauldronContentInterface
     {
         $this->position();
 
-        if( $this->depth > $this->ww->cauldronDepth ){
-            DataAccess::increaseDepth( $this->ww );
-        }
-        
-        if( !$this->exist() )
-        {
-            Handler::writeProperties($this); 
-            $result = DataAccess::insert($this); 
-            
-            if( $result ){
-                $this->id = (int) $result;
-            }
-        }
-        else 
-        {
-            $properties = $this->properties;
-
-            Handler::writeProperties($this);
-            $result = DataAccess::update( $this, array_diff_assoc($this->properties, $properties) );
-        }
-        
-        if( $result === false ){
+        if( !Handler::save($this) ){
             return false;
         }
-        $result = true;
         
         // Deletion of pending deprecated contents
-        $result = $result && $this->purge();
+        $result = $this->purge();
 
         // Saving contents
         foreach( $this->ingredients as $ingredient ){
@@ -520,7 +466,7 @@ class Cauldron implements CauldronContentInterface
         return $result;
     }
 
-    function delete( bool $transactionMode=true ): bool
+    function delete( bool $transactionMode=true ): ?bool
     {
         if( $this->target?->draft === $this ){
             $this->target->draft = null;
@@ -529,10 +475,12 @@ class Cauldron implements CauldronContentInterface
         if( !$transactionMode ){
             return $this->deleteAction();
         }
-        $this->ww->db->begin();
 
+        $this->ww->db->begin();
         try {
-            if( !$this->deleteAction() )
+            $result = $this->deleteAction();
+
+            if( $result === false )
             {
                 $this->ww->db->rollback();
                 return false;
@@ -544,26 +492,25 @@ class Cauldron implements CauldronContentInterface
             $this->ww->db->rollback();
             return false;
         }
-
         $this->ww->db->commit();
-        return true;
+
+        return $result;
     }
 
-    protected function deleteAction(): bool
+    protected function deleteAction(): ?bool
     {
         $result = true;
-
         foreach( $this->ingredients as $ingredient ){
-            $result = $result && $ingredient->delete();
+            $result = $result && ($ingredient->delete() !== false);
         }
 
         foreach( $this->children as $child ) 
         {
-            if( !is_a($child, __CLASS__) ){
+            if( !is_a($child, self::class) ){
                 continue;
             }
 
-            $result = $result && $child->delete( false );
+            $result = $result && ( $child->delete(false) !== false );
         }
 
         if( $result === false ){
@@ -575,17 +522,13 @@ class Cauldron implements CauldronContentInterface
             return false;
         }
         
-        if( $this->exist() ){
-            return DataAccess::delete( $this ) !== false;
-        }
-        
-        return true;
+        return Handler::delete( $this );
     }
   
     function add( CauldronContentInterface $content ): bool
     {
         // Cauldron case
-        if( is_a($content, __CLASS__) ){
+        if( is_a($content, self::class) ){
             return $this->addCauldron( $content );
         }
 
@@ -616,16 +559,20 @@ class Cauldron implements CauldronContentInterface
         return true;
     }
 
-    function readInputs( mixed $inputs=null ): self
+    function edit( ?array $inputs=null ): self
     {
         $params = $inputs ?? $this->ww->request->inputs();
-
+        
         if( !$params ){
             return $this;
         }
         
         if( isset($params['name']) ){
             $this->name = htmlspecialchars($params['name']);
+        }
+        
+        if( isset($params['priority']) ){
+            $this->priority = (int) $params['priority'];
         }
         
         $priorityInterval   = 100;
@@ -757,11 +704,11 @@ class Cauldron implements CauldronContentInterface
                 );
 
                 if( !empty($contentParams['content']) ){
-                    $content->readInputs( $contentParams );
+                    $content->edit( $contentParams );
                 }
             }
             else {
-                $content->readInputs( $contentParams );
+                $content->edit( $contentParams );
             }
 
             if( $content->isIngredient() && !in_array($content, $this->ingredients) ){
@@ -967,8 +914,9 @@ class Cauldron implements CauldronContentInterface
         {
             $this->status = null;
             $this->save( false );
+
             if( $this->targetID ){
-                DataAccess::updateTargetID( $this->ww, $this->targetID, $this->id );
+                Handler::updateTargetID( $this->ww, $this->targetID, $this->id );
             }
         }
 
@@ -988,7 +936,10 @@ class Cauldron implements CauldronContentInterface
         }
         unset($this->witches[ $witchToRemoveKey ]);
         
-        WitchHandler::removeCauldron( $witch );
+        $witch->edit([
+            'cauldron'          => null, 
+            'cauldron_priority' => 0
+        ])->save();
 
         if( !$this->witches ){
             $this->delete();

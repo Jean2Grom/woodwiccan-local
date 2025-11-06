@@ -10,10 +10,10 @@ class FileCauldron extends Cauldron
     /** @var string[] */
     public array $pendingRemoveFiles = [];
 
-    function readInputs( mixed $inputs=null ): self
+    function edit( ?array $inputs=null ): self
     {
         $storagePath    = $this->content('storage-path')->value();
-        $return         = parent::readInputs( $inputs );
+        $return         = parent::edit( $inputs );
         $newStoragePath = $this->content('storage-path')->value();
 
         if( $newStoragePath !== $storagePath ){
@@ -34,7 +34,7 @@ class FileCauldron extends Cauldron
         return true;
     }
 
-    protected function deleteAction(): bool
+    protected function deleteAction(): ?bool
     {
         $this->pendingRemoveFiles[] = $this->content('storage-path')->value();
 

@@ -1,5 +1,6 @@
 <?php /** @var WW\Module $this */
 
+use WW\Cairn;
 use WW\Handler\WitchHandler;
 
 $currentId = $this->witch("target")?->id ?? $this->witch()?->id;
@@ -26,18 +27,19 @@ $obj->baseUrl       = $this->ww->website->getUrl("view");
 $obj->unSafeMode    = $this->config['navigationUnSafeMode'] ?? false;
 $obj->currentSite   = $this->ww->website->site;
 
-$root = WitchHandler::recursiveTree( 
+$tree = Cairn::tree( 
     $this->witch, 
-    $this->ww->website->sitesRestrictions, 
+    [
+        // 'site'      => $this->ww->website->sitesRestrictions, 
+        // 'status'    => $this->maxStatus, 
+    ],
     $currentId, 
-    $this->maxStatus, 
     [$obj, "href"] 
 );
 
-$tree           = [ $this->witch->id => $root ];
 $breadcrumb     = [ $this->witch->id ];
 $pathFound      = true;
-$daughters      = $root["daughters"];
+$daughters      = $tree["daughters"];
 $draggble       = true;
 $clipboardUrl   = $this->ww->website->getUrl('clipboard');
 $createUrl      = $this->ww->website->getUrl('create-witch');

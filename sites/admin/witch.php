@@ -136,7 +136,7 @@ switch( $action = Tools::filterAction(
         ]);
     break;
     
-    case 'edit-witch-menu-info':        
+    case 'edit-witch-menu-info':
         $witchNewData   = [
             'name'      =>  trim($this->ww->request->param('witch-name') ?? ""),
             'data'      =>  trim($this->ww->request->param('witch-data') ?? ""),
@@ -148,13 +148,21 @@ switch( $action = Tools::filterAction(
                 'message'   =>  "Witch name is missing"
             ]);
         }
-        else if( !$this->witch("target")->edit( $witchNewData ) ){
+        elseif( is_null(
+            $save = $this->witch("target")->edit( $witchNewData )->save()
+        ) ){
+            $this->ww->user->addAlert([
+                'level'     =>  'warning',
+                'message'   =>  "No update"
+            ]);
+        }
+        elseif( !$save ){
             $this->ww->user->addAlert([
                 'level'     =>  'error',
                 'message'   =>  "Error, witch was not updated"
             ]);
         }
-        else{
+        else {
             $this->ww->user->addAlert([
                 'level'     =>  'success',
                 'message'   =>  "Witch updated"
@@ -229,9 +237,9 @@ switch( $action = Tools::filterAction(
             }
         }
         
-        $edit = $this->witch("target")->edit( $witchNewData );
-        
-        if( $edit === 0 ){
+        if( is_null( 
+            $edit = $this->witch("target")->edit( $witchNewData )->save()
+        ) ){
             $this->ww->user->addAlert([
                 'level'     =>  'warning',
                 'message'   =>  "No update",
@@ -256,16 +264,27 @@ switch( $action = Tools::filterAction(
         
         $errors     = [];
         $success    = [];
-        foreach( $priorities as $witchId => $witchPriority ){
-            if( !$this->witch("target")->daughter( $witchId )->edit([ 'priority' => $witchPriority ]) ){
+        foreach( $priorities as $witchId => $witchPriority )
+        {
+            $save = $this->witch("target")->daughter( $witchId )->edit([ 
+                'priority' => $witchPriority 
+            ])->save();
+
+            if( $save === false ){
                 $errors[] = "<strong>".$this->witch("target")->daughter( $witchId )->name."</strong> priority not updated";
             }
-            else {
+            elseif( $save ){
                 $success[] = "<strong>".$this->witch("target")->daughter( $witchId )->name."</strong> priority updated";
             }
         }
         
-        if( empty($errors) ){
+        if( empty($errors) && empty($success) ){
+            $this->ww->user->addAlert([
+                'level'     =>  'warning',
+                'message'   =>  "No priority update"
+            ]);
+        }
+        elseif( empty($errors) ){
             $this->ww->user->addAlert([
                 'level'     =>  'success',
                 'message'   =>  "Priorities updated"
@@ -342,7 +361,7 @@ switch( $action = Tools::filterAction(
         if( !$cauldron 
             || !$folderCauldron->addCauldron( $cauldron ) 
             || !$cauldron->save() 
-            || !$this->witch("target")->edit([ 'cauldron' => $cauldron->id ]) 
+            || !$this->witch("target")->edit([ 'cauldron' => $cauldron->id ])->save() 
         ){
             $this->ww->user->addAlert([
                 'level'     =>  'error',
@@ -388,7 +407,7 @@ switch( $action = Tools::filterAction(
             ]);
             break;
         }
-        elseif( !$this->witch("target")->edit([ 'cauldron' => $importedCauldronWitch->cauldronId ]) )
+        elseif( !$this->witch("target")->edit([ 'cauldron' => $importedCauldronWitch->cauldronId ])->save() )
         {
             $this->ww->user->addAlert([
                 'level'     =>  'error',
@@ -433,7 +452,7 @@ switch( $action = Tools::filterAction(
             break;
         }
 
-        if( !$witch->edit([ 'cauldron' => $this->witch("target")->cauldronId ]) )
+        if( !$witch->edit([ 'cauldron' => $this->witch("target")->cauldronId ])->save() )
         {
             $this->ww->user->addAlert([
                 'level'     =>  'error',
@@ -447,7 +466,7 @@ switch( $action = Tools::filterAction(
             'message'   =>  "Cauldron added to witch"
         ]);
 
-        header( 'Location: '.$this->ww->website->getFullUrl('view', [ 'id' => $witch->id ])."#tab-cauldron-part" );
+        header( 'Location: '.$this->ww->website->getFullUrl('view', [ 'id' => $witch->id ]) );
         exit();
     break;
     
@@ -481,13 +500,14 @@ switch( $action = Tools::filterAction(
             break;
         }
         
-        $newWitchData   = [
+        $params   = [
             'name'          =>  $this->witch("target")->name,
             'data'          =>  $this->witch("target")->data,
             'cauldron'      =>  $this->witch("target")->cauldronId 
         ];
         
-        $newWitch = $witch->createDaughter( $newWitchData );
+        $newWitch = $witch->newDaughter( $params );
+        $newWitch->save();
         
         if( !$newWitch )
         {
@@ -503,7 +523,7 @@ switch( $action = Tools::filterAction(
             'message'   =>  "New cauldron's witch created"
         ]);
         
-        header( 'Location: '.$this->ww->website->getFullUrl('view', [ 'id' => $newWitch->id ])."#tab-cauldron-part" );
+        header( 'Location: '.$this->ww->website->getFullUrl('view', [ 'id' => $newWitch->id ]) );
         exit();
     break;
     

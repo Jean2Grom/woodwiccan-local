@@ -18,7 +18,7 @@ class ProfilesCauldron extends Cauldron
         ];
     }
 
-    function edit( ?string $filename=null, ?array $params=null )
+    function form( ?string $filename=null, ?array $params=null )
     {
         if( is_null($this->profiles) )
         {
@@ -71,7 +71,7 @@ class ProfilesCauldron extends Cauldron
         return;
     }
 
-    function readInputs( mixed $inputs=null ): self
+    function edit( ?array $inputs=null ): self
     {
         $formattedInputs = $inputs;
 
@@ -86,7 +86,7 @@ class ProfilesCauldron extends Cauldron
 
         $formattedInputs['content'] = $profileInput;
 
-        parent::readInputs( $formattedInputs );
+        parent::edit( $formattedInputs );
 
         return $this;
     }

@@ -3,7 +3,9 @@
 <div style="display: flex; flex-direction: column;">
     <?=$this->content('name') ?>
     <div>
-        <img src="<?=$this->file->value() ?>" style="max-width: 100%;" /> 
+        <?php if($this->file): ?>
+            <img src="<?=$this->file?->value() ?>" style="max-width: 100%;" /> 
+        <?php endif; ?>
     </div>
     <?=$this->content('caption') ?>
 </div>

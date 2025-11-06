@@ -17,7 +17,7 @@ class ConnexionCauldron extends Cauldron
         ];
     }
 
-    function readInputs( mixed $inputs=null ): self
+    function edit( ?array $inputs=null ): self
     {
         if( is_null($this->content) ){
             $this->generateContent();
@@ -48,9 +48,9 @@ class ConnexionCauldron extends Cauldron
             $formattedInputs['content']['pass_hash'] ?? []
         );
 
-        $this->content('email')->readInputs( $formattedInputs['content']['email'] );
-        $this->content('login')->readInputs( $formattedInputs['content']['login'] );
-        $this->content('pass_hash')->readInputs( $formattedInputs['content']['pass_hash'] );
+        $this->content('email')->edit( $formattedInputs['content']['email'] );
+        $this->content('login')->edit( $formattedInputs['content']['login'] );
+        $this->content('pass_hash')->edit( $formattedInputs['content']['pass_hash'] );
 
         return $this;
     }
@@ -60,28 +60,7 @@ class ConnexionCauldron extends Cauldron
     {
         $this->position();
 
-        if( $this->depth > $this->ww->cauldronDepth ){
-            DataAccess::increaseDepth( $this->ww );
-        }
-        
-        if( !$this->exist() )
-        {
-            Handler::writeProperties($this); 
-            $result = DataAccess::insert($this); 
-            
-            if( $result ){
-                $this->id = (int) $result;
-            }
-        }
-        else 
-        {
-            $properties = $this->properties;
-
-            Handler::writeProperties($this);
-            $result = DataAccess::update( $this, array_diff_assoc($this->properties, $properties) );
-        }
-        
-        if( $result === false ){
+        if( !Handler::save($this) ){
             return false;
         }
         
@@ -123,7 +102,7 @@ class ConnexionCauldron extends Cauldron
     }
 
 
-    protected function deleteAction(): bool
+    protected function deleteAction(): ?bool
     {
         $result = true;
 
@@ -149,11 +128,7 @@ class ConnexionCauldron extends Cauldron
             return false;
         }
         
-        if( $this->exist() ){
-            return DataAccess::delete( $this ) !== false;
-        }
-        
-        return true;
+        return Handler::delete( $this );
     }
 
     protected function generateContent(): void
