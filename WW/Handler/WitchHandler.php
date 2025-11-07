@@ -330,7 +330,9 @@ class WitchHandler
      */
     static function unsetMother( Witch $witch ): Witch
     {
-        self::removeDaughter( $witch->mother, $witch );
+        if( $witch->mother ){
+            self::removeDaughter( $witch->mother, $witch );
+        }
         return $witch;
     }
     
