@@ -176,7 +176,7 @@ class Witch
      */
     function mother(): self|false
     {
-        if( is_null($this->id) ){
+        if( is_array($this->position) && count($this->position) === 0 ){
             return false;
         }
         
@@ -191,7 +191,7 @@ class Witch
             }
         }
         
-        if( is_null($this->mother) ){
+        if( is_null($this->mother) && !is_null($this->id) ){
             Handler::setMother( $this, Handler::fetchAncestors($this) );
         }
         
