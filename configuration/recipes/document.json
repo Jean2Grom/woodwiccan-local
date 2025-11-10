@@ -1,0 +1,21 @@
+{
+    "name": "document",
+    "composition": [
+        {
+            "name": "file",
+            "type": "file"
+        },
+        {
+            "name": "name",
+            "type": "string"
+        },
+        {
+            "name": "author",
+            "type": "string"
+        },
+        {
+            "name": "information",
+            "type": "string"
+        }
+    ]
+}
