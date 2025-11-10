@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
             let saveButton      = form.querySelector("button");
             let typeSelector    = form.querySelector("select");
             let nameInput       = form.querySelector("input");
+            let lastType        = typeSelector.value;
 
             showButton.addEventListener( 'click', e => {
                 e.preventDefault();
@@ -60,7 +61,22 @@ document.addEventListener("DOMContentLoaded", () => {
                 return false;
             });
 
-            typeSelector.addEventListener('change', () => checkAddFormValidity( typeSelector, nameInput, saveButton ));
+            typeSelector.addEventListener('focus', () => {
+                lastType = typeSelector.value;
+            });
+
+            typeSelector.addEventListener('change', () => {
+                if( nameInput.value === "" 
+                    || nameInput.value === lastType
+                ){
+                    nameInput.value = typeSelector.value;
+                }
+
+                nameInput.select();
+                nameInput.focus();
+
+                checkAddFormValidity( typeSelector, nameInput, saveButton );
+            });
             nameInput.addEventListener('input', () => checkAddFormValidity( typeSelector, nameInput, saveButton ));
         }
     );
@@ -87,7 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 input.removeAttribute('data-previous');
             }
         }
-
+        
         if( !button.classList.contains("disabled") ){
             button.classList.add("disabled");
         }

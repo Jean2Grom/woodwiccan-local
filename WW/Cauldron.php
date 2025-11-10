@@ -353,7 +353,7 @@ class Cauldron implements CauldronContentInterface
         if( !Handler::save($this) ){
             return false;
         }
-        
+
         // Deletion of pending deprecated contents
         $result = $this->purge();
 
@@ -456,10 +456,10 @@ class Cauldron implements CauldronContentInterface
 
         foreach( $this->pendingRemoveContents as $removingContent ){
             if( $removingContent->isIngredient() ){
-                $result = $result && $removingContent->delete();
+                $result = $result && ($removingContent->delete() ?? true);
             }
             else {
-                $result = $result && $removingContent->delete( false );
+                $result = $result && ($removingContent->delete( false ) ?? true);
             }
         }
 
@@ -641,13 +641,28 @@ class Cauldron implements CauldronContentInterface
                     $path   =   mime_content_type($contentParams['value']);
                     $value  =   sha1_file($contentParams['value']);
 
-                    if( (!is_file( $storage.'/'.$path.'/'.$value ) 
-                            || sha1_file( $storage.'/'.$path.'/'.$value ) !== $value)
-                        && (!$this->ww->configuration->createFolder( $storage.'/'.$path ) 
-                            || !rename( $contentParams['value'], $storage.'/'.$path.'/'.$value ))
+                    $storeFile  = $storage.'/'.$path.'/'.$value;
+                    $paramFile  = $contentParams['value'];
+
+                    if( is_file($storeFile) 
+                        && sha1_file($storeFile) === $value
                     ){
-                        $this->ww->log->error( "file move failed" );
+                        $contentParams['value'] = $path.'/'.$value;
+                    }
+                    elseif( !$this->ww->configuration->createFolder( $storage.'/'.$path ) )
+                    {
+                        $this->ww->log->error( "file folders creation failed" );
                         $contentParams['value'] = "";
+                    }
+                    elseif( !copy($paramFile, $storeFile) )
+                    {
+                        $this->ww->log->error( "file move failed : ".$paramFile );
+                        $contentParams['value'] = "";
+                    }
+                    elseif( !unlink($paramFile) )
+                    {
+                        $this->ww->log->error( "file copied : ".$paramFile." but not removed" );
+                        $contentParams['value'] = $path.'/'.$value;
                     }
                     else {
                         $contentParams['value'] = $path.'/'.$value;
