@@ -1024,4 +1024,36 @@ class Cauldron implements CauldronContentInterface
     function init(){
         return;
     }
+
+    function url( bool $getParentUrl=false, bool $dataAccess=false ): ?string
+    {
+        if( $dataAccess ){
+            $this->witches();
+        }
+
+        foreach( $this->witches ?? [] as $witch ){
+            if( $url = $witch->url() ){
+                return $url;
+            }
+        }
+
+        if( $getParentUrl ){
+            foreach( $this->witches() ?? [] as $witch )
+            {
+                $mother         = $witch->mother;
+                $loopSecurity   = $this->ww->depth;
+                while( $mother && $loopSecurity > 0 )
+                {
+                    if( $url = $mother->url() ){
+                        return $url;
+                    }
+
+                    $mother = $mother->mother;
+                    $loopSecurity--;
+                }
+            }
+        }
+        
+        return $this->parent?->url( $getParentUrl );
+    }
 }

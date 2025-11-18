@@ -186,4 +186,8 @@ abstract class Ingredient implements CauldronContentInterface
     function isIngredient(): bool {
         return true;
     }
+
+    function url( bool $getParentUrl=false, bool $dataAccess=false ): ?string {
+        return $this->cauldron?->url( $getParentUrl, $dataAccess );
+    }
 }
