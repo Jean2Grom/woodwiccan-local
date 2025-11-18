@@ -643,4 +643,9 @@ class Cairn
         
         return $tree;
     }
+
+    function cauldrons(): array {
+        return $this->cauldrons ?? [];
+    }
+
 }
