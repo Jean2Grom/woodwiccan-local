@@ -22,7 +22,7 @@
                 no site selected
             </option>
             <?php foreach( $websitesList as $website ): ?>
-                <option <?=($witch->site()?->site === $website->site)? 'selected' :'' ?>
+                <option <?=($witch->website()?->site === $website->site)? 'selected' :'' ?>
                         value="<?=$website->site ?>">
                     <?=$website->name ?> 
                 </option>

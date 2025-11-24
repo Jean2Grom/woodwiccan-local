@@ -40,7 +40,8 @@ class Witch
     public ?int $id                     = null;
     public ?string $name                = null;
     public ?string $data                = null;
-    public Website|string|null $site    = null;
+    public ?string $site                = null;
+    public ?Website $website            = null;
     public ?string $url                 = null;
     public ?string $status              = null;
     public ?string $invoke              = null;
@@ -118,7 +119,7 @@ class Witch
     function status(): ?string
     {
         if( is_null($this->status) ){
-            $this->status = $this->site()?->status( $this->statusLevel );
+            $this->status = $this->website()?->status( $this->statusLevel );
         }
         
         if( is_null($this->status) )
@@ -481,13 +482,25 @@ class Witch
         
         if( in_array('site', $exitingInputs) )
         {
-            $this->site = null;
-            if( (is_object( $inputs['site'] ) 
-                    && is_a( $inputs['site'], Website::class ))
-                || !empty($inputs['site']) 
+            if( is_object( $inputs['site'] ) 
+                && is_a( $inputs['site'], Website::class )
             ){
-                $this->site = trim( (string) $inputs['site']);
+                $this->website  =  $inputs['site'];
+                $this->site     =  $this->website->name;
             }
+            elseif( $site = $inputs['site'] )
+            {
+                $this->site = trim( $site );
+
+                if( $this->site !== $this->website?->name ){
+                    $this->website  =  null;
+                }
+            }
+            else 
+            {
+                $this->website  =  null;
+                $this->site     =  null;
+            } 
         }
         
         if( in_array('status', $exitingInputs) )
@@ -546,8 +559,8 @@ class Witch
         }
         
         if( isset($inputs['url']) 
-            && !empty($this->invoke) 
-            && !empty($this->site) 
+            && $this->invoke
+            && $this->site 
         ){
             $this->url = Handler::checkUrls( 
                 $this->ww, 
@@ -558,8 +571,8 @@ class Witch
         }
         elseif(  
             in_array('url', $exitingInputs)
-            && !empty($this->invoke) 
-            && !empty($this->site) 
+            && $this->invoke
+            && $this->site
         ){
             $urlArray   = [];
             $rootUrl    = ""; 
@@ -704,7 +717,7 @@ class Witch
             return null;
         }
 
-        $website    = $this->site() ?? $this->ww->website;
+        $website    = $this->website() ?? $this->ww->website;
         $method     = "getUrl";
 
         if( $website->name ===  $this->ww->website->site ){
@@ -796,17 +809,28 @@ class Witch
     {
         $this->ww->db->begin();
         try {
-
-            if( $previousUrl = $this->mother()?->getClosestUrl() )
-            {
-                $previousUrl .= '/';
-
-                if( $destinationUrl = $witch->getClosestUrl( $this->site ) ){
-                    $destinationUrl .= '/';
-                }
+            $siteEvolution  = null;
+            $prevSite       = $this->site();
+            $destSite       = $witch->site();
+            if( $prevSite && $destSite ){
+                $siteEvolution = [ 
+                    'from'  => $prevSite,
+                    'to'    => $destSite
+                ];
             }
-            
-            $newWitch = $this->innerTransactionCopyTo( $witch, $previousUrl, $destinationUrl );
+
+            $urlEvolution   = null;
+            $prevUrl        = $this->mother()?->getClosestUrl( $siteEvolution['from'] ?? null );
+            $destUrl        = $witch->getClosestUrl( $siteEvolution['to'] ?? $siteEvolution['from'] ?? null );
+
+            if( $prevUrl && $destUrl ){
+                $urlEvolution = [ 
+                    'from'  => $prevUrl.'/',
+                    'to'    => $destUrl.'/'
+                ];
+            }
+
+            $newWitch = $this->innerTransactionCopyTo( $witch, $siteEvolution, $urlEvolution );
             $newWitch->save( false );
 
             if( $order ){
@@ -832,7 +856,7 @@ class Witch
     /**
      * Action to encapsulate in try/catch bock
      */
-    private function innerTransactionCopyTo( self $witch, ?string $previousUrl=null, ?string $destinationUrl=null )
+    private function innerTransactionCopyTo( self $witch, ?array $siteEvolution=null, ?array $urlEvolution=null )
     {
         Handler::writeProperties( $this );
 
@@ -848,19 +872,18 @@ class Witch
             }
         }
 
-        if( !empty($destinationUrl) 
-            && !is_null($destinationUrl) 
-            && !empty($params['url']) 
-            && str_starts_with($params['url'], $previousUrl) 
-        ){
-            $url = $destinationUrl.substr( $params['url'], strlen($previousUrl) );
-            $params['url'] = $url;
+        if( $siteEvolution && $params['site'] === $siteEvolution['from'] ){
+            $params['site'] = $siteEvolution['to'];
+        }
+
+        if( $urlEvolution && str_starts_with($params['url'], $urlEvolution['from']) ){
+            $params['url'] = $urlEvolution['to'].substr( $params['url'], strlen($urlEvolution['from']) );
         }
 
         $newWitch   = $witch->newDaughter( $params );
         
         foreach( $this->daughters() ?? [] as $daughterWitch ){
-            $daughterWitch->innerTransactionCopyTo( $newWitch, $previousUrl, $destinationUrl );
+            $daughterWitch->innerTransactionCopyTo( $newWitch, $siteEvolution, $urlEvolution );
         }
         
         return $newWitch;
@@ -887,38 +910,34 @@ class Witch
     }
     
     /**
+     * witch site name
+     * @return ?string
+     */
+    function site(): ?string
+    {
+        if( !$this->site && $this->mother ){
+            return $this->mother->site();
+        }
+        
+        return $this->site;
+    }
+    
+    /**
      * witch website
      * @return ?Website
      */
-    function site(): ?Website
+    function website(): ?Website
     {
-        if( is_object($this->site) ){
-            return $this->site;
-        }
-        
-        $site       = $this->site;
-        $witchRef   = $this->mother;
-        
-        while( !$site && $witchRef )
-        {
-            $site       = $witchRef->site;
-            $witchRef   = $witchRef->mother;
+        if( !$this->website ){
+            if( $this->site ){
+                $this->website = new Website( $this->ww, $this->site );
+            }
+            elseif( $this->mother ){
+                $this->website = $this->mother->website();
+            }
         }
 
-        if( !$site ){
-            return null;
-        }
-        elseif( is_object($site) ){
-            $this->site = $site;
-        }
-        elseif( $site === $this->ww->website->name ){
-            $this->site = $this->ww->website;
-        }
-        else {
-            $this->site = new Website( $this->ww, $site );
-        }
-
-        return $this->site;
+        return $this->website;
     }
     
     /**
