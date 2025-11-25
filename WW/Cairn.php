@@ -624,12 +624,11 @@ class Cairn
 
             $daughtersTrees[] = $subTree;
         }
-
-        $site = $witch->site? (string) $witch->site: "";
+        
         $tree   = [ 
             'id'                => $witch->id ?? uniqid('new_'),
             'name'              => $witch->name,
-            'site'              => $site,
+            'site'              => $witch->site ?? "",
             'description'       => $witch->data,
             'cauldron'          => $witch->hasCauldron(),
             'invoke'            => $witch->hasInvoke(),

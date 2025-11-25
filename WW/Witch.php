@@ -40,7 +40,8 @@ class Witch
     public ?int $id                     = null;
     public ?string $name                = null;
     public ?string $data                = null;
-    public Website|string|null $site    = null;
+    public ?string $site                = null;
+    public ?Website $website            = null;
     public ?string $url                 = null;
     public ?string $status              = null;
     public ?string $invoke              = null;
@@ -118,7 +119,7 @@ class Witch
     function status(): ?string
     {
         if( is_null($this->status) ){
-            $this->status = $this->site()?->status( $this->statusLevel );
+            $this->status = $this->website()?->status( $this->statusLevel );
         }
         
         if( is_null($this->status) )
@@ -481,13 +482,25 @@ class Witch
         
         if( in_array('site', $exitingInputs) )
         {
-            $this->site = null;
-            if( (is_object( $inputs['site'] ) 
-                    && is_a( $inputs['site'], Website::class ))
-                || !empty($inputs['site']) 
+            if( is_object( $inputs['site'] ) 
+                && is_a( $inputs['site'], Website::class )
             ){
-                $this->site = trim( (string) $inputs['site']);
+                $this->website  =  $inputs['site'];
+                $this->site     =  $this->website->name;
             }
+            elseif( $site = $inputs['site'] )
+            {
+                $this->site = trim( $site );
+
+                if( $this->site !== $this->website?->name ){
+                    $this->website  =  null;
+                }
+            }
+            else 
+            {
+                $this->website  =  null;
+                $this->site     =  null;
+            } 
         }
         
         if( in_array('status', $exitingInputs) )
@@ -546,8 +559,8 @@ class Witch
         }
         
         if( isset($inputs['url']) 
-            && !empty($this->invoke) 
-            && !empty($this->site) 
+            && $this->invoke
+            && $this->site 
         ){
             $this->url = Handler::checkUrls( 
                 $this->ww, 
@@ -558,8 +571,8 @@ class Witch
         }
         elseif(  
             in_array('url', $exitingInputs)
-            && !empty($this->invoke) 
-            && !empty($this->site) 
+            && $this->invoke
+            && $this->site
         ){
             $urlArray   = [];
             $rootUrl    = ""; 
@@ -704,7 +717,7 @@ class Witch
             return null;
         }
 
-        $website    = $this->site() ?? $this->ww->website;
+        $website    = $this->website() ?? $this->ww->website;
         $method     = "getUrl";
 
         if( $website->name ===  $this->ww->website->site ){
@@ -716,46 +729,55 @@ class Witch
         
         return call_user_func([$website, $method], $this->url, $queryParams ?? null);
     }
-    
 
-    function updateRelativesUrls( self $destination )
+    /**
+     * recursive function that apply evolutions of site and/or url
+     * to this witch and her descendants
+     * @param ?array $siteEvolution [ 'from' => string, 'to' => string ] 
+     * @param ?array $urlEvolution [ 'from' => string, 'to' => string ] 
+     * @return void
+     */    
+    private function replaceSiteAndUrl( ?array $siteEvolution=null, ?array $urlEvolution=null ): void
     {
-        if( !$previousUrl = $this->mother()?->getClosestUrl() ){
+        if( !$siteEvolution && !$urlEvolution ){
             return;
         }
-        $previousUrl .= '/';
 
-        $destinationUrl = $destination->getClosestUrl( $this->site );
-        if( $destinationUrl ){
-            $destinationUrl .= '/';
+        if( $siteEvolution && $this->site === $siteEvolution['from'] )
+        {
+            $this->site = $siteEvolution['to'];
+
+            if( $this->website?->name !== $this->site ){
+                $this->website = null;
+            }
         }
 
-        $this->replaceUrls( $previousUrl, $destinationUrl );
-
-        return;
-    }
-    
-    private function replaceUrls( string $search, string $replace )
-    {
-        if( str_starts_with($this->url ?? "", $search) )
-        {
-            $url = $replace.substr( $this->url, strlen($search) );
-            $this->url = $url;
+        if( $urlEvolution && str_starts_with($this->url ?? "", $urlEvolution['from']) ){
+            $this->url = $urlEvolution['to'].substr( $this->url, strlen($urlEvolution['from']) );
         }
 
         foreach( $this->daughters() as $daughter ){
-            $daughter->replaceUrls( $search, $replace );
+            $daughter->replaceSiteAndUrl( $siteEvolution, $urlEvolution );
         }
         
         return;
     }
 
-
+    /**
+     * Move this witch and all her descendants to a new destination witch (new mother witch)
+     * @param self $witch is the new mother of this witch
+     * @param array $order array of witches id, giving the wanted displayed order 
+     * for daughters of destination witch
+     * @return bool
+     */
     function moveTo( self $witch, array $order=[] ): bool
     {
         $this->ww->db->begin();
         try {
-            $this->updateRelativesUrls( $witch );
+            $evolutions = $this->getSiteUrlEvolutions( $witch );
+
+            $this->replaceSiteAndUrl( $evolutions['site'] ?? null, $evolutions['url'] ?? null );
+
             $this->innerTransactionMoveTo( $witch );
             $this->save( false );
 
@@ -775,9 +797,11 @@ class Witch
     }
     
     /**
-     * Action to encapsulate in try/catch bock
+     * recursive move action to be encapsulated in try/catch bock
+     * @param self $witch destination witch (new mother witch)
+     * @return void
      */
-    private function innerTransactionMoveTo( self $witch )
+    private function innerTransactionMoveTo( self $witch ): void
     {
         $this->daughters();
 
@@ -792,21 +816,51 @@ class Witch
         return;
     }
 
-    function copyTo( self $witch, array $order=[] )
+    /**
+     * generate the evolutions of site ans url in use in copy or move action
+     * @param self $destination destination witch (new mother witch)
+     * @return array [ 'site' => ['from' => string, 'to' => string], 'url' => ['from' => string, 'to' => string] ]
+     */
+    private function getSiteUrlEvolutions( self $destination ): array
+    {
+        $evolutions     = [];
+
+        $prevSite       = $this->site();
+        $destSite       = $destination->site();
+        if( $prevSite && $destSite ){
+            $evolutions['site'] = [ 
+                'from'  => $prevSite,
+                'to'    => $destSite
+            ];
+        }
+
+        $init           = $evolutions['site']['from'] ?? null;
+        $prevUrl        = $this->mother()?->getClosestUrl( $init );
+        $init           = $evolutions['site']['to'] ?? $evolutions['site']['from'] ?? null;
+        $destUrl        = $destination->getClosestUrl( $init );
+        if( $prevUrl && $destUrl ){
+            $evolutions['url'] = [ 
+                'from'  => $prevUrl.'/',
+                'to'    => $destUrl.'/'
+            ];
+        }
+
+        return $evolutions;
+    }
+
+    /**
+     * Copy this witch and all her descendants to a new destination witch (new mother witch)
+     * @param self $witch is the mother of the new witch (destination witch)
+     * @param array $order array of witches id, giving the wanted displayed order 
+     * for daughters of destination witch
+     * @return ?self new copied witch or null if failed
+     */
+    function copyTo( self $witch, array $order=[] ): ?self
     {
         $this->ww->db->begin();
         try {
-
-            if( $previousUrl = $this->mother()?->getClosestUrl() )
-            {
-                $previousUrl .= '/';
-
-                if( $destinationUrl = $witch->getClosestUrl( $this->site ) ){
-                    $destinationUrl .= '/';
-                }
-            }
-            
-            $newWitch = $this->innerTransactionCopyTo( $witch, $previousUrl, $destinationUrl );
+            $evolutions = $this->getSiteUrlEvolutions( $witch );
+            $newWitch   = $this->innerTransactionCopyTo( $witch, $evolutions['site'] ?? null, $evolutions['url'] ?? null );
             $newWitch->save( false );
 
             if( $order ){
@@ -822,7 +876,7 @@ class Witch
         {
             $this->ww->log->error($e->getMessage());
             $this->ww->db->rollback();
-            return false;
+            return null;
         }
         $this->ww->db->commit();
         
@@ -830,9 +884,13 @@ class Witch
     }
 
     /**
-     * Action to encapsulate in try/catch bock
+     * recursive copy action to be encapsulated in try/catch bock
+     * @param self $witch destination witch (new mother witch)
+     * @param ?array $siteEvolution [ 'from' => string, 'to' => string ]
+     * @param ?array $urlEvolution [ 'from' => string, 'to' => string ]
+     * @return self new copied witch
      */
-    private function innerTransactionCopyTo( self $witch, ?string $previousUrl=null, ?string $destinationUrl=null )
+    private function innerTransactionCopyTo( self $witch, ?array $siteEvolution=null, ?array $urlEvolution=null ): self
     {
         Handler::writeProperties( $this );
 
@@ -848,26 +906,25 @@ class Witch
             }
         }
 
-        if( !empty($destinationUrl) 
-            && !is_null($destinationUrl) 
-            && !empty($params['url']) 
-            && str_starts_with($params['url'], $previousUrl) 
-        ){
-            $url = $destinationUrl.substr( $params['url'], strlen($previousUrl) );
-            $params['url'] = $url;
+        if( $siteEvolution && $params['site'] === $siteEvolution['from'] ){
+            $params['site'] = $siteEvolution['to'];
+        }
+
+        if( $urlEvolution && str_starts_with($params['url'], $urlEvolution['from']) ){
+            $params['url'] = $urlEvolution['to'].substr( $params['url'], strlen($urlEvolution['from']) );
         }
 
         $newWitch   = $witch->newDaughter( $params );
         
         foreach( $this->daughters() ?? [] as $daughterWitch ){
-            $daughterWitch->innerTransactionCopyTo( $newWitch, $previousUrl, $destinationUrl );
+            $daughterWitch->innerTransactionCopyTo( $newWitch, $siteEvolution, $urlEvolution );
         }
         
         return $newWitch;
     }
 
     /**
-     * Cauldron witch content, store it in the Cairn (if exists, only read it)
+     * Get witch's cauldron, fetch it if not there
      * @return ?Cauldron
      */
     function cauldron(): ?Cauldron
@@ -887,38 +944,34 @@ class Witch
     }
     
     /**
-     * witch website
+     * Get witch site name
+     * @return ?string
+     */
+    function site(): ?string
+    {
+        if( !$this->site && $this->mother ){
+            return $this->mother->site();
+        }
+        
+        return $this->site;
+    }
+    
+    /**
+     * Get witch website
      * @return ?Website
      */
-    function site(): ?Website
+    function website(): ?Website
     {
-        if( is_object($this->site) ){
-            return $this->site;
-        }
-        
-        $site       = $this->site;
-        $witchRef   = $this->mother;
-        
-        while( !$site && $witchRef )
-        {
-            $site       = $witchRef->site;
-            $witchRef   = $witchRef->mother;
+        if( !$this->website ){
+            if( $this->site ){
+                $this->website = new Website( $this->ww, $this->site );
+            }
+            elseif( $this->mother ){
+                $this->website = $this->mother->website();
+            }
         }
 
-        if( !$site ){
-            return null;
-        }
-        elseif( is_object($site) ){
-            $this->site = $site;
-        }
-        elseif( $site === $this->ww->website->name ){
-            $this->site = $this->ww->website;
-        }
-        else {
-            $this->site = new Website( $this->ww, $site );
-        }
-
-        return $this->site;
+        return $this->website;
     }
     
     /**
@@ -954,9 +1007,11 @@ class Witch
     }
 
     /**
-     * Action to encapsulate in try/catch bock
+     * recursive save action to be encapsulated in try/catch bock
+     * save descendants witches if needed
+     * @return ?bool true for success, false for failure, null for no effect
      */
-    protected function saveAction()
+    protected function saveAction(): ?bool
     {
         $this->position();
         $this->daughters();
@@ -991,9 +1046,12 @@ class Witch
     }
 
     /**
-     * @return ?int|int[]
+     * Get witch descendant position or positions array 
+     * in genealogic tree
+     * @param ?int $level if set, will return value for the this depth level (all positions array if null)
+     * @return null|int|int[] 
      */
-    function position( ?int $level=null )
+    function position( ?int $level=null ): array|int|null
     {
         if( is_null($this->position) ){
             Handler::position( $this );
@@ -1005,6 +1063,4 @@ class Witch
 
         return $this->position[ $level ] ?? null;
     }
-
-
 }

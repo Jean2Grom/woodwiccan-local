@@ -14,10 +14,10 @@
         <tr>
             <td class="label">Site</td>
             <td class="value">
-                <?php if( $witch->site() ): ?>
+                <?php if( $witch->website() ): ?>
                     <a  target="_blank" 
-                        href="<?=$witch->site()->getFullUrl() ?>">
-                        <?=$witch->site() ?>
+                        href="<?=$witch->website()->getFullUrl() ?>">
+                        <?=$witch->website() ?>
                     </a>
                 <?php else: ?>
                     <em>no</em>

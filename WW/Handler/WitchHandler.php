@@ -59,11 +59,12 @@ class WitchHandler
             $witch->data = $witch->properties['data'];
         }
 
-        $witch->site = null;
+        $witch->site    = null;
+        $witch->website = null;
         if( isset($witch->properties['site']) ){
             $witch->site = $witch->properties['site'];
         }
-
+        
         $witch->url = null;
         if( isset($witch->properties['url']) ){
             $witch->url = $witch->properties['url'];
