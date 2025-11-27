@@ -1,4 +1,10 @@
-<?php /** @var WW\Module $this */ ?>
+<?php 
+/**
+ * @var WW\Module $this
+ * @var WW\Website[] $websitesList
+ * @var array $allSitesModulesList
+ */
+?>
 
 <div class="box create__profile">
    <form id="create-profile-form" method="post" >
@@ -41,37 +47,40 @@
             <tbody>
                 <tr class="policy-container policy-pattern">
                     <td>
-                        <input type="hidden" name="policy-id[]" class="policy-id" value="-1" />
-                        
+                        <input  type="hidden" 
+                                name="policy-id[]" 
+                                class="policy-id" 
+                                value="-1" />
                         <div  class="profile-site-displayed profile-site-all">
-                            <select name="policy-module[all][]" data-init="*">
+                            <select name="policy-module[all][]" 
+                                    data-init="*">
                                 <option value="*">
                                     All modules
                                 </option>
                                 <?php foreach( $allSitesModulesList as $moduleItem ): ?>
-                                    <option value="<?=$moduleItem ?>">
-                                        <?=$moduleItem ?>
+                                    <option value="<?= $moduleItem ?>">
+                                        <?= $moduleItem ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
-                        
                         <?php foreach( $websitesList as $site => $website ): ?>
-                            <div style="display: none;" class="profile-site-displayed profile-site-<?=$site ?>">
-                                <select name="policy-module[<?=$site ?>][]" data-init="*">
+                            <div    style="display: none;" 
+                                    class="profile-site-displayed profile-site-<?= $site ?>">
+                                <select name="policy-module[<?= $site ?>][]" 
+                                        data-init="*">
                                     <option value="*">
                                         All modules
                                     </option>
                                     <?php foreach( $website->listModules() as $moduleItem ): ?>
-                                        <option value="<?=$moduleItem ?>">
-                                            <?=$moduleItem ?>
+                                        <option value="<?= $moduleItem ?>">
+                                            <?= $moduleItem ?>
                                         </option>
                                     <?php endforeach; ?>
                                 </select>
                             </div>
                         <?php endforeach; ?>
                     </td>
-                    
                     <td>
                         <div class="profile-site-displayed profile-site-all">
                             <select name="policy-status[all][]" data-init="*">
@@ -79,53 +88,51 @@
                                     All status
                                 </option>
                                 <?php foreach( $statusGlobal as $statusKey => $statusLabel ): ?>
-                                    <option value="<?=$statusKey ?>">
-                                        <?=$statusLabel ?>
+                                    <option value="<?= $statusKey ?>">
+                                        <?= $statusLabel ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
-                        
                         <?php foreach( $websitesList as $site => $website ): ?>
-                            <div style="display: none;" class="profile-site-displayed profile-site-<?=$site ?>">
-                                <select name="policy-status[<?=$site ?>][]" data-init="*">
+                            <div    style="display: none;" 
+                                    class="profile-site-displayed profile-site-<?= $site ?>">
+                                <select name="policy-status[<?= $site ?>][]" 
+                                        data-init="*">
                                     <option value="*">
                                         All status
                                     </option>
-                                    <?php foreach( $website->status as $statusKey => $statusLabel ): ?>
-                                        <option value="<?=$statusKey ?>">
-                                            <?=$statusLabel ?>
+                                    <?php foreach( $website->status ?? [] as $statusKey => $statusLabel ): ?>
+                                        <option value="<?= $statusKey ?>">
+                                            <?= $statusLabel ?>
                                         </option>
                                     <?php endforeach; ?>
                                 </select>
                             </div>
                         <?php endforeach; ?>
                     </td>
-                    
                     <td>
                         <button class="policy-witch">
                             <i class="fa fa-sitemap"></i>
                             Choose Witch
                         </button>
-
                         <a  style="display: none;"
-                            href="<?=$this->ww->website->getUrl("/view?id=") ?>"
+                            href="<?= $this->ww->website->getUrl("view?id=") ?>"
                             class="policy-witch-display"
-                            target="_blank">                            
+                            target="_blank">
                         </a>
-                        
                         <a  style="display: none;"
                             class="unset-policy-witch">
                             <i class="fa fa-times"></i>
                         </a>
-
                         <input  type="hidden" 
                                 value="" 
                                 name="policy-witch-id[]" 
                                 class="policy-witch-id" />
                     </td>
                     <td>
-                        <ul class="policy-witch-set" style="display: none;">
+                        <ul class="policy-witch-set" 
+                            style="display: none;">
                             <li>
                                 <input type="checkbox" 
                                        name="policy-witch-rules-ancestors[]"
@@ -157,10 +164,8 @@
                         </a>
                     </td>
                 </tr>
-                
             </tbody>
         </table>
-
         <div class="box__actions">
            <button class="reset-profile-action">
                <i class="fa fa-undo"></i>
