@@ -420,6 +420,7 @@ class WitchDataAccess
         
         
         $userPoliciesConditions = [];
+        /*
         foreach( $ww->user->policies as $policyId => $policy )
         {
             $condition = [];
@@ -462,7 +463,7 @@ class WitchDataAccess
                 $userPoliciesConditions[] = $condition;
             }
         }
-        
+
         if( !empty($userPoliciesConditions) )
         {
             $query .= "AND ( ";
@@ -481,6 +482,7 @@ class WitchDataAccess
             }
             $query .= ") ";
         } 
+        */
         
         return $ww->db->selectQuery($query, $parameters);
     }

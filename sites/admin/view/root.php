@@ -1,4 +1,8 @@
-<?php /** @var WW\Module $this */
+<?php 
+/**
+ * @var WW\Module $this
+ * @var WW\Witch $witch
+ */
 
 $this->addCssFile('boxes.css');
 $this->addJsFile('triggers.js');
@@ -21,7 +25,7 @@ $this->addJsFile('root.js');
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach( ($this->witch("root") ?? $this->witch())?->daughters() ?? [] as $daughter ): ?>
+                        <?php foreach( $witch->daughters() ?? [] as $daughter ): ?>
                             <tr>
                                 <td>
                                     <a href="<?=$this->ww->website->getUrl("/view?id=".$daughter->id) ?>">

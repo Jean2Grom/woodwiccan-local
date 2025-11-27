@@ -92,7 +92,7 @@ class Cairn
         $conf = [];
         foreach( $rawConfiguration as $entry => $entryConf )
         {
-            if( !$entryConf['match'] ){
+            if( !($entryConf['match'] ?? false) ){
                 continue;
             }
 
@@ -165,7 +165,7 @@ class Cairn
                 ];
             }
         }
-
+        
         return $conf;
     }
     
