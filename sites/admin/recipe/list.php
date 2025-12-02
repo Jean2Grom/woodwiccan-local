@@ -13,4 +13,4 @@ foreach( $recipes as $recipe ){
     $recipeArray[ $recipe->name ]['name'] = $recipe->name;
 }
 
-$this->view();
+$this->display();

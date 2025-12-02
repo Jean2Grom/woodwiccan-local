@@ -15,7 +15,7 @@ class Context
     const DEFAULT_FILE  = "default";    
     const DIR           = "context";
     
-    const VIEW_DIR          = "view/context";
+    const DISPLAY_DIR          = "view/context";
     
     const IMAGES_SUBFOLDER          = "assets/images";
     const JS_SUBFOLDER              = "assets/js";
@@ -29,10 +29,13 @@ class Context
     
     public $name;
     public $execFile;
-    public $viewFile;
     public $website;
-    public $view;
     
+
+    public ?string $displayFile         = null;
+    public ?string $displayFileConf     = null;
+    public bool $displayFileOnExecution = false;
+
     private $css    = [];
     private $js     = [];
     private $jsLib  = [];
@@ -76,36 +79,48 @@ class Context
         return $this;
     }
     
-    function getViewFile( ?string $viewFile=null, bool $mandatory=true )
+    /**
+     * search, memorise and return module display file, memorise it 
+     * @var ?string $filename forced filename, if null will search module's name based filename
+     * @var bool $mandatory, if true will end process (usefull for including file)
+     * @return ?string full path file to be displayed
+     */
+    function displayFile( ?string $filename=null, bool $mandatory=true )
     {
-        if( $this->viewFile ){
-            return $this->viewFile;
+        // If displayed file for conf is already memorised
+        if( $this->displayFile && $this->displayFileConf === $filename ){
+            return $this->displayFile;
         }
         
-        if( !$viewFile ){
-            $viewFile = $this->name;
+        $this->displayFileConf = $filename;
+
+        if( !$filename ){
+            $filename = $this->name.".php";
+        }
+        elseif( strcasecmp(substr($filename, -4), ".php") != 0 ){
+            $filename .=  ".php";
+        }
+
+        $this->displayFile = $this->ww->website->getFilePath( self::DISPLAY_DIR."/".$filename );
+        
+        if( !$this->displayFile ){
+            $this->ww->log->error("Can't get view file: ".$filename, $mandatory);
         }
         
-        if( strcasecmp(substr($viewFile, -4), ".php") == 0 ){
-            $viewFile = substr($viewFile, 0, -4);
-        }
-        
-        $this->viewFile = $this->ww->website->getFilePath( self::VIEW_DIR."/".$viewFile.".php" );
-        
-        if( !$this->viewFile ){
-            $this->ww->log->error("Can't get view file: ".$viewFile, $mandatory);
-        }
-        
-        $this->ww->debug->toResume("Design file to be included : \"".$this->viewFile."\"", 'CONTEXT');
-        return $this->viewFile;
+        $this->ww->debug->toResume("Design file to be included : \"".$this->displayFile."\"", 'CONTEXT');
+        return $this->displayFile;
     }
     
-    function view( ?string $designName=null, bool $mandatory=true )
+    /** 
+     * prepare visualisation file to be displayed at module execution
+     * @var ?string $filename forced filename, if null will search module's name based filename
+     * @return bool
+     */
+    function display( ?string $filename=null )
     {
-        $this->view = true;        
-        return $this->getViewFile( $designName, $mandatory );
+        $this->displayFileOnExecution = (bool) $this->displayFile( $filename, false );;
+        return $this->displayFileOnExecution;
     }
-    
     
     /**
      * Access internal css file ressource that can be access from web browser,  
@@ -192,7 +207,10 @@ class Context
     
     function favicon( string $iconFile="favicon.ico" ): void
     {
-        $displayFilePath    = $this->ww->website->getFilePath( Website::INCLUDE_VIEW_DIR."/".self::FAVICON_FILE_DISPLAY );
+        $displayFilePath = $this->ww->website->getFilePath( 
+            Website::INCLUDE_DIR."/".self::FAVICON_FILE_DISPLAY 
+        );
+
         if( empty($displayFilePath) )
         {
             $this->ww->log->error("Can't get FAVICON file display file");
@@ -229,10 +247,9 @@ class Context
      */
     function getIncludeViewFile( string $filename ): ?string
     {
-        if( !$fullPath = $this->ww->website->getFilePath(Website::INCLUDE_VIEW_DIR."/".$filename) ){
-            $fullPath = $this->ww->website->getFilePath($filename);
-        }
-
+        $fullPath = $this->ww->website->getFilePath( Website::INCLUDE_DIR."/".$filename ) 
+                        ?? $this->ww->website->getFilePath( $filename );
+        
         if( !$fullPath )
         {
             $this->ww->log->error("CONTEXT Ressource view file to be Included: \"".$filename."\" not found", 'CONTEXT');
@@ -259,8 +276,7 @@ class Context
         return;
     }
 
-
-    function display()
+    function execute()
     {
         $this->execFile = $this->website->getFilePath( self::DIR."/". $this->name.".php" );
         
@@ -277,8 +293,8 @@ class Context
         $this->ww->debug->toResume("Executing file: \"".$this->execFile."\"", 'CONTEXT');
         
         include $this->execFile;
-        if( $this->view ){
-            include $this->getViewFile();
+        if( $this->displayFileOnExecution ){
+            include $this->displayFile();
         }
         
         return $this;

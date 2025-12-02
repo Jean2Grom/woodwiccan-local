@@ -773,4 +773,4 @@ while( !empty($breadcrumbWitch) )
 }
 
 $this->addContextVar( 'breadcrumb', array_reverse($breadcrumb) );
-$this->view();
+$this->display();

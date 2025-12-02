@@ -83,4 +83,4 @@ if( $captchaError )
 }
 
 $this->setContext('empty');
-$this->view();
+$this->display();

@@ -27,7 +27,7 @@
                     </td>
                     <td>
                         <?php if( !empty($policy->positionId) ): ?>
-                            <a href="<?=$this->ww->website->getUrl("/view?id=".$policy->positionId) ?>"
+                            <a href="<?=$this->ww->website->getUrl("view", [ 'id' => $policy->positionId ]) ?>"
                                target="_blank">
                                 <?=$policy->positionName ?? $policy->positionId ?>
                             </a>

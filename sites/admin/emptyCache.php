@@ -7,5 +7,5 @@ $this->ww->user->addAlerts([[
     'message'   =>  $reset? 'Cache has been removed': 'Cache removing has failed',    
 ]]);
 
-$this->setContext( 'empty' );
-$this->view('back');
+$this->setContext('empty');
+$this->display('back');

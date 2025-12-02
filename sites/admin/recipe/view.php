@@ -15,4 +15,4 @@ if( !$recipe )
     exit();
 }
 
-$this->view();
+$this->display();

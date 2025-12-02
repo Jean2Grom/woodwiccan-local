@@ -15,4 +15,4 @@ $root = Cairn::tree(
 $tree       = [ $root ];
 $breadcrumb = [ $this->witch->id ];
 
-$this->view();
+$this->display();

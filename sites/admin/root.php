@@ -79,4 +79,4 @@ switch( $action = Tools::filterAction(
     break;
 }
 
-$this->view();
+$this->display();
