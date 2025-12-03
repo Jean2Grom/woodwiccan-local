@@ -9,6 +9,6 @@ $this->addJsFile('choose-witch.js');
         <a class="close"><i class="fa fa-times"></i></a>
     </h3>
     
-    <?php include $this->ww->website->getViewFilePath( 'arborescence.php' ); ?>
+    <?php include $this->ww->website->displayFilePath( 'arborescence.php' ); ?>
 </div>
 

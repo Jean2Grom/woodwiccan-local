@@ -34,4 +34,4 @@ else
     $breadcrumb = array_reverse($breadcrumb);
 }
 
-$this->view();
+$this->display();

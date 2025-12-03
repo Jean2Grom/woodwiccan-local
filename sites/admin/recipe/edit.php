@@ -109,4 +109,4 @@ function getRequire( $inputs, $name )
     return $require;
 }
 
-$this->view();
+$this->display();

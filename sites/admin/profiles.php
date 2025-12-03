@@ -244,4 +244,4 @@ asort( $allSitesModulesList );
 
 $statusGlobal = $this->ww->configuration->read("global", "status");
 
-$this->view();
+$this->display();

@@ -4,4 +4,4 @@ if( $this->ww->user->connexion ){
     $this->setContext('standard');
 }
 
-$this->view();
+$this->display();

@@ -28,7 +28,7 @@ $this->addJsFile('root.js');
                         <?php foreach( $witch->daughters() ?? [] as $daughter ): ?>
                             <tr>
                                 <td>
-                                    <a href="<?=$this->ww->website->getUrl("/view?id=".$daughter->id) ?>">
+                                    <a href="<?=$this->ww->website->getUrl("view", [ 'id' => $daughter->id ]) ?>">
                                         <?=$daughter->name ?>
                                     </a>
                                 </td>

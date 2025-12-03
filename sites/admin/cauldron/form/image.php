@@ -22,4 +22,4 @@ else {
     $input .= "[content]";
 }
 
-include $this->ww->website->getFilePath( self::VIEW_DIR."/edit/image.php");
+include $this->editFilePath();

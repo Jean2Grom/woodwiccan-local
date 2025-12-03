@@ -19,7 +19,7 @@ elseif( !$this->witch("target")->cauldron() )
         'message'   =>  "Cauldron not found"
     ]);
     
-    header( 'Location: '.$this->ww->website->getFullUrl('view?id='.$this->witch("target")->id) );
+    header( 'Location: '.$this->ww->website->getFullUrl('view', ['id' => $this->witch("target")->id]) );
     exit();
 }
 elseif( !$this->witch("target")->cauldron()->draft() )
@@ -29,7 +29,7 @@ elseif( !$this->witch("target")->cauldron()->draft() )
         'message'   =>  "Draft can't be read"
     ]);
     
-    header( 'Location: '.$this->ww->website->getFullUrl('view?id='.$this->witch("target")->id) );
+    header( 'Location: '.$this->ww->website->getFullUrl('view', ['id' => $this->witch("target")->id]) );
     exit();
 }
 
@@ -121,4 +121,4 @@ if( $return )
     exit();
 }
 
-$this->view();
+$this->display();

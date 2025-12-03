@@ -17,7 +17,7 @@
 
         <?php if( $this->ww->user->connexion ): ?>
             <div class="nav-user">
-                <a  href="<?=$this->website->getUrl( "view?id=".$this->witch("user")->id ) ?>">
+                <a  href="<?=$this->website->getUrl( "view", ['id' => $this->witch("user")->id] ) ?>">
                     <span><?=$this->ww->user->name ?></span>
                 </a>
                 <a href="<?=$this->website->getUrl("login") ?>">

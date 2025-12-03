@@ -21,4 +21,4 @@ else {
     $input .= "[content]";
 }
 
-include $this->ww->website->getFilePath( self::VIEW_DIR."/edit/file.php");
+include $this->editFilePath();

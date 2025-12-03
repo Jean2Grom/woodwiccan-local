@@ -16,4 +16,4 @@ foreach( $this->ww->user->loginMessages as $message ){
 
 $this->ww->user->disconnect();
 
-$this->view();
+$this->display();

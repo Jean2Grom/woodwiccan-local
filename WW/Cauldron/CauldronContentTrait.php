@@ -10,10 +10,10 @@ trait CauldronContentTrait
         }
         
         $instanciedClass    = (new \ReflectionClass($this))->getName();
-        $file               = $this->ww->website->getFilePath( $instanciedClass::DIR."/view/".$filename.'.php');
+        $file               = $this->ww->website->getFilePath( $instanciedClass::DIR."/".$filename.'.php');
         
         if( !$file ){
-            $file = $this->ww->website->getFilePath( $instanciedClass::DIR."/view/default.php");
+            $file = $this->ww->website->getFilePath( $instanciedClass::DIR."/default.php");
         }
         
         if( $file )
@@ -48,10 +48,10 @@ trait CauldronContentTrait
         }
         
         $instanciedClass    = (new \ReflectionClass($this))->getName();
-        $file               = $this->ww->website->getFilePath( $instanciedClass::DIR."/edit/".$filename.'.php');
+        $file               = $this->ww->website->getFilePath( $instanciedClass::DIR."/form/".$filename.'.php');
         
         if( !$file ){
-            $file = $this->ww->website->getFilePath( $instanciedClass::DIR."/edit/default.php");
+            $file = $this->ww->website->getFilePath( $instanciedClass::DIR."/form/default.php");
         }
         
         if( !$file ){
@@ -67,6 +67,39 @@ trait CauldronContentTrait
         return;
     }
     
+
+    function editFilePath( ?string $filename=null )
+    {
+        if( !$filename ){
+            $filename = $this->type.".php";
+        }
+        elseif( strcasecmp(substr($filename, -4), ".php") != 0 ){
+            $filename .=  ".php";
+        }
+
+        $instanciedClass    = (new \ReflectionClass($this))->getName();
+
+        return $this->ww->website->getFilePath( $instanciedClass::DISPLAY_DIR."/form/".$filename ) 
+                ?? $this->ww->website->getFilePath( $instanciedClass::DISPLAY_DIR."/form/default.php" ); 
+    }
+
+    function displayFilePath( ?string $filename=null )
+    {
+        if( !$filename ){
+            $filename = $this->type.".php";
+        }
+        elseif( strcasecmp(substr($filename, -4), ".php") != 0 ){
+            $filename .=  ".php";
+        }
+
+        $instanciedClass    = (new \ReflectionClass($this))->getName();
+
+        return $this->ww->website->getFilePath( $instanciedClass::DISPLAY_DIR."/".$filename ) 
+                ?? $this->ww->website->getFilePath( $instanciedClass::DISPLAY_DIR."/default.php" ); 
+    }
+
+
+
     function isIngredient(): bool {
         return false;
     }

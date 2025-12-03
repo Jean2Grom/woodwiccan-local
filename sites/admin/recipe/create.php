@@ -97,4 +97,4 @@ function getRequire( $inputs, $name )
     return $require;
 }
 
-$this->view('recipe/edit');
+$this->display('recipe/edit');

@@ -161,7 +161,7 @@ $this->addContextArrayItems( 'tabs', [
     </button>
     
     <button class="trigger-href" 
-            data-href="<?=$this->ww->website->getUrl("view?id=".$destWitch->id)?>">
+            data-href="<?=$this->ww->website->getUrl("view", ['id' => $destWitch->id] )?>">
         <i class="fa fa-times"></i>
         Cancel
     </button>

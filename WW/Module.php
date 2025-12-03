@@ -17,13 +17,15 @@ class Module
         
     public $name;
     public $execFile;
-    public $viewFile;
     public $result;
     public $config;
-    public $view;
     public $maxStatus;
     public $isRedirection;
     public $allowContextSetting;
+
+    public ?string $displayFile         = null;
+    public ?string $displayFileConf     = null;
+    public bool $displayFileOnExecution = false;
     
     /**
      * Witch that calls this module
@@ -88,8 +90,8 @@ class Module
         $this->ww->debug->toResume("Executing file: \"".$this->execFile."\"", 'MODULE '.$this->name);
         ob_start();
         include $this->execFile;        
-        if( $this->view ){
-            include $this->getViewFile();
+        if( $this->displayFileOnExecution ){
+            include $this->displayFile;
         }
         $result = ob_get_contents();
         ob_end_clean();
@@ -120,34 +122,49 @@ class Module
     function getResult(){
         return $this->result;
     }
-    
-    function getViewFile( ?string $designName=null, bool $mandatory=true )
+
+    /**
+     * search, memorise and return module display file, memorise it 
+     * @var ?string $filename forced filename, if null will search module's name based filename
+     * @var bool $mandatory, if true will end process (usefull for including file)
+     * @return ?string full path file to be displayed
+     */
+    function displayFile( ?string $filename=null, bool $mandatory=true )
     {
-        if( !empty($this->viewFile) ){
-            return $this->viewFile;
+        // If displayed file for conf is already memorised
+        if( $this->displayFile && $this->displayFileConf === $filename ){
+            return $this->displayFile;
         }
         
-        if( !$designName ){
-            $designName = $this->name.".php";
-        }
-        elseif( strcasecmp(substr($designName, -4), ".php") != 0 ){
-            $designName .=  ".php";
-        }
+        $this->displayFileConf = $filename;
         
-        $this->viewFile   = $this->ww->website->getViewFilePath( $designName );
-        
-        if( !$this->viewFile ){
-            $this->ww->log->error("Can't get view file: ".$designName, $mandatory);
+        if( !$filename ){
+            $filename = $this->name.".php";
+        }
+        elseif( strcasecmp(substr($filename, -4), ".php") != 0 ){
+            $filename .=  ".php";
         }
         
-        $this->ww->debug->toResume("View file : \"".$this->viewFile."\"", 'MODULE '.$this->name);
-        return $this->viewFile;
+        $this->displayFile = $this->ww->website->displayFilePath( $filename );
+        
+        if( !$this->displayFile ){
+            $this->ww->log->error("Can't get view file: ".$filename, $mandatory);
+        }
+        
+        $this->ww->debug->toResume("View file : \"".$this->displayFile."\"", 'MODULE '.$this->name);
+
+        return $this->displayFile;
     }
     
-    function view( ?string $designName=null, bool $mandatory=true )
+    /** 
+     * prepare visualisation file to be displayed at module execution
+     * @var ?string $filename forced filename, if null will search module's name based filename
+     * @return bool
+     */
+    function display( ?string $filename=null ): bool
     {
-        $this->view = true;        
-        return $this->getViewFile( $designName, $mandatory );
+        $this->displayFileOnExecution = (bool) $this->displayFile( $filename, false );
+        return $this->displayFileOnExecution;
     }
     
     function getImageFile( $filename ){
@@ -189,8 +206,8 @@ class Module
     
     function getIncludeViewFile( $filename ): ?string
     {
-        if( !$fullPath = $this->ww->website->getIncludeViewFilePath($filename) ){
-            $fullPath = $this->ww->website->getIncludeViewFilePath( $filename.'.php' );
+        if( !$fullPath = $this->ww->website->includeFilePath($filename) ){
+            $fullPath = $this->ww->website->includeFilePath( $filename.'.php' );
         }
 
         if( !$fullPath )

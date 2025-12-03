@@ -11,8 +11,8 @@ class Website
     const SITES_DIR             = "sites";
     const DEFAULT_SITE_DIR      = "sites/default";
     
-    const VIEW_DIR              = "view";
-    const INCLUDE_VIEW_DIR      = "view/include";
+    const DISPLAY_DIR           = "display";
+    const INCLUDE_DIR           = "display/include";
 
     public $name;
     public $currentAccess;
@@ -145,20 +145,20 @@ class Website
             'url'   => $this->urlPath,
         ];
     }
+
     
-    function display()
+    function display(): self
     {
-        $this->context->display();
-        
+        $this->context->execute();
         return $this;
     }
 
-    function getViewFilePath( string $filename ): ?string {
-        return $this->getFilePath( self::VIEW_DIR."/".$filename );
+    function displayFilePath( string $filename ): ?string {
+        return $this->getFilePath( self::DISPLAY_DIR."/".$filename );
     }
-    
-    function getIncludeViewFilePath( string $filename ): ?string {
-        return $this->getFilePath( self::INCLUDE_VIEW_DIR."/".$filename );
+
+    function includeFilePath( string $filename ): ?string {
+        return $this->getFilePath( self::INCLUDE_DIR."/".$filename );
     }
     
     function getFilePath( string $filename ): ?string
@@ -261,7 +261,7 @@ class Website
         $dirContentArray = array_diff( scandir($dir), array('..', '.') );
         
         foreach( $dirContentArray as $dirContent ){
-            if( is_dir($dir.'/'.$dirContent) && $dirContent !== self::VIEW_DIR ){
+            if( is_dir($dir.'/'.$dirContent) && $dirContent !== self::DISPLAY_DIR ){
 
                 $modulesList = array_merge( $modulesList, $this->recursiveRead( $dir.'/'.$dirContent, $prefix ) );
             }
@@ -333,21 +333,21 @@ class Website
         if( !$request ){
             $request = $this->ww->request;
         }
-        
+
         $fullUrl    =   $request->protocole.'://';
-        if( strstr($this->currentAccess, '/') ){
-            $fullUrl .= dirname($this->currentAccess);
+        if( $pos = strpos($this->currentAccess, '/') ){
+            $fullUrl .= substr($this->currentAccess, 0, $pos);
         }
         else {
             $fullUrl .= $this->currentAccess;
         }
-        
+
         if( substr($fullUrl, -( strlen($request->port) + 1 )) !== ':'.$request->port ){
             $fullUrl .= ':'.$request->port;
         }
         
         $fullUrl    .=  $this->getUrl( $urlPath, $urlParams );
-        
+
         return $fullUrl;
     }
     
@@ -376,7 +376,7 @@ class Website
             $$name = $value;
         }
 
-        $fullPath = $this->getFilePath( self::INCLUDE_VIEW_DIR."/".$filename);
+        $fullPath = $this->getFilePath( self::INCLUDE_DIR."/".$filename);
 
         if( !$fullPath ){
             $this->ww->log->error( "Ressource file to be Included: \"".$filename."\" not found", false);

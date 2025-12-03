@@ -1,7 +1,6 @@
 <?php /** @var WW\Module $this */
 
 use WW\Cairn;
-use WW\Handler\WitchHandler;
 
 $currentId = $this->witch("target")?->id ?? $this->witch()?->id;
 
@@ -61,4 +60,4 @@ while( $pathFound )
     }
 }
 
-$this->view();
+$this->display();
