@@ -10,10 +10,10 @@ trait CauldronContentTrait
         }
         
         $instanciedClass    = (new \ReflectionClass($this))->getName();
-        $file               = $this->ww->website->getFilePath( $instanciedClass::DIR."/view/".$filename.'.php');
+        $file               = $this->ww->website->getFilePath( $instanciedClass::DIR."/".$filename.'.php');
         
         if( !$file ){
-            $file = $this->ww->website->getFilePath( $instanciedClass::DIR."/view/default.php");
+            $file = $this->ww->website->getFilePath( $instanciedClass::DIR."/default.php");
         }
         
         if( $file )
@@ -67,6 +67,39 @@ trait CauldronContentTrait
         return;
     }
     
+
+    function editFilePath( ?string $filename=null )
+    {
+        if( !$filename ){
+            $filename = $this->type.".php";
+        }
+        elseif( strcasecmp(substr($filename, -4), ".php") != 0 ){
+            $filename .=  ".php";
+        }
+
+        $instanciedClass    = (new \ReflectionClass($this))->getName();
+
+        return $this->ww->website->getFilePath( $instanciedClass::VIEW_DIR."/edit/".$filename ) 
+                ?? $this->ww->website->getFilePath( $instanciedClass::VIEW_DIR."/edit/default.php" ); 
+    }
+
+    function displayFilePath( ?string $filename=null )
+    {
+        if( !$filename ){
+            $filename = $this->type.".php";
+        }
+        elseif( strcasecmp(substr($filename, -4), ".php") != 0 ){
+            $filename .=  ".php";
+        }
+
+        $instanciedClass    = (new \ReflectionClass($this))->getName();
+
+        return $this->ww->website->getFilePath( $instanciedClass::VIEW_DIR."/".$filename ) 
+                ?? $this->ww->website->getFilePath( $instanciedClass::VIEW_DIR."/default.php" ); 
+    }
+
+
+
     function isIngredient(): bool {
         return false;
     }
