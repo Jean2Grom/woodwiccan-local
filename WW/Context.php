@@ -15,7 +15,7 @@ class Context
     const DEFAULT_FILE  = "default";    
     const DIR           = "context";
     
-    const DISPLAY_DIR          = "view/context";
+    const DISPLAY_DIR          = "display/context";
     
     const IMAGES_SUBFOLDER          = "assets/images";
     const JS_SUBFOLDER              = "assets/js";

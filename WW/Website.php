@@ -11,8 +11,8 @@ class Website
     const SITES_DIR             = "sites";
     const DEFAULT_SITE_DIR      = "sites/default";
     
-    const DISPLAY_DIR           = "view";
-    const INCLUDE_DIR           = "view/include";
+    const DISPLAY_DIR           = "display";
+    const INCLUDE_DIR           = "display/include";
 
     public $name;
     public $currentAccess;

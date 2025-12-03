@@ -79,8 +79,8 @@ trait CauldronContentTrait
 
         $instanciedClass    = (new \ReflectionClass($this))->getName();
 
-        return $this->ww->website->getFilePath( $instanciedClass::VIEW_DIR."/form/".$filename ) 
-                ?? $this->ww->website->getFilePath( $instanciedClass::VIEW_DIR."/form/default.php" ); 
+        return $this->ww->website->getFilePath( $instanciedClass::DISPLAY_DIR."/form/".$filename ) 
+                ?? $this->ww->website->getFilePath( $instanciedClass::DISPLAY_DIR."/form/default.php" ); 
     }
 
     function displayFilePath( ?string $filename=null )
@@ -94,8 +94,8 @@ trait CauldronContentTrait
 
         $instanciedClass    = (new \ReflectionClass($this))->getName();
 
-        return $this->ww->website->getFilePath( $instanciedClass::VIEW_DIR."/".$filename ) 
-                ?? $this->ww->website->getFilePath( $instanciedClass::VIEW_DIR."/default.php" ); 
+        return $this->ww->website->getFilePath( $instanciedClass::DISPLAY_DIR."/".$filename ) 
+                ?? $this->ww->website->getFilePath( $instanciedClass::DISPLAY_DIR."/default.php" ); 
     }
 
 
