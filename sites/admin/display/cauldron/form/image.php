@@ -4,7 +4,7 @@
  * @var string $input 
  */
 
-$this->ww->website->context->addJsFile('cauldron/image-edit.js');
+$this->addJsFile('cauldron/image-edit.js');
 
 $key = "_FILES__".md5( microtime().rand() );
 ?>

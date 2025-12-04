@@ -1,4 +1,10 @@
-<?php /** @var WW\Module $this */
+<?php 
+/**
+ * @var WW\Module $this
+ * @var array $tree  
+ * @var ?array $breadcrumb
+ * @var ?int $currentId 
+ */
 
 $this->addCssFile('choose-witch.css');
 $this->addJsFile('choose-witch.js');
@@ -9,6 +15,10 @@ $this->addJsFile('choose-witch.js');
         <a class="close"><i class="fa fa-times"></i></a>
     </h3>
     
-    <?php include $this->ww->website->displayFilePath( 'arborescence.php' ); ?>
+    <?php $this->include( '../arborescence.php', [
+        'currentId'     => $currentId,
+        'tree'          => $tree,
+        'breadcrumb'    => $breadcrumb
+    ] ); ?>
 </div>
 

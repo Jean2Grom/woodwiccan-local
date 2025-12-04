@@ -4,7 +4,7 @@
  * @var string $input 
  */
 
-$this->ww->website->context->addJsFile('cauldron/file-edit.js');
+$this->addJsFile('cauldron/file-edit.js');
 ?>
 <div>
     <legend>Filename</legend>
