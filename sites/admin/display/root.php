@@ -20,7 +20,6 @@ $this->addJsFile('root.js');
                         <tr>
                             <th>Name</th>
                             <th>Site</th>
-                            <th>Type</th>
                             <th>Priority</th>
                         </tr>
                     </thead>
@@ -34,17 +33,6 @@ $this->addJsFile('root.js');
                                 </td>
                                 <td>
                                     <?=$daughter->site ?>
-                                </td>
-                                <td>
-                                    <?php if( $daughter->hasInvoke() && $daughter->hasCauldron() ): ?>
-                                        Craft & Invoke 
-                                    <?php elseif( $daughter->hasInvoke() ): ?>
-                                        Invoke
-                                    <?php elseif( $daughter->hasCauldron() ): ?>
-                                        Craft
-                                    <?php else: ?>
-                                        Folder
-                                    <?php endif; ?>
                                 </td>
                                 <td class="text-right">
                                     <input  class="priorities-input" 
