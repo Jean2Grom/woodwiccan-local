@@ -6,12 +6,6 @@
 ?>
 <header>
     <div class="banner">
-        <?php if( count($this->witch('menu')?->daughters() ?? []) > 0 ): ?>
-            <a class="side-nav-toggler">
-                <i class="fa fa-bars"></i>
-            </a>
-        <?php endif; ?>
-
         <div class="logo">
             <a href="<?=$this->website->getRootUrl()?>">
                 <img    src="<?=$this->imageSrc("logo.png"); ?>" 
@@ -23,6 +17,12 @@
         <h1 title="<?=$this->witch()->data ?>">
             <?=$this->ww->witch()->name ?>
         </h1>
+
+        <?php if( count($this->witch('menu')?->daughters() ?? []) > 0 ): ?>
+            <a class="side-nav-toggler">
+                <i class="fa fa-bars"></i>
+            </a>
+        <?php endif; ?>
     </div>
     
     <?php if( $breadcrumb ?? [] ): ?>

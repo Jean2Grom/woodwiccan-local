@@ -25,11 +25,8 @@ header {
         margin: 0;
         margin-right: 16px;
     }
-    header .side-nav-toggler {
-        position: absolute;
-    }
     header .logo {
-        margin-left: 8px;
+        margin-left: -16px;
     }
     header .banner-nav {
         display: flex;
@@ -50,6 +47,9 @@ footer {
 }
 
 @media screen and (min-device-width: 768px) {
+    header .logo {
+        margin-left: 8px;
+    }
     header .side-nav-toggler {
         display: none;
     }
