@@ -89,11 +89,4 @@ function recursiveTree( Cauldron $cauldron, array|bool $sitesRestrictions=false,
     return $tree;
 }
 
-$this->addCssFile('choose-witch.css');
-?>
-<div id="cauldrons">
-    <h3><span>Cauldrons Navigation</span></h3>
-    
-    <?php include $this->ww->website->displayFilePath( 'arborescence.php' ); ?>
-</div>
-
+$this->display();

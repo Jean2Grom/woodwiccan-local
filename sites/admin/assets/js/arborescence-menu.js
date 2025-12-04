@@ -593,8 +593,14 @@ const ArborescenceMenu = function( key ){
         scrollToLastLevel: async function()
         {
             if( this.container && this.container.lastChild ){
+                this.container.lastChild.scrollIntoView({ 
+                    behavior: "smooth", 
+                    block: "start", 
+                    container: "nearest", 
+                    inline: "end" 
+                });
                 //this.container.lastChild.scrollIntoView({ behavior: "smooth", block: "start", inline: "end" });
-                this.container.lastChild.scrollIntoView({ behavior: "smooth", inline: "end" });
+                //this.container.lastChild.scrollIntoView({ behavior: "smooth", inline: "end" });
             }
         },
         toggle: async function( target )

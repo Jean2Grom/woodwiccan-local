@@ -12,10 +12,8 @@ class Context
 {
     use ShortcutAccessTrait;
 
-    const DEFAULT_FILE  = "default";    
-    const DIR           = "context";
-    
-    const DISPLAY_DIR          = "display/context";
+    const DIR                   = "context";
+    const DISPLAY_DIR           = "display/context";
     
     const IMAGES_SUBFOLDER          = "assets/images";
     const JS_SUBFOLDER              = "assets/js";
@@ -48,12 +46,13 @@ class Context
      */
     public WoodWiccan $ww;
     
+
     function __construct( Website $website, ?string $initialContext=null )
     {
         $this->website  = $website;
         $this->ww       = $this->website->ww;
         
-        $this->name     = $initialContext ?? self::DEFAULT_FILE;
+        $this->name     = $initialContext ?? "default";
         
         if( strcasecmp(substr( $this->name, -4), ".php") == 0 ){
              $this->name = substr( $this->name, 0, -4);
@@ -64,16 +63,18 @@ class Context
         }
     }
     
+    
     function set( string $context )
     {
         if( strcasecmp(substr($context, -4), ".php") == 0 ){
             $context = substr($context, 0, -4);
         }
-        
-        $this->name     = $context;
-        
-        if( empty($this->name) ){
-            $this->ww->log->error("Context has been set with empty value");
+
+        if( !$context ){
+            $this->ww->log->error("Cannot set context with empty value");
+        }
+        else {
+            $this->name     = $context;
         }
         
         return $this;
@@ -282,8 +283,8 @@ class Context
         
         if( !$this->execFile )
         {
-            $this->ww->debug->toResume("Context File: \"". $this->name."\" not found, searching for ".self::DEFAULT_FILE." file", 'CONTEXT');
-            $this->execFile = $this->website->getFilePath( self::DIR."/".self::DEFAULT_FILE.".php" );
+            $this->ww->debug->toResume("Context File: \"". $this->name."\" not found, searching for default file", 'CONTEXT');
+            $this->execFile = $this->website->getFilePath( self::DIR."/default.php" );
         }
         
         if( !$this->execFile ){

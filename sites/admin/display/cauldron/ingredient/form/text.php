@@ -4,9 +4,9 @@
  * @var string $input 
  */
 
-$this->ww->website->context->addCssFile('../trumbowyg/dist/ui/trumbowyg.min.css');
-$this->ww->website->context->addJsLibFile('jquery-3.6.0.min.js');
-$this->ww->website->context->addJsLibFile('../trumbowyg/dist/trumbowyg.min.js');
+$this->addCssFile('../trumbowyg/dist/ui/trumbowyg.min.css');
+$this->addJsLibFile('jquery-3.6.0.min.js');
+$this->addJsLibFile('../trumbowyg/dist/trumbowyg.min.js');
 
 $id = uniqid('text__'); 
 ?>

@@ -12,9 +12,7 @@ use WW\Trait\ShortcutAccessTrait;
 class Module 
 {
     use ShortcutAccessTrait;
-
-    const DEFAULT_FILE  = "default";   
-        
+    
     public $name;
     public $execFile;
     public $result;
@@ -52,7 +50,7 @@ class Module
         $this->execFile = $this->ww->website->getFilePath( $this->name.".php" );
         
         if( !$this->execFile ){
-            $this->execFile = $this->ww->website->getFilePath( self::DEFAULT_FILE.".php" );
+            $this->execFile = $this->ww->website->getFilePath("default.php");
         }
         
         $this->config = array_replace_recursive( 
@@ -228,7 +226,7 @@ class Module
 
         if( $file = $this->getIncludeViewFile($filename) ){
             include $file;
-        };
+        }
         return;
     }
     

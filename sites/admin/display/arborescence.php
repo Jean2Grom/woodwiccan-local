@@ -1,4 +1,25 @@
-<?php /** @var WW\Module $this */
+<?php 
+/**
+ * @var WW\Module $this
+ * @var array $tree  
+ * @var ?array $breadcrumb
+ * @var ?int $currentId 
+ * @var ?string $currentSite
+ * @var ?bool $draggble
+ * @var ?string $clipboardUrl
+ * @var ?string $createUrl
+ * @var ?string $cauldronUrl
+ * @var ?string $urlHash
+ */
+
+$breadcrumb     = $breadcrumb ?? [];
+$currentId      = $currentId ?? 0;
+$currentSite    = $currentSite ?? $this->ww->website->name;
+$draggble       = $draggble ?? false;
+$clipboardUrl   = $clipboardUrl ?? "null";
+$createUrl      = $createUrl ?? "null";
+$cauldronUrl    = $cauldronUrl ?? "null";
+$urlHash        = $urlHash ?? "null";
 
 $this->addJsFile('fontawesome.js');
 $this->addCssFile('arborescence-menu.css');
@@ -15,14 +36,14 @@ $key = "arborescence_".md5(microtime().rand());
     
     arborescencesInputs[ "<?=$key ?>" ] = {
         "treeData": <?=json_encode($tree)?>,
-        "currentId": <?=$currentId ?? 0?>,
-        "currentSite": "<?=$this->ww->website->name?>",
         "breadcrumb": <?=json_encode($breadcrumb)?>,
-        "draggable": <?=$draggble ?? null ? "true": "false"?>,
-        "clipboardUrl": <?=($clipboardUrl ?? null)? '"'.$clipboardUrl.'"': "null" ?>,
-        "createUrl": <?=($createUrl ?? null)? '"'.$createUrl.'"': "null" ?>,
-        "cauldronUrl": <?=($cauldronUrl ?? null)? '"'.$cauldronUrl.'"': "null" ?>,
-        "urlHash": <?=($urlHash ?? null)? '"'.$urlHash.'"': "null" ?>,
+        "currentId": <?=$currentId?>,
+        "currentSite": "<?=$currentSite ?>",
+        "draggable": <?=$draggble? "true": "false"?>,
+        "clipboardUrl": "<?=$clipboardUrl ?>",
+        "createUrl": "<?=$createUrl ?>",
+        "cauldronUrl": "<?=$cauldronUrl ?>",
+        "urlHash": "<?=$urlHash ?>",
     };
 </script>
 

@@ -19,4 +19,4 @@ else {
     $input .= "[content]";
 }
 
-include $this->editFilePath();
+include $this->formFilePath();
