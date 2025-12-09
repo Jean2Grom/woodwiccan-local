@@ -1,18 +1,23 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-    document.querySelectorAll('.side-nav-toggler').forEach( 
-        navTogglerDom => navTogglerDom.addEventListener("click", 
-            () => document.querySelectorAll('nav').forEach( 
-                navDom => {
-                    if( navDom.style.display !== 'block' ){
-                        navDom.style.display = 'block';
-                    }
-                    else {
-                        navDom.style.display = 'none';
-                    }
-                }
+    document.querySelectorAll(".burger-menu-icon").forEach(
+        menuIcon => menuIcon.addEventListener( 'click', 
+            () => document.querySelectorAll("nav").forEach(
+                nav => nav.classList.toggle('show')
             )
         )
+    );
+    
+    document.addEventListener('click', 
+        e => {
+            if( !e.target.closest('nav') 
+                && !e.target.closest('.burger-menu-icon') 
+            ){
+                document.querySelectorAll("nav").forEach(
+                    nav => nav.classList.remove('show')
+                );
+            }
+        }
     );
     
     var tabs = document.getElementsByClassName("tabs__item");

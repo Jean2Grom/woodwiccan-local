@@ -19,9 +19,8 @@
         </h1>
 
         <?php if( count($this->witch('menu')?->daughters() ?? []) > 0 ): ?>
-            <a class="side-nav-toggler">
-                <i class="fa fa-bars"></i>
-            </a>
+        <img    class="burger-menu-icon" 
+                src="<?= $this->getImageFile('burger.png') ?>" />
         <?php endif; ?>
     </div>
     
