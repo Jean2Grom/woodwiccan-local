@@ -1,138 +1,189 @@
-$(document).ready(function()
+document.addEventListener("DOMContentLoaded", () => 
 {
-    // List
-    $('.view-profile').click(function()
-    {
-        let profileDom  = $(this).parents('.profile-container');
-        let hash        = '#tab-profile-'+ $(profileDom).data('id');
-        
-        $('a[href="'+hash+'"]').parent().show();
-        triggerTabItem( hash );
-        
-        $( hash ).find('.box.view__profile').show();
-        $( hash ).find('.box.edit__profile').hide();
-    });
-    
-    $('.edit-profile').click(function()
-    {
-        let profileDom  = $(this).parents('.profile-container');
-        let hash        = '#tab-profile-'+ $(profileDom).data('id');
-        
-        $('a[href="'+hash+'"]').parent().show();
-        triggerTabItem( hash );
-        
-        $( hash ).find('.box.view__profile').hide();
-        $( hash ).find('.box.edit__profile').show();
-    });
-    
-    $('#profile-list-site-filter').change(function()
-    {
-        let siteFilter = $(this).val();
-        
-        if( siteFilter === '' ){
-            $('.profile-container').show();
+    document.querySelectorAll('.view-profile').forEach(
+        clickDom => clickDom.addEventListener( "click", 
+        () => {
+            let profileDom  = clickDom.closest('.profile-container');
+            let hash        = '#tab-profile-'+ profileDom.dataset.id;
+            let tab         = document.querySelector('a[href="'+hash+'"]').parentElement;
+            let tabDom      = document.querySelector( hash );
+
+            tab.style.display = 'block';
+            triggerTabItem( hash );
+
+            tabDom.querySelectorAll('.box.view__profile').forEach(
+                viewDom => viewDom.style.display = 'block'
+            );
+
+            tabDom.querySelectorAll('.box.edit__profile').forEach(
+                editDom => editDom.style.display = 'none'
+            );
+        })
+    );
+
+    document.querySelectorAll('.edit-profile').forEach(
+        clickDom => clickDom.addEventListener( "click", 
+        () => {
+            let profileDom  = clickDom.closest('.profile-container');
+            let hash        = '#tab-profile-'+ profileDom.dataset.id;
+            let tab         = document.querySelector('a[href="'+hash+'"]').parentElement;
+            let tabDom      = document.querySelector( hash );
+
+            tab.style.display = 'block';
+            triggerTabItem( hash );
+
+            tabDom.querySelectorAll('.box.view__profile').forEach(
+                viewDom => viewDom.style.display = 'none'
+            );
+
+            tabDom.querySelectorAll('.box.edit__profile').forEach(
+                editDom => editDom.style.display = 'block'
+            );
+        })
+    );
+
+    let siteFilter = document.getElementById('profile-list-site-filter');
+    siteFilter.addEventListener('change',
+        () => {
+            let site = siteFilter.value;
+            document.querySelectorAll('.profile-container').forEach(
+                profileDom => {
+                    if( site === '' 
+                        || profileDom.classList.contains('profile-site-all')
+                        || profileDom.classList.contains('profile-site-'+site)
+                    ){
+                        profileDom.style.display = 'table-row';
+                    }
+                    else {
+                        profileDom.style.display = 'none';
+                    }
+                }
+            );
         }
-        else 
-        {
-            $('.profile-container').hide();
-            $('.profile-container.profile-site-all').show();
-            $('.profile-container.profile-site-'+siteFilter).show();
-            
-        }
-        return false;
-    });
-    
+    );
+
     // Toggles
-    $('.box.edit__profile').hide();
-    $('button.view-edit-profile-toggle').click(function()
-    {
-        let profileId  = $(this).parents('.box').data('profile');
-        
-        $('.view__profile[data-profile="'+profileId+'"]').toggle();
-        $('.edit__profile[data-profile="'+profileId+'"]').toggle();
-        
-        return false;
-    });
-    
-    
+    document.querySelectorAll('.box.edit-profile').forEach( boxDom => boxDom.style.display = 'none' );
+    document.querySelectorAll('button.view-edit-profile-toggle').forEach( 
+        buttonDom => buttonDom.addEventListener('click', e => {
+            e.preventDefault();
+
+            let profileId   =   buttonDom.closest('.box').dataset.profile;
+            let query       =   '.view__profile[data-profile="'+profileId+'"] ';
+            query           +=  ', .edit__profile[data-profile="'+profileId+'"] ';
+
+            document.querySelectorAll( query ).forEach( 
+                toggleDom => {
+                    if( toggleDom.style.display === 'none' ){
+                        toggleDom.style.display = 'block';
+                    }
+                    else {
+                        toggleDom.style.display = 'none';
+                    }
+                }
+            );
+            
+            return false;
+        })
+    );
+
     // Site 
-    $('.profile-site').change(function()
-    {
-        let formDom = $(this).parents('form');
-        let siteVal = $(this).val();
-        
-        if( siteVal === '*' ){
-            siteVal = 'all';
-        }
-        
-        $(formDom).find('.profile-site-displayed').hide();
-        $(formDom).find('.profile-site-displayed.profile-site-'+siteVal).show();
-    });
+    document.querySelectorAll('.profile-site').forEach(
+        siteInput => siteInput.addEventListener('change', () => {
+            let formDom = siteInput.closest('form');
+            let site    = siteInput.value;
+
+            if( site === '*' ){
+                site = 'all';
+            }
+
+            formDom.querySelectorAll('.profile-site-displayed').forEach(
+                profileDom => {
+                    if( profileDom.classList.contains('profile-site-'+site) ){
+                        profileDom.style.display = 'block';
+                    }
+                    else {
+                        profileDom.style.display = 'none';
+                    }
+                }
+            );
+        })
+    );
     
     // Policy
-    $('.edit-profile-form').on('click', 'button.policy-witch',  function()
-    {
-        chooseWitch().then( (witchId) => {
-            if( witchId === false ){
-                return;
+    document.querySelectorAll('.edit-profile-form').forEach(
+        formDom => formDom.addEventListener('click', e => {
+            if( e.target.nodeName === 'BUTTON' && e.target.classList.contains('policy-witch') )
+            {
+                e.preventDefault();
+                let policyDom = e.target.closest('.policy-container');
+
+                chooseWitch().then( witchId => {
+
+                    if( witchId === false ){
+                        return;
+                    }
+                    
+                    let witchName           = readWitchName( witchId );
+                    let witchBaseHref       = policyDom.querySelector('.policy-witch-display').getAttribute('href').split('?')[0];
+                    let witchNameDisplayDom = policyDom.querySelector('.policy-witch-display'); 
+
+                    policyDom.querySelector('button.policy-witch').style.display = 'none';
+
+                    witchNameDisplayDom.innerHTML = witchName;
+                    witchNameDisplayDom.setAttribute('href', witchBaseHref + '?id=' + witchId);
+                    witchNameDisplayDom.style.display = 'block';
+
+                    policyDom.querySelector('.unset-policy-witch').style.display    = 'block';
+                    policyDom.querySelector('.policy-witch-set').style.display      = 'block';
+                    policyDom.querySelector('.policy-witch-id').value               =  witchId;
+                });
+            }
+            else if( e.target.classList.contains('unset-policy-witch') )
+            {
+                e.preventDefault();
+                let policyDom = e.target.closest('.policy-container');
+                
+                policyDom.querySelector('button.policy-witch').style.display    = 'block';
+                policyDom.querySelector('.policy-witch-display').style.display  = 'none';
+                policyDom.querySelector('.unset-policy-witch').style.display    = 'none';
+                policyDom.querySelector('.policy-witch-set').style.display      = 'none';
+                policyDom.querySelector('.policy-witch-id').value               = '';
+            }
+            // Remove / Add on Edit profile
+            else if( e.target.classList.contains('add-policy-action') )
+            {
+                e.preventDefault();
+
+                let formDom         = e.target.closest('form.edit-profile-form');
+                let newPolicy       = formDom.querySelector('.policy-container').cloneNode(true);
+                newPolicy.classList.remove('policy-pattern');
+                newPolicy.classList.add('new-policy');
+
+                let newPolicyIndex  = formDom.querySelectorAll('.policy-container.new-policy').length;
+                
+                newPolicy.querySelector('.policy-id').value = 'new-' + newPolicyIndex;
+                newPolicy.querySelector('.policy-witch-set input[type="checkbox"]').value = 'new-' + newPolicyIndex;
+                
+                formDom.querySelector('tbody').append( newPolicy );
+                formDom.querySelector('.policy-container.new-policy').style.dusplay = 'block';
+            }
+            else if( e.target.closest('a') && e.target.closest('a').classList.contains('policy-remove') )
+            {
+                e.preventDefault();
+                let policyDom = e.target.closest('.policy-container');
+
+                let policyId  = policyDom.querySelector('.policy-id').value;
+        
+                policyDom.querySelector('.policy-deleted').value = policyId;
+                policyDom.style.display = 'none';
             }
             
-            let witchName       = readWitchName(witchId);
-            let policyDom       = $(this).parents('.policy-container');
-            let witchBaseHref   = $(policyDom).find('.policy-witch-display').attr('href').split('?')[0];
-            
-            $(policyDom).find('button.policy-witch').hide();
-            $(policyDom).find('.policy-witch-display').html( witchName ).attr('href', witchBaseHref + '?id=' + witchId).show();
-            $(policyDom).find('.unset-policy-witch').show();
-            $(policyDom).find('.policy-witch-set').show();
-            
-            $(policyDom).find('.policy-witch-id').val( witchId );
-        });
-        
-        return false;
-    });
-    
-    $('.edit-profile-form').on('click', '.unset-policy-witch',  function()
-    {
-        let policyDom       = $(this).parents('.policy-container');
-        
-        $(policyDom).find('button.policy-witch').show();
-        $(policyDom).find('.policy-witch-display').hide();
-        $(policyDom).find('.unset-policy-witch').hide();
-        $(policyDom).find('.policy-witch-set').hide();        
-        $(policyDom).find('.policy-witch-id').val('');
-        
-        return false;
-    });
-    
-    // Remove / Add on Edit profile
-    $('.edit-profile-form').on('click', '.policy-remove',  function()
-    {
-        let policyDom       = $(this).parents('.policy-container');
-        let policyId        = $(policyDom).find('.policy-id').val();
-        
-        $(policyDom).find('.policy-deleted').val( policyId );
-        $(policyDom).hide();
-        
-        return false;
-    });
-    
-    $('.edit-profile-form').on('click', '.add-policy-action',  function()
-    {
-        let formDom         = $(this).parents('form.edit-profile-form');
-        let newPolicy       = $(formDom).find('.policy-container').first().clone();
-        let newPolicyIndex  = $(formDom).find('.policy-container.new-policy').length;
-        
-        $(newPolicy).find('.policy-id').val('new-' + newPolicyIndex);
-        $(newPolicy).find('.policy-witch-set input[type="checkbox"]').val('new-' + newPolicyIndex);
-        
-        $(formDom).find('tbody').append( newPolicy );
-        $(formDom).find('.policy-container').last().addClass('new-policy').show();
-        
-        return false;
-    });
-    
-    
+            return false;
+        })
+    );
+
+    // TODO
     $('.undo-profile-action').click(function()
     {
         let formDom         = $(this).parents('form.edit-profile-form');

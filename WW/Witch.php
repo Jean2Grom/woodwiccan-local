@@ -136,7 +136,7 @@ class Witch
      * @return bool
      */
     function hasCauldron(): bool {
-        return !empty($this->properties[ 'cauldron' ]);
+        return (bool) ($this->cauldron ?? $this->cauldronId);
     }
     
     /**
@@ -144,7 +144,7 @@ class Witch
      * @return bool
      */
     function hasInvoke(): bool {
-        return !empty($this->properties[ 'invoke' ]);
+        return (bool) $this->invoke;
     }
     
     /**
@@ -154,7 +154,7 @@ class Witch
      */
     function isMotherOf( self $potentialDaughter ): bool
     {
-        if( $potentialDaughter->depth != $this->depth + 1 ){
+        if( $potentialDaughter->depth !== $this->depth + 1 ){
             return false;
         }
         
@@ -327,7 +327,7 @@ class Witch
             return "";
         }
         
-        $permission = $this->isAllowed( $module );
+        $permission = $this->ww->user->isAllowed( $module );
         
         if( !$permission && !empty($module->config['notAllowed']) )
         {
@@ -347,77 +347,6 @@ class Witch
         
         return $module->execute();
     }    
-    
-    /**
-     * Is user allowed to execute the module
-     * @param Module $module
-     * @param User $user
-     * @return bool
-     */
-    function isAllowed( Module $module, ?User $user=null ): bool
-    {
-        if( empty($user) ){
-            $user = $this->ww->user;
-        }
-        
-        if( !empty($module->config['public']) ){
-            $permission = true;
-        }
-        else // Is the current user has permission to access module ?
-        {
-            $permission = false;
-            foreach( $user->policies as $policy )
-            {
-                if( $policy['module'] != '*' && $policy['module'] != $module->name ){
-                    continue;
-                }
-                
-                if( $policy["position"] === false )
-                {
-                    $permission = true;
-                    break;
-                }
-                
-                if( $policy["position_rules"]["self"] && $policy["position"] == $this->position )
-                {
-                    $permission = true;
-                    break;
-                }
-                
-                if( $policy["position_rules"]["ancestors"] && count($this->position) < count($policy["position"]) )
-                {
-                    $matchPosition = true;
-                    foreach( $this->position as $level => $positionID ){
-                        if( $policy["position"][ $level ] != $positionID )
-                        {
-                            $matchPosition = false;
-                            break;
-                        }
-                    }
-                }
-                
-                if( $policy["position_rules"]["descendants"] && count($policy["position"]) < count($this->position) )
-                {
-                    $matchPosition = true;
-                    foreach( $policy["position"] as $level => $positionID ){
-                        if( $this->position[ $level ] != $positionID )
-                        {
-                            $matchPosition = false;
-                            break;
-                        }
-                    }
-                }
-                
-                if( !empty($matchPosition) )
-                {
-                    $permission = true;
-                    break;
-                }
-            }
-        }
-        
-        return $permission;
-    }
     
     /**
      * Read witch module, invoke it if needed

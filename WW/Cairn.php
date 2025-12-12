@@ -183,18 +183,30 @@ class Cairn
             $permission = false;
             foreach( $witchConf['entries'] as $invoke )
             {
-                if( $invoke === false ){
+                if( $invoke === false )
+                {
                     $permission = true;
+                    break;
                 }
-                elseif( $invoke == true && $this->witch($refWitch)->hasInvoke() )
-                {
-                    $module     = new Module( $this->witch($refWitch), $this->witch($refWitch)->invoke );
-                    $permission = $this->witch( $refWitch )->isAllowed( $module );
+
+                $module = null;
+                if( $invoke === true ){
+                    if( $this->witch( $refWitch )?->hasInvoke() ){
+                        $module     = new Module( 
+                            $this->witch( $refWitch ), 
+                            $this->witch( $refWitch )->invoke 
+                        );
+                    }
                 }
-                else 
-                {
-                    $module     = new Module( $this->witch( $refWitch ), $invoke );
-                    $permission = $this->witch( $refWitch )->isAllowed( $module );
+                elseif( $invoke ){
+                    $module     = new Module( 
+                        $this->witch( $refWitch ), 
+                        $invoke 
+                    );
+                }
+
+                if( $module ){
+                    $permission = $this->ww->user->isAllowed( $module );
                 }
                 
                 if( $permission ){
