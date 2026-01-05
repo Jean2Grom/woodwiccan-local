@@ -39,10 +39,11 @@ if( $witch->cauldron() ): ?>
                     <thead>
                         <tr>
                             <th>Main</th>
-                            <th>ID</th>
-                            <th>Detach</th>
-                            <th>Delete</th>
+                            <th>detach / delete</th>
+                            <th>ID / depth</th>
+                            <th>Parent</th>
                             <th>Name</th>
+                            <th>Daughters Count</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -63,21 +64,32 @@ if( $witch->cauldron() ): ?>
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="text-center"><?=$witchItem->id ?></div>
+                                    <div class="text-center">
+                                        <?php if( $witchItem->id !== $witch->id ): ?>
+                                            <a  class="remove-cauldron-witch"
+                                                data-witch="<?=$witchItem->id?>">
+                                                <i class="fa fa-times"></i>
+                                            </a>
+                                            <a  class="delete-cauldron-witch"
+                                                data-witch="<?=$witchItem->id?>">
+                                                <i class="fa fa-trash"></i>
+                                            </a>
+                                        <?php else: ?>
+                                            -
+                                        <?php endif; ?>
+                                    </div>
                                 </td>
                                 <td>
-                                    <?php if( $witchItem->id !== $witch->id ): ?>
-                                        <a  class="remove-cauldron-witch text-center"
-                                            data-witch="<?=$witchItem->id?>">
-                                            <i class="fa fa-times"></i>
-                                        </a>
-                                    <?php endif; ?>
+                                    <div class="text-center">
+                                        <?=$witchItem->id." / ".$witchItem->depth ?>
+                                    </div>
                                 </td>
                                 <td>
-                                    <?php if( $witchItem->id !== $witch->id ): ?>
-                                        <a  class="delete-cauldron-witch text-center"
-                                            data-witch="<?=$witchItem->id?>">
-                                            <i class="fa fa-trash"></i>
+                                    <?php if( !$witchItem->mother?->exist() ): ?>
+                                        no
+                                    <?php else: ?>
+                                        <a href="<?=$witch->ww->website->getUrl( "view", ['id'=> $witchItem->mother->id] ) ?>">
+                                            <?=$witchItem->mother->name ?>
                                         </a>
                                     <?php endif; ?>
                                 </td>
@@ -92,6 +104,15 @@ if( $witch->cauldron() ): ?>
                                             <?=$witchItem->name ?>
                                         </a>
                                     <?php endif; ?>
+                                </td>
+                                <td>
+                                    <div class="text-center">
+                                        <?php if( is_null($witchItem->daughters) ): ?>
+                                            -
+                                        <?php else: ?>
+                                            <?=count($witchItem->daughters) ?>
+                                        <?php endif; ?>
+                                    </div>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

@@ -44,6 +44,10 @@
     .box table .full{
         display: none;
     }
+    .box table .text-center {
+        display: flex;
+        justify-content: space-around;
+    }
     .box table th {
         background-color: #eee;
         padding: 3px;
@@ -53,10 +57,6 @@
     }
         .box table td a em {
             font-size: 0.9em;        
-        }
-        .box table td .text-center {
-            display: flex;
-            justify-content: center;
         }
         .box table td.icons-container {
             display: flex;

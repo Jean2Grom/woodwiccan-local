@@ -53,10 +53,6 @@
                 </td>
             </tr>
         <?php endif; ?>
-        <tr>
-            <td class="label">Witch ID</td>
-            <td class="value"><?=$witch->id ?></td>
-        </tr>
         <?php if( $witch->mother() ): ?>
             <tr>
                 <td class="label"><em>Mother</em></td>
@@ -67,6 +63,10 @@
                 </td>
             </tr>
         <?php endif; ?>
+        <tr>
+            <td class="label">ID / depth</td>
+            <td class="value"><?=$witch->id." / ".$witch->depth ?></td>
+        </tr>
     </table>
     
     <div class="box__actions">
