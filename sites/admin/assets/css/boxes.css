@@ -10,6 +10,9 @@
         width: 100%;
         resize: none;
     }
+.screen {
+    display: none;
+}
 .box {
     border: 1px solid #ccc;
     border-radius: 12px;
@@ -108,6 +111,9 @@
     } 
     
 @media screen and (min-device-width: 768px) {
+    .screen {
+        display: block;
+    }
     .box table .full {
         display: table-cell;
     }

@@ -40,10 +40,10 @@ if( $witch->cauldron() ): ?>
                         <tr>
                             <th>Main</th>
                             <th>detach / delete</th>
-                            <th>ID / depth</th>
+                            <th class="screen">ID / depth</th>
                             <th>Parent</th>
                             <th>Name</th>
-                            <th>Daughters Count</th>
+                            <th class="screen">Daughters Count</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -79,7 +79,7 @@ if( $witch->cauldron() ): ?>
                                         <?php endif; ?>
                                     </div>
                                 </td>
-                                <td>
+                                <td class="screen">
                                     <div class="text-center">
                                         <?=$witchItem->id." / ".$witchItem->depth ?>
                                     </div>
@@ -105,7 +105,7 @@ if( $witch->cauldron() ): ?>
                                         </a>
                                     <?php endif; ?>
                                 </td>
-                                <td>
+                                <td class="screen">
                                     <div class="text-center">
                                         <?php if( is_null($witchItem->daughters) ): ?>
                                             -

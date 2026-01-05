@@ -19,7 +19,7 @@ $this->addJsFile('root.js');
                     <thead>
                         <tr>
                             <th>Name</th>
-                            <th>Site</th>
+                            <th class="screen">Site</th>
                             <th>Priority</th>
                         </tr>
                     </thead>
@@ -31,7 +31,7 @@ $this->addJsFile('root.js');
                                         <?=$daughter->name ?>
                                     </a>
                                 </td>
-                                <td>
+                                <td class="screen">
                                     <?=$daughter->site ?>
                                 </td>
                                 <td class="text-right">

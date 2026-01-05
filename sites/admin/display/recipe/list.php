@@ -13,7 +13,7 @@ $this->addJsFile('triggers.js');
         <thead>
             <tr>
                 <th>Name</th>
-                <th>Implementations</th>
+                <th class="screen">Implementations</th>
                 <th>Usages in Witches</th>
                 <th>Actions</th>
             </tr>
@@ -26,7 +26,7 @@ $this->addJsFile('triggers.js');
                             <?=$data['name']?>
                         </a>
                     </td>
-                    <td><span class="text-center"><?=$data['cauldron']?></span></td>
+                    <td class="screen"><span class="text-center"><?=$data['cauldron']?></span></td>
                     <td><span class="text-center"><?=$data['witches']?></span></td>
                     <td>
                         <div class="text-center">
