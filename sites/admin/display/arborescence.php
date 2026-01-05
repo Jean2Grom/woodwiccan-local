@@ -27,7 +27,18 @@ $this->addJsFile('arborescence-menu.js');
 
 $key = "arborescence_".md5(microtime().rand());
 ?>
-<div id="<?=$key ?>" class="arborescence-menu-container module"></div>
+
+<div id="<?=$key ?>" class="module"> 
+    <div class="arborescence-menu-form">
+        <i class="fa fa-search"></i>
+        <input type="text" />
+        <a class="show-arborescence-menu-results">
+            <i class="fas fa-list"></i>
+        </a>
+    </div>
+    <div class="arborescence-menu-results"></div>
+    <div class="arborescence-menu-container"></div>
+</div>
 
 <script type="text/javascript">
     if( arborescencesInputs === undefined ){

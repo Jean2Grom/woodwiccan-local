@@ -112,3 +112,34 @@
             .arborescence-menu-context-menu li a i {
                 margin-right: 8px;
             }
+
+.arborescence-menu-results {
+    width: fit-content;
+    font-size: 14px;
+    position: absolute;
+    margin-top: 5px;
+    margin-left: 20px;
+    background-color: #FFFFFF;
+    border: 1px solid #ccc;
+}
+    .arborescence-menu-results .breadcrumb {
+        font-style: italic;
+        font-size: 12px;
+        margin-left: 40px;
+    }
+    .arborescence-menu-results .arborescence-level__witch {
+        box-shadow: none;
+        border-radius: 0;
+        margin-bottom: 0;
+        padding-right: 8px;
+        display: flex;
+    }
+    .arborescence-menu-results a {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+    }
+    .arborescence-menu-results, 
+    .show-arborescence-menu-results {
+        display: none;        
+    }

@@ -1,16 +1,22 @@
 #choose-witch {
     display: none;
     
-    position: fixed;
+    position: absolute;
     top: 30%;
     left: 5%;
     max-width: 80%;
+    max-height: 70%;
     background-color: #FFF;
     padding: 15px;
     border: 1px solid #000;
     border-radius: 5px;
-    
+    overflow: auto;
+    z-index: 30;
 }
+    #choose-witch h3 {
+        cursor: move;
+        margin-bottom: 12px;
+    }
     #choose-witch .close {
         cursor: pointer;
         float: right;

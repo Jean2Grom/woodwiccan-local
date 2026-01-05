@@ -18,6 +18,8 @@ const ArborescenceMenu = function( key ){
         urlHash: null,
 
         container: null,
+        searchForm: null,
+        searchResults: null,
 
         icons: {
             homeWitch: {dom: "i", classes: [ 'fas', 'fa-home' ]}, 
@@ -34,7 +36,7 @@ const ArborescenceMenu = function( key ){
             toggleDomOpen: {dom: "i", classes: [ 'far', 'fa-folder-open' ]}, 
             //toggleDomClosed: {dom: "i", classes: [ 'fas', 'fa-chevron-down' ]},
             //toggleDomOpen: {dom: "i", classes: [ 'fas', 'fa-chevron-right' ]},
-
+ 
             add: {dom: "i", classes: [ 'fa', 'fa-plus' ]}, 
             view: {dom: "i", classes: [ 'fa', 'fa-eye' ]}, 
             cancel: {dom: "i", classes: [ 'fa', 'fa-times' ]}, 
@@ -55,22 +57,29 @@ const ArborescenceMenu = function( key ){
             this.currentSite    = entries.currentSite;
             this.breadcrumb     = entries.breadcrumb;
 
-            this.draggable      = entries.draggable ?? false;
-            this.clipboardUrl   = entries.clipboardUrl ?? null,
-            this.createUrl      = entries.createUrl ?? null,
-            this.cauldronUrl    = entries.cauldronUrl ?? null,
-            this.urlHash        = entries.urlHash ?? null,
+            let keyDom          = document.getElementById( this.key );
 
-            this.container      = document.querySelector('#' + this.key + '.arborescence-menu-container'),
+            this.draggable      = entries.draggable ?? false;
+            this.clipboardUrl   = entries.clipboardUrl ?? null;
+            this.createUrl      = entries.createUrl ?? null;
+            this.cauldronUrl    = entries.cauldronUrl ?? null;
+            this.urlHash        = entries.urlHash ?? null;
+
+            this.container      = keyDom.querySelector('.arborescence-menu-container');
+            
+            this.searchForm     = keyDom.querySelector('.arborescence-menu-form');
+            this.searchResults  = keyDom.querySelector('.arborescence-menu-results');
 
             this.treeData.forEach(firstLevel => this.homeIds.push(firstLevel.id) );
 
+            this.searchInit();
+            
             this.addArborescenceLevel( this.treeData )
             .then( 
                 this.open( this.breadcrumb )
             )
             .then(
-                this.container.addEventListener("wheel", (e) => {
+                this.container.addEventListener("wheel", e => {
 
                     let diff = this.container.scrollWidth - this.container.offsetWidth;
                     if( !(this.container.scrollLeft === 0 && e.deltaY < 0) 
@@ -291,6 +300,9 @@ const ArborescenceMenu = function( key ){
                         );
                         arborescenceLevelWitchDom.append(iDom);
                     }
+                    if( daughterData['description'] ?? null ){
+                        arborescenceLevelWitchDom.setAttribute('title', daughterData['description']);
+                    }
     
                     let aDom = document.createElement('a');
                     aDom.classList.add("arborescence-level__witch__name");
@@ -298,7 +310,6 @@ const ArborescenceMenu = function( key ){
                     if( daughterData['href'] !== undefined ){
                         aDom.setAttribute('href', daughterData['href']);
                     }
-                    aDom.setAttribute('title', daughterData['description']);
                     aDom.innerHTML = daughterData['name'];
                     arborescenceLevelWitchDom.append(aDom);
                     
@@ -531,6 +542,7 @@ const ArborescenceMenu = function( key ){
                         positionTop.setAttribute('rel', 'before');
                         positionTop.setAttribute('ref', witch.dataset.id);
                         level.insertBefore(  positionTop, witch );  
+                        //document.querySelector('html').scrollTop += 10;
                     }
                     
                     if( !witch.nextSibling || this.draggedId !== witch.nextSibling.dataset.id )
@@ -592,16 +604,31 @@ const ArborescenceMenu = function( key ){
         },
         scrollToLastLevel: async function()
         {
-            if( this.container && this.container.lastChild ){
-                this.container.lastChild.scrollIntoView({ 
-                    behavior: "smooth", 
-                    block: "start", 
-                    container: "nearest", 
-                    inline: "end" 
-                });
-                //this.container.lastChild.scrollIntoView({ behavior: "smooth", block: "start", inline: "end" });
-                //this.container.lastChild.scrollIntoView({ behavior: "smooth", inline: "end" });
+            if( !this.container || !this.container.lastChild ){
+                return;
             }
+
+            this.container.lastChild.scrollIntoView();
+            //this.container.scrollLeft += this.container.lastChild.clientWidth;
+
+            let security            = 0;
+            let overflowDom         = this.container;
+            let overflowDomFound    = false;
+            while( overflowDom && !overflowDomFound && security < 1000 )
+            {
+                if( overflowDom.id === 'choose-witch' || overflowDom.scrollTop > 0 )
+                {
+                    overflowDom.scrollTop = 0;
+                    overflowDomFound = true;
+                }
+                else {
+                    overflowDom = overflowDom.parentNode;
+                }
+
+                security++;
+            }
+
+            return;
         },
         toggle: async function( target )
         {
@@ -699,6 +726,135 @@ const ArborescenceMenu = function( key ){
             }
 
             return true;
+        },
+        searchInit: function()
+        {
+            let showResults = this.searchForm.querySelector('.show-arborescence-menu-results');
+            let searchInput = this.searchForm.querySelector('input[type="text"]');
+
+            searchInput.addEventListener( "input", () => {
+                this.searchResults.innerHTML        = "";
+                this.searchResults.style.display    = "none";
+                showResults.style.display           = "none";
+                let searchString                    = searchInput.value;
+
+                if( searchString === "" ){
+                    return;
+                }
+
+                let results = this.searchString( searchString, this.treeData );
+
+                if( results.length > 25 ){
+                    return;
+                }
+
+                results.forEach( entry => {
+                    let arborescenceLevelWitchDom   = document.createElement('div');
+                    arborescenceLevelWitchDom.classList.add("arborescence-level__witch");
+                    
+                    arborescenceLevelWitchDom.dataset.id        = entry.witch.id;
+                    arborescenceLevelWitchDom.dataset.cauldron  = entry.witch.cauldron;
+                    arborescenceLevelWitchDom.dataset.invoke    = entry.witch.invoke;
+                    
+                    let witchIcon = false;
+
+                    if( this.homeIds.includes(entry.witch.id) ){
+                        witchIcon = this.icons.homeWitch;
+                    }
+                    else if( entry.witch.cauldron && entry.witch.invoke ){
+                        witchIcon = this.icons.fullWitch;
+                    } 
+                    else if( entry.witch.cauldron ){
+                        witchIcon = this.icons.cauldronWitch;
+                    } 
+                    else if( entry.witch.invoke ){
+                        witchIcon = this.icons.invokeWitch;
+                    } 
+                    else {
+                        witchIcon = this.icons.basicWitch;
+                    }
+
+                    if( witchIcon )
+                    {
+                        let iDom = document.createElement( witchIcon.dom );
+                        witchIcon.classes.forEach(
+                            witchIconClass => iDom.classList.add( witchIconClass )
+                        );
+                        arborescenceLevelWitchDom.append(iDom);
+                    }
+    
+                    let aDom = document.createElement('a');
+                    aDom.classList.add("arborescence-level__witch__name");
+    
+                    if( entry.witch.href !== undefined ){
+                        aDom.setAttribute('href', entry.witch.href);
+                    }
+                    if( entry.witch.description ?? null ){
+                        arborescenceLevelWitchDom.setAttribute('title', entry.witch.description);
+                    }
+                    aDom.innerHTML = entry.witch.name;
+
+                    let breadcrumbDom       = document.createElement( 'span' );
+                    breadcrumbDom.classList.add("breadcrumb");
+                    breadcrumbDom.innerHTML = entry.breadcrumb.join(' > ');
+                    aDom.append(breadcrumbDom);
+
+                    arborescenceLevelWitchDom.append(aDom);
+                
+                    this.searchResults.append( arborescenceLevelWitchDom );
+                });
+
+                this.searchResults.style.display = "block";
+            });
+
+            this.searchForm.parentNode.addEventListener( 'click', e => {
+                if( e.target.closest('.arborescence-menu-results') === this.searchResults ){
+                    return;
+                }
+
+                if( showResults === e.target ||
+                    e.target.closest('.show-arborescence-menu-results') === showResults 
+                ){
+                    this.searchResults.style.display    = 'block';
+                    showResults.style.display           = 'none';
+                    return;
+                }
+
+                if( this.searchResults.checkVisibility() )
+                {
+                    this.searchResults.style.display    = 'none';
+
+                    if( this.searchResults.innerHTML !== "" ){
+                        showResults.style.display = 'inline-block';
+                    }
+                }
+
+                return;
+            });
+        },
+        searchString: function( value, subTree, breadcrumb=[] )
+        {
+            let matchList   = [];
+
+            subTree.forEach( 
+                witch => {
+                    if( witch.name.toLowerCase().indexOf( value.toLowerCase() ) !== -1 )
+                    {
+                        matchList.push({ 
+                            'witch': witch, 
+                            'breadcrumb': breadcrumb
+                        });
+                    }
+
+                    matchList = matchList.concat( this.searchString( 
+                        value, 
+                        witch.daughters ?? [], 
+                        breadcrumb.concat( witch.name ) 
+                    ) ); 
+                }
+            );
+
+            return matchList;
         }
     };
 };
