@@ -3,7 +3,9 @@
  * @var WW\Context $this 
  * @var ?array $breadcrumb
  */ 
+$breadcrumb = $breadcrumb ?? [];
 ?>
+
 <header>
     <div class="banner">
         <div class="logo">
@@ -19,15 +21,14 @@
         </h1>
 
         <?php if( count($this->witch('menu')?->daughters() ?? []) > 0 ): ?>
-            <a class="side-nav-toggler">
-                <i class="fa fa-bars"></i>
-            </a>
+        <img    class="burger-menu-icon" 
+                src="<?= $this->getImageFile('burger.png') ?>" />
         <?php endif; ?>
     </div>
     
-    <?php if( $breadcrumb ?? [] ): ?>
+    <?php if( $breadcrumb ): ?>
         <div class="banner-nav">
-            <?php if( count($breadcrumb ?? []) > 1 ): ?>
+            <?php if( count($breadcrumb) > 1 ): ?>
                 <a href="<?=array_reverse($breadcrumb)[1]['href']?>">
                     <i class="fa fa-arrow-up"></i>
                 </a>

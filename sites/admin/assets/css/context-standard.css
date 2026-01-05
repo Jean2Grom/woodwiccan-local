@@ -1,22 +1,19 @@
 nav {
-    display: none;
+    max-width: 50%;
     height: 100%;
+    background-color: #f5f5f5;
     position: fixed;
     z-index: 30;
-    background-color: #cccccc;
-    overflow-x: hidden;
+    display: none;
 }
+    nav.show {
+        display: block;
+    }
     nav .nav-container {
         display: flex;
         flex-direction: column;
         justify-content: space-between;
         height: 100%;
-    }
-    nav a.side-nav-toggler {
-        position: absolute;
-        right: 10px;
-        top: 10px;
-        margin: 0;
     }
     nav a {
         font-size: 1em;
@@ -30,10 +27,10 @@ nav {
         font-weight: normal;
         justify-content: space-evenly;
         background-color: white;
-        padding: 8px 0px;
+        padding: 8px 4px;
     }
         nav .nav-user a {
-            margin: 0;
+            margin: 0 4px;
         }
 
 main, footer {
@@ -53,12 +50,6 @@ fieldset {
     margin-bottom: 8px;
     padding: 8px;
 }
-    fieldset ul li {
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        margin-bottom: 4px;
-        padding: 4px 8px;
-    }
 .tabs {
     display: flex;
 }
@@ -96,14 +87,12 @@ fieldset {
     nav {
         display: block;
         width: 128px;
+        background-color: #cccccc;
     }
         nav a {
             display: block;
             margin-top: 20px;
             margin-left: 20px;
-        }
-        nav a.side-nav-toggler {
-            display: none;
         }
     main, header, footer {
         margin-left: 128px;

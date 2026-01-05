@@ -10,6 +10,9 @@
         width: 100%;
         resize: none;
     }
+.screen {
+    display: none;
+}
 .box {
     border: 1px solid #ccc;
     border-radius: 12px;
@@ -44,6 +47,10 @@
     .box table .full{
         display: none;
     }
+    .box table .text-center {
+        display: flex;
+        justify-content: space-around;
+    }
     .box table th {
         background-color: #eee;
         padding: 3px;
@@ -53,10 +60,6 @@
     }
         .box table td a em {
             font-size: 0.9em;        
-        }
-        .box table td .text-center {
-            display: flex;
-            justify-content: center;
         }
         .box table td.icons-container {
             display: flex;
@@ -108,6 +111,9 @@
     } 
     
 @media screen and (min-device-width: 768px) {
+    .screen {
+        display: block;
+    }
     .box table .full {
         display: table-cell;
     }

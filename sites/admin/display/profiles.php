@@ -69,8 +69,7 @@ $this->addContextArrayItems( 'tabs', [
                                 </span>
                             </td>
                             <td>
-                                <a  class="view-profile" 
-                                    data-id="<?=$profile->id?>">
+                                <a  class="view-profile" >
                                     <?=$profile->name?>
                                 </a>
                             </td>

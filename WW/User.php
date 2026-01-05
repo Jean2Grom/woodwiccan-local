@@ -151,5 +151,93 @@ class User
         $this->session->pushTo( $varname, $varvalue );
         
         return $this;
-    }    
+    }
+
+
+    /**
+     * Is user allowed to execute the module
+     * @param Module $module
+     * @return bool
+     */
+    function isAllowed( Module $module ): bool
+    {
+        if( !empty($module->config['public']) ){
+            return true;
+        }
+
+        // Is the current user has permission to access module ?
+        $permission = false;
+        foreach( $this->policies as $policy )
+        {
+            if( $policy['module'] != '*' && $policy['module'] != $module->name ){
+                continue;
+            }
+            
+            if( $policy["position"] === false )
+            {
+                $permission = true;
+                break;
+            }
+            
+            if( $policy["position_rules"]["self"] && $policy["position"] == $module->witch->position )
+            {
+                $permission = true;
+                break;
+            }
+            
+            if( $policy["position_rules"]["ancestors"] && count($module->witch->position) < count($policy["position"]) )
+            {
+                $matchPosition = true;
+                foreach( $module->witch->position as $level => $positionID ){
+                    if( $policy["position"][ $level ] != $positionID )
+                    {
+                        $matchPosition = false;
+                        break;
+                    }
+                }
+            }
+            
+            if( $policy["position_rules"]["descendants"] && count($policy["position"]) < count($module->witch->position) )
+            {
+                $matchPosition = true;
+                foreach( $policy["position"] as $level => $positionID ){
+                    if( $module->witch->position[ $level ] != $positionID )
+                    {
+                        $matchPosition = false;
+                        break;
+                    }
+                }
+            }
+            
+            if( !empty($matchPosition) )
+            {
+                $permission = true;
+                break;
+            }
+        }
+        
+        return $permission;
+    }
+
+
+    /**
+     * Is user allowed to access the witch
+     * @param Witch $witch
+     * @return bool
+     */
+    function hasAccess( Witch $witch ): bool
+    {
+        $permission = true;
+        
+        $this->ww->debug( $this );
+        $this->ww->dump( $this->policies  );
+
+
+
+
+        return $permission;
+    }
+
+
+
 }

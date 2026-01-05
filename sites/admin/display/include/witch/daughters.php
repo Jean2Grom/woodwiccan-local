@@ -7,7 +7,8 @@
 <div class="box view__daughters">
     <h3>
         <i class="fa fa-folder-open"></i>
-        Daughters
+        Daughters 
+        <?= $witch->daughters()? '('.count($witch->daughters()).')': '' ?>
     </h3>
     
     
