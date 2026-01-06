@@ -220,8 +220,10 @@ const ArborescenceMenu = function( key ){
             let menu        = document.createElement('menu');
 
             menu.classList.add("arborescence-menu-context-menu");
-            menu.style.left = e.x +'px';
-            menu.style.top  = e.y +'px';
+            
+            menu.style.position = 'fixed';
+            menu.style.left     = e.x +'px';
+            menu.style.top      = e.y +'px';
 
             menuItems.forEach(  
                 item => {
@@ -733,9 +735,9 @@ const ArborescenceMenu = function( key ){
             let searchInput = this.searchForm.querySelector('input[type="text"]');
 
             searchInput.addEventListener( "input", () => {
-                this.searchResults.innerHTML        = "";
-                this.searchResults.style.display    = "none";
-                showResults.style.display           = "none";
+                this.searchResults.innerHTML        = '';
+                this.searchResults.style.display    = 'none';
+                showResults.style.display           = 'none';
                 let searchString                    = searchInput.value;
 
                 if( searchString === "" ){
@@ -743,10 +745,6 @@ const ArborescenceMenu = function( key ){
                 }
 
                 let results = this.searchString( searchString, this.treeData );
-
-                if( results.length > 25 ){
-                    return;
-                }
 
                 results.forEach( entry => {
                     let arborescenceLevelWitchDom   = document.createElement('div');
@@ -804,7 +802,15 @@ const ArborescenceMenu = function( key ){
                     this.searchResults.append( arborescenceLevelWitchDom );
                 });
 
-                this.searchResults.style.display = "block";
+
+                if( results.length > 25 ){
+                    showResults.style.display           = 'inline-block';
+                }
+                else {
+                    this.searchResults.style.display    = 'block';
+                }
+
+                return;
             });
 
             this.searchForm.parentNode.addEventListener( 'click', e => {
