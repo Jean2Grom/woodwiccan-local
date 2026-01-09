@@ -257,6 +257,49 @@ const ArborescenceMenu = function( key ){
 
             this.container.append(menu);
         },
+        witchIcon: function( witchData )
+        {
+            let icon       = false;
+            let iconTitle  = "ID " + witchData.id;
+            if( witchData.cauldron ?? null )
+            {
+                if( witchData.invoke ?? null )
+                {
+                    icon       =   this.icons.fullWitch;
+                    iconTitle  +=  ", invokation, cauldron";
+                }
+                else 
+                {
+                    icon       =   this.icons.cauldronWitch;
+                    iconTitle  +=  ", cauldron";
+                }
+            } 
+            else if( witchData.invoke ?? null )
+            {
+                icon       =   this.icons.invokeWitch;
+                iconTitle  +=  ", invokation";
+            } 
+            else {
+                icon = this.icons.basicWitch;
+            }
+
+            if( this.homeIds.includes(witchData.id) ){
+                icon = this.icons.homeWitch;
+            }
+
+            if( icon )
+            {
+                let iDom = document.createElement( icon.dom );
+                iDom.setAttribute('title', iconTitle);
+                icon.classes.forEach(
+                    iconClass => iDom.classList.add( iconClass )
+                );
+
+                return iDom;
+            }
+            
+            return false;
+        },
         addArborescenceLevel: async function( subTree )
         {
             let arborescenceLevelDom = document.createElement('div');
@@ -273,52 +316,34 @@ const ArborescenceMenu = function( key ){
                         arborescenceLevelWitchDom.classList.add("current");
                     }
                     
-                    arborescenceLevelWitchDom.dataset.id        = daughterData['id'];
-                    arborescenceLevelWitchDom.dataset.cauldron  = daughterData['cauldron'];
-                    arborescenceLevelWitchDom.dataset.invoke    = daughterData['invoke'];
+                    arborescenceLevelWitchDom.dataset.id        = daughterData.id;
+                    arborescenceLevelWitchDom.dataset.cauldron  = daughterData.cauldron ?? false;
+                    arborescenceLevelWitchDom.dataset.invoke    = daughterData.invoke ?? false;
                     
-                    let witchIcon = false;
+                    let witchIcon = this.witchIcon( daughterData );
+                    if( witchIcon ){
+                        arborescenceLevelWitchDom.append(witchIcon);
+                    }
 
-                    if( this.homeIds.includes(daughterData.id) ){
-                        witchIcon = this.icons.homeWitch;
+                    if( daughterData.description ?? null ){
+                        arborescenceLevelWitchDom.setAttribute('title', daughterData.description);
                     }
-                    else if( daughterData['cauldron'] && daughterData['invoke'] ){
-                        witchIcon = this.icons.fullWitch;
-                    } 
-                    else if( daughterData['cauldron'] ){
-                        witchIcon = this.icons.cauldronWitch;
-                    } 
-                    else if( daughterData['invoke'] ){
-                        witchIcon = this.icons.invokeWitch;
-                    } 
-                    else {
-                        witchIcon = this.icons.basicWitch;
-                    }
-                    if( witchIcon )
-                    {
-                        let iDom = document.createElement( witchIcon.dom );
-                        witchIcon.classes.forEach(
-                            witchIconClass => iDom.classList.add( witchIconClass )
-                        );
-                        arborescenceLevelWitchDom.append(iDom);
-                    }
-                    if( daughterData['description'] ?? null ){
-                        arborescenceLevelWitchDom.setAttribute('title', daughterData['description']);
-                    }
-    
+                    
                     let aDom = document.createElement('a');
                     aDom.classList.add("arborescence-level__witch__name");
-    
-                    if( daughterData['href'] !== undefined ){
-                        aDom.setAttribute('href', daughterData['href']);
-                    }
-                    aDom.innerHTML = daughterData['name'];
-                    arborescenceLevelWitchDom.append(aDom);
                     
-                    if( daughterData['daughters'].length > 0 )
+                    if( daughterData.href ?? null ){
+                        aDom.setAttribute('href', daughterData.href);
+                    }
+                    aDom.innerHTML = daughterData.name ?? "";
+                    arborescenceLevelWitchDom.append(aDom);
+
+                    let daughters = daughterData.daughters ?? [];
+                    if( daughters.length > 0 )
                     {
                         let spanDom = document.createElement('span');
                         spanDom.classList.add("arborescence-level__witch__daughters-display");
+                        spanDom.setAttribute('title', daughters.length + " daughters");
                         
                         let toggleDom = document.createElement( this.icons.toggleDomClosed.dom );
                         this.icons.toggleDomClosed.classes.forEach(
@@ -754,33 +779,11 @@ const ArborescenceMenu = function( key ){
                     arborescenceLevelWitchDom.dataset.cauldron  = entry.witch.cauldron;
                     arborescenceLevelWitchDom.dataset.invoke    = entry.witch.invoke;
                     
-                    let witchIcon = false;
-
-                    if( this.homeIds.includes(entry.witch.id) ){
-                        witchIcon = this.icons.homeWitch;
+                    let witchIcon = this.witchIcon( entry.witch );
+                    if( witchIcon ){
+                        arborescenceLevelWitchDom.append(witchIcon);
                     }
-                    else if( entry.witch.cauldron && entry.witch.invoke ){
-                        witchIcon = this.icons.fullWitch;
-                    } 
-                    else if( entry.witch.cauldron ){
-                        witchIcon = this.icons.cauldronWitch;
-                    } 
-                    else if( entry.witch.invoke ){
-                        witchIcon = this.icons.invokeWitch;
-                    } 
-                    else {
-                        witchIcon = this.icons.basicWitch;
-                    }
-
-                    if( witchIcon )
-                    {
-                        let iDom = document.createElement( witchIcon.dom );
-                        witchIcon.classes.forEach(
-                            witchIconClass => iDom.classList.add( witchIconClass )
-                        );
-                        arborescenceLevelWitchDom.append(iDom);
-                    }
-    
+                    
                     let aDom = document.createElement('a');
                     aDom.classList.add("arborescence-level__witch__name");
     
@@ -801,7 +804,6 @@ const ArborescenceMenu = function( key ){
                 
                     this.searchResults.append( arborescenceLevelWitchDom );
                 });
-
 
                 if( results.length > 25 ){
                     showResults.style.display           = 'inline-block';
@@ -859,6 +861,33 @@ const ArborescenceMenu = function( key ){
                     ) ); 
                 }
             );
+
+            matchList.sort( (a, b) => {
+                let aName = a.witch.name.toLowerCase();
+                let bName = b.witch.name.toLowerCase();
+
+                if( aName < bName ){
+                    return -1;
+                }
+                if( aName > bName ){
+                    return 1;
+                }
+                if( a.witch.name < b.witch.name ){
+                    return -1;
+                }
+                if( a.witch.name > b.witch.name ){
+                    return 1;
+                }
+
+                if( a.breadcrumb.length < b.breadcrumb.length ){
+                    return -1;
+                }
+                if( a.breadcrumb.length > b.breadcrumb.length ){
+                    return 1;
+                }
+
+                return 0;
+            });
 
             return matchList;
         }
