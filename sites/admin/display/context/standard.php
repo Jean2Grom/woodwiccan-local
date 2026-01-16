@@ -110,8 +110,6 @@ $this->addJsFile('context-standard.js');
             <?php $this->include('context/footer.php'); ?>
         </div>
         
-        <?php foreach( $this->getJsFiles() as $jsFile ): ?>
-            <script src="<?=$jsFile?>"></script>
-        <?php endforeach; ?>        
+        <?=$this->js() ?>
     </body>
 </html>

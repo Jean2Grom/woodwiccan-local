@@ -7,7 +7,7 @@ if( $witch->cauldron() ): ?>
     <div class="box">
         <h3>
             <i class="fa fa-project-diagram"></i>
-            Cauldron Witches
+            Cauldron Witches (<?= count($witch->cauldron()->witches()) ?>)
         </h3>
 
         <form   method="post" 
@@ -30,95 +30,91 @@ if( $witch->cauldron() ): ?>
                     data-confirm="Delete cauldron's witch ?" 
                     data-target="view-cauldron-witches-action" >delete-cauldron-witch</button>
 
-            <?php if( count($witch->cauldron()->witches()) === 1 ): ?>
-                <p><em>No other witch</em></p>
-
-            <?php else: ?>
-                <p><em>Cauldron's associated witches list</em></p>
-                <table>
-                    <thead>
+            <p><em>Cauldron's associated witches list</em></p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Main</th>
+                        <th>detach / delete</th>
+                        <th class="screen">ID / depth</th>
+                        <th>Parent</th>
+                        <th>Name</th>
+                        <th class="screen">Daughters Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach( $witch->cauldron()->witches() as $key => $witchItem ): ?>
                         <tr>
-                            <th>Main</th>
-                            <th>detach / delete</th>
-                            <th class="screen">ID / depth</th>
-                            <th>Parent</th>
-                            <th>Name</th>
-                            <th class="screen">Daughters Count</th>
+                            <td>
+                                <div class="text-center">
+                                    <input type="radio" 
+                                            name="main"
+                                            value="<?=$witchItem->id ?>"
+                                            <?php if( array_key_first($witch->cauldron()->witches()) === $key ): ?>
+                                                checked
+                                            <?php else: ?>
+                                                class="trigger-action" 
+                                                data-action="switch-cauldron-main-witch" 
+                                                data-target="view-cauldron-witches-action" 
+                                            <?php endif; ?> />
+                                </div>
+                            </td>
+                            <td>
+                                <div class="text-center">
+                                    <?php if( $witchItem->id !== $witch->id ): ?>
+                                        <a  class="remove-cauldron-witch"
+                                            data-witch="<?=$witchItem->id?>">
+                                            <i class="fa fa-times"></i>
+                                        </a>
+                                        <a  class="delete-cauldron-witch"
+                                            data-witch="<?=$witchItem->id?>">
+                                            <i class="fa fa-trash"></i>
+                                        </a>
+                                    <?php else: ?>
+                                        -
+                                    <?php endif; ?>
+                                </div>
+                            </td>
+                            <td class="screen">
+                                <div class="text-center">
+                                    <?=$witchItem->id." / ".$witchItem->depth ?>
+                                </div>
+                            </td>
+                            <td>
+                                <?php if( !$witchItem->mother?->exist() ): ?>
+                                    no
+                                <?php else: ?>
+                                    <a href="<?=$witch->ww->website->getUrl( "view", ['id'=> $witchItem->mother->id] ) ?>">
+                                        <?=$witchItem->mother->name ?>
+                                    </a>
+                                <?php endif; ?>
+                            </td>
+                            <td>
+                                <?php if( $witchItem->id === $witch->id ): ?>
+                                    <span class="highlighted">
+                                        <?=$witchItem->name ?>
+                                        <em>(this witch)</em>
+                                    </span>
+                                <?php else: ?>
+                                    <a href="<?=$witch->ww->website->getUrl( "view", ['id'=> $witchItem->id] ) ?>">
+                                        <?=$witchItem->name ?>
+                                    </a>
+                                <?php endif; ?>
+                            </td>
+                            <td class="screen">
+                                <div class="text-center">
+                                    <?php if( is_null($witchItem->daughters) ): ?>
+                                        -
+                                    <?php else: ?>
+                                        <?=count($witchItem->daughters) ?>
+                                    <?php endif; ?>
+                                </div>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach( $witch->cauldron()->witches() as $key => $witchItem ): ?>
-                            <tr>
-                                <td>
-                                    <div class="text-center">
-                                        <input type="radio" 
-                                               name="main"
-                                               value="<?=$witchItem->id ?>"
-                                               <?php if( array_key_first($witch->cauldron()->witches()) === $key ): ?>
-                                                    checked
-                                               <?php else: ?>
-                                                    class="trigger-action" 
-                                                    data-action="switch-cauldron-main-witch" 
-                                                    data-target="view-cauldron-witches-action" 
-                                               <?php endif; ?> />
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="text-center">
-                                        <?php if( $witchItem->id !== $witch->id ): ?>
-                                            <a  class="remove-cauldron-witch"
-                                                data-witch="<?=$witchItem->id?>">
-                                                <i class="fa fa-times"></i>
-                                            </a>
-                                            <a  class="delete-cauldron-witch"
-                                                data-witch="<?=$witchItem->id?>">
-                                                <i class="fa fa-trash"></i>
-                                            </a>
-                                        <?php else: ?>
-                                            -
-                                        <?php endif; ?>
-                                    </div>
-                                </td>
-                                <td class="screen">
-                                    <div class="text-center">
-                                        <?=$witchItem->id." / ".$witchItem->depth ?>
-                                    </div>
-                                </td>
-                                <td>
-                                    <?php if( !$witchItem->mother?->exist() ): ?>
-                                        no
-                                    <?php else: ?>
-                                        <a href="<?=$witch->ww->website->getUrl( "view", ['id'=> $witchItem->mother->id] ) ?>">
-                                            <?=$witchItem->mother->name ?>
-                                        </a>
-                                    <?php endif; ?>
-                                </td>
-                                <td>
-                                    <?php if( $witchItem->id === $witch->id ): ?>
-                                        <span class="highlighted">
-                                            <?=$witchItem->name ?>
-                                            <em>(this witch)</em>
-                                        </span>
-                                    <?php else: ?>
-                                        <a href="<?=$witch->ww->website->getUrl( "view", ['id'=> $witchItem->id] ) ?>">
-                                            <?=$witchItem->name ?>
-                                        </a>
-                                    <?php endif; ?>
-                                </td>
-                                <td class="screen">
-                                    <div class="text-center">
-                                        <?php if( is_null($witchItem->daughters) ): ?>
-                                            -
-                                        <?php else: ?>
-                                            <?=count($witchItem->daughters) ?>
-                                        <?php endif; ?>
-                                    </div>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            <?php endif; ?>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+            
         </form>
         
         <div class="box__actions">

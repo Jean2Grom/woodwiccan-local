@@ -20,10 +20,7 @@ class Context
     const CSS_SUBFOLDER             = "assets/css";
     const FONTS_SUBFOLDER           = "assets/fonts";
     
-    const CSS_FILE_DISPLAY          = "css-file.php";
-    const JS_FILE_DISPLAY           = "js-file.php";
-    const IMAGE_FILE_DISPLAY        = "image-file.php";
-    const FAVICON_FILE_DISPLAY      = "context/favicon-file.php";
+    const DOM_FILE_DISPLAY          = "dom.php";
     
     public $name;
     public $execFile;
@@ -154,6 +151,33 @@ class Context
         return $this->css;
     }
     
+    function css(): void
+    {
+        $displayFilePath = $this->ww->website->getFilePath( 
+            Website::INCLUDE_DIR."/".self::DOM_FILE_DISPLAY
+        );
+        
+        if( empty($displayFilePath) )
+        {
+            $this->ww->log->error("Can't get DOM display file");
+            return;
+        }
+
+        foreach( $this->getCssFiles() as $cssFile )
+        {
+            $dom        = "link";
+            $attributes = [ 
+                'rel'   => "stylesheet", 
+                'type'  => "text/css", 
+                'href'  => $cssFile, 
+            ];
+            
+            include $displayFilePath;
+        }
+
+        return;
+    }
+
     function jsSrc( string $jsFile ): ?string {
         return $this->ww->website->getWebPath( self::JS_SUBFOLDER."/".$jsFile );
     }
@@ -178,6 +202,29 @@ class Context
         return $this->js;
     }
     
+    function js(): void
+    {
+        $displayFilePath = $this->ww->website->getFilePath( 
+            Website::INCLUDE_DIR."/".self::DOM_FILE_DISPLAY
+        );
+        
+        if( empty($displayFilePath) )
+        {
+            $this->ww->log->error("Can't get DOM display file");
+            return;
+        }
+
+        foreach( $this->getJsFiles() as $jsFile )
+        {
+            $dom        = "script";
+            $attributes = [ 'src'  => $jsFile ];
+            
+            include $displayFilePath;
+        }
+
+        return;
+    }
+
     function addJsLibFile( string $jsFile ): bool
     {
         $jsWebPath = $this->ww->website->getWebPath( self::JS_SUBFOLDER."/".$jsFile );
@@ -197,7 +244,57 @@ class Context
     function getJsLibFiles(): array {
         return $this->jsLib;
     }
-    
+
+    function jsLibs(): void
+    {
+        $displayFilePath = $this->ww->website->getFilePath( 
+            Website::INCLUDE_DIR."/".self::DOM_FILE_DISPLAY
+        );
+        
+        if( empty($displayFilePath) )
+        {
+            $this->ww->log->error("Can't get DOM display file");
+            return;
+        }
+
+        foreach( $this->getJsLibFiles() as $jsLibFile )
+        {
+            $dom        = "script";
+            $attributes = [ 'src' => $jsLibFile ];
+            
+            include $displayFilePath;
+        }
+
+        return;
+    }
+
+    function image( string $imageFile ): void 
+    {
+        $displayFilePath = $this->ww->website->getFilePath( 
+            Website::INCLUDE_DIR."/".self::DOM_FILE_DISPLAY
+        );
+
+        if( empty($displayFilePath) )
+        {
+            $this->ww->log->error("Can't get DOM display file");
+            return;
+        }
+        
+        $imageSrc = $this->imageSrc( $imageFile );
+        if( !$imageSrc )
+        {
+            $this->ww->log->error("Can't get IMAGE file");
+            return;
+        }
+
+        $dom        = "img";
+        $attributes = [ 'src' => $imageSrc ];
+        
+        include $displayFilePath;
+        
+        return;
+    }
+
     function imageSrc( string $imageFile ): ?string {
         return $this->ww->website->getWebPath( self::IMAGES_SUBFOLDER."/".$imageFile );
     }
@@ -209,21 +306,28 @@ class Context
     function favicon( string $iconFile="favicon.ico" ): void
     {
         $displayFilePath = $this->ww->website->getFilePath( 
-            Website::INCLUDE_DIR."/".self::FAVICON_FILE_DISPLAY 
+            Website::INCLUDE_DIR."/".self::DOM_FILE_DISPLAY
         );
 
         if( empty($displayFilePath) )
         {
-            $this->ww->log->error("Can't get FAVICON file display file");
+            $this->ww->log->error("Can't get DOM display file");
             return;
         }
         
-        $iconSrc = $this->imageSrc( $iconFile );
-        if( empty($iconSrc) )
+        $imagePath = $this->ww->website->getFilePath(self::IMAGES_SUBFOLDER."/".$iconFile);
+        if( !$imagePath )
         {
             $this->ww->log->error("Can't get FAVICON file");
             return;
         }
+        
+        $dom        = "link";        
+        $attributes = [ 
+            'rel'   => "icon",
+            'type'  => mime_content_type( $imagePath ),
+            'href'  => $this->imageSrc( $iconFile ),
+        ];
         
         include $displayFilePath;
         
