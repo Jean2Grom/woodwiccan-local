@@ -752,12 +752,7 @@ $breadcrumb         = [];
 $breadcrumbWitch    = $this->witch("target");
 while( !empty($breadcrumbWitch) )
 {
-    if( $breadcrumbWitch  === $this->witch("target") ){
-        $url    = "javascript: location.reload();";
-    }
-    else {
-        $url    = $this->witch->url([ 'id' => $breadcrumbWitch->id ]);
-    }
+    $url    = $this->witch->url([ 'id' => $breadcrumbWitch->id ]);
     
     $breadcrumb[]   = [
         "name"  => $breadcrumbWitch->name,
