@@ -30,9 +30,125 @@ class CauldronHandler
             return false;
         }
         
-        return self::instanciate($ww, $configuration, $result);
+$ww->dump( $configuration );
+//$ww->dump( $result );
+        $cauldronsIds = [];
+        foreach( $result as $row ){
+            $cauldronsIds[] = $row['id'];
+        }
+//$ww->dump( $cauldronsIds );
+
+        $result2 = DataAccess::ingredientsRequest($ww, $cauldronsIds, $getWitches);
+        
+        if( $result2 === false ){
+            return false;
+        }
+        
+//$ww->dump( $result2 );
+
+
+        return self::instanciate2($ww, $configuration, $result, $result2);
+        // return self::instanciate($ww, $configuration, $result);
+    }
+
+    private static function instanciate2( WoodWiccan $ww, array $configuration, array $result, array $ingedientsResult ): array
+    {
+        $return         = [];
+        $cauldronsList  = [];
+        $witchesList    = [];
+        $depthArray     = [];
+        foreach( range(0, $ww->cauldronDepth) as $d ){
+            $depthArray[ $d ] = [];
+        }
+        
+        foreach( $result as $row )
+        {
+            $id                     = (int) $row['id'];
+            $cauldronsList[ $id ]   = $cauldronsList[ $id ] ?? self::createFromData( $ww, $row );
+
+            foreach( $ingedientsResult as $ingedientRow ){
+                if( (int) $ingedientRow['id'] === $id )
+                {
+                    IngredientHandler::createFromDBRow( $cauldronsList[ $id ], $ingedientRow );
+
+                    if( !in_array($id, $depthArray[ $cauldronsList[ $id ]->depth ]) ){
+                        $depthArray[ $cauldronsList[ $id ]->depth ][] = $id;
+                    }
+
+                    // Witch part
+                    $witchId = $row['w_id'] ?? null;
+                    if( !$witchId || !empty($witchesList[ $witchId ]) ){
+                        continue;
+                    }
+
+                    $witch = $ww->cairn->searchById( $witchId );
+                    if( !$witch )
+                    {
+                        $witchData = [];
+                        foreach( Witch::FIELDS as $field ){
+                            $witchData[ $field ] = $row[ "w_".$field ];
+                        }
+                        
+                        foreach( range(1, $ww->depth) as $i ){
+                            $witchData[  "level_".$i ] = $row[ "w_level_".$i ];
+                        }
+                        
+                        $witch = WitchHandler::instanciate($ww, $witchData);
+                    }
+                    
+                    $witchesList[ $witchId ] = $witch;
+
+                }
+            }
+
+            foreach( $configuration as $conf ){
+                if( (int) $conf === $id ){
+                    $return[ $conf ] = $cauldronsList[ $id ];
+                }
+            }
+
+            if(  in_array('user', $configuration) 
+                &&  empty($return['user'])
+                &&  $row['i_name'] === 'user__connexion'
+                &&  $row['i_value'] === $ww->user->id 
+            ){
+                $return['user'] = $cauldronsList[ $id ];
+            }
+
+        }
+        
+        // Link witches and cauldron objects
+        foreach( $witchesList as $witch ){
+            if( isset($cauldronsList[ $witch->cauldronId ]) )
+            {
+                $witch->cauldron = $cauldronsList[ $witch->cauldronId ];
+                $cauldronsList[ $witch->cauldronId ]->witches = array_replace(
+                    $cauldronsList[ $witch->cauldronId ]->witches ?? [],
+                    [ $witch->id => $witch ]
+                );
+            }
+        }
+        foreach( $cauldronsList as $cauldron ){ 
+            $cauldron->orderWitches();
+        }
+        
+        for( $i=0; $i < $ww->cauldronDepth; $i++ ){
+            foreach( $depthArray[ $i ] as $potentialParentId ){
+                foreach( $depthArray[ ($i+1) ] as $potentialDaughterId ){
+                    if( self::isParentPosition( 
+                        $cauldronsList[ $potentialParentId ]->position, 
+                        $cauldronsList[ $potentialDaughterId ]->position 
+                    ) ){
+                        self::setParenthood($cauldronsList[ $potentialParentId ], $cauldronsList[ $potentialDaughterId ]);
+                    }
+                }
+            }
+        }
+$ww->debug( $return );
+        return $return;
     }
     
+
 
     /**
      * PRIVATE instanciate Cauldrons and Ingredients from configuration and data access results

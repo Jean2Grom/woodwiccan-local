@@ -43,54 +43,47 @@ class CauldronDataAccess
 
         // Determine the list of fields in select part of query
         $query  =   "SELECT DISTINCT `c`.`".implode( "`, `c`.`", Cauldron::FIELDS)."` ";
+        //$query  =   "SELECT `c`.`".implode( "`, `c`.`", Cauldron::FIELDS)."` ";
 
         $prefix = "`c`.`level_"; 
         $query  .=  ", ".$prefix.implode("`, ".$prefix, range(1, $ww->cauldronDepth))."` ";
 
-        $excludFields = [
-            'cauldron_fk',
-        ];
-        foreach( Ingredient::DEFAULT_AVAILABLE_INGREDIENT_TYPES_PREFIX as $type => $prefix ){
-            foreach( Ingredient::FIELDS as $field ){
-                if( !in_array($field, $excludFields) ){
-                    $query  .=  ", `".$prefix."`.`".$field."` AS `".$prefix."_".$field."` ";
-                }
-            }
-        }
+        // $excludFields = [
+        //     'cauldron_fk',
+        // ];
+        // foreach( Ingredient::DEFAULT_AVAILABLE_INGREDIENT_TYPES_PREFIX as $type => $prefix ){
+        //     foreach( Ingredient::FIELDS as $field ){
+        //         if( !in_array($field, $excludFields) ){
+        //             $query  .=  ", `".$prefix."`.`".$field."` AS `".$prefix."_".$field."` ";
+        //         }
+        //     }
+        // }
 
-        if( $getWitches )
-        {
-            foreach( Witch::FIELDS as $field ){
-                $query  .=  ", `w`.`".$field."` AS `w_".$field."` ";
-            }
+        // if( $getWitches )
+        // {
+        //     foreach( Witch::FIELDS as $field ){
+        //         $query  .=  ", `w`.`".$field."` AS `w_".$field."` ";
+        //     }
             
-            foreach( range(1, $ww->depth) as $i ){
-                $query  .=  ", `w`.`level_".$i."` AS `w_level_".$i."` ";
-            }
-        }
+        //     foreach( range(1, $ww->depth) as $i ){
+        //         $query  .=  ", `w`.`level_".$i."` AS `w_level_".$i."` ";
+        //     }
+        // }
 
-        
         $query  .= "FROM ";
 
-        // $userConnexionJointure = false;
-        // if( in_array('user', $configuration) && $ww->user->connexion )
+        $query  .= "`cauldron` AS `c` ";
+        // foreach( Ingredient::DEFAULT_AVAILABLE_INGREDIENT_TYPES_PREFIX as $type => $prefix )
         // {
-        //     $userConnexionJointure = true;
-        //     $query  .= "`ingredient__integer` AS `user_connexion`, ";
+        //     $query  .=  "LEFT JOIN `ingredient__".$type."` AS `".$prefix."` ";
+        //     $query  .=      "ON `".$prefix."`.`cauldron_fk` = `c`.`id` ";
         // }
         
-        $query  .= "`cauldron` AS `c` ";
-        foreach( Ingredient::DEFAULT_AVAILABLE_INGREDIENT_TYPES_PREFIX as $type => $prefix )
-        {
-            $query  .=  "LEFT JOIN `ingredient__".$type."` AS `".$prefix."` ";
-            $query  .=      "ON `".$prefix."`.`cauldron_fk` = `c`.`id` ";
-        }
-        
-        if( $getWitches )
-        {
-            $query  .= "LEFT JOIN `witch` AS `w` ";
-            $query  .=  "ON `w`.`cauldron` = `c`.`id` ";
-        }
+        // if( $getWitches )
+        // {
+        //     $query  .= "LEFT JOIN `witch` AS `w` ";
+        //     $query  .=  "ON `w`.`cauldron` = `c`.`id` ";
+        // }
 
         $query  .= "LEFT JOIN `cauldron` AS `c_ref` ";
         $query  .=  "ON ( ";
@@ -118,23 +111,82 @@ class CauldronDataAccess
         $query      .=  str_replace(' %s.', ' `c`.', $condition);
         $query      .=  "OR ".str_replace(' %s.', " `c_ref`.", $condition);
         
-        // if( $userConnexionJointure )
-        // {
-        //     $query      .=  $separator;
-        //     $separator  =   "OR ";
+//$ww->db->debugQuery($query, $parameters);
+        return $ww->db->selectQuery($query, $parameters);
+    }
 
-        //     $query  .=  "( ";
-        //     $query  .=      " `c`.`id` = `user_connexion`.`cauldron_fk` ";
-        //     $query  .=          "OR  `c_user`.`id` = `user_connexion`.`cauldron_fk` ";
-        //     $query  .=  ") ";
+    static function ingredientsRequest( WoodWiccan $ww, array $configuration, bool $getWitches=true )
+    {
+        if( !$configuration ){
+            return [];
+        }
 
-        //     $query  .=  "AND `user_connexion`.`id` IS NOT NULL ";
-        //     $query  .=  "AND `user_connexion`.`name` = \"user__connexion\" ";
-        //     $query  .=  "AND `user_connexion`.`value` = :user_id ";
+        // Determine the list of fields in select part of query
+        //$query  =   "SELECT DISTINCT `c`.`".implode( "`, `c`.`", Cauldron::FIELDS)."` ";
+        $query  =   "SELECT DISTINCT `c`.`id` ";
 
-        //     $parameters[ 'user_id' ] = (int) $ww->user->id;
-        // }
+        // $prefix = "`c`.`level_"; 
+        // $query  .=  ", ".$prefix.implode("`, ".$prefix, range(1, $ww->cauldronDepth))."` ";
 
+        $excludFields = [
+            'cauldron_fk',
+        ];
+        foreach( Ingredient::DEFAULT_AVAILABLE_INGREDIENT_TYPES_PREFIX as $type => $prefix ){
+            foreach( Ingredient::FIELDS as $field ){
+                if( !in_array($field, $excludFields) ){
+                    $query  .=  ", `".$prefix."`.`".$field."` AS `".$prefix."_".$field."` ";
+                }
+            }
+        }
+
+        if( $getWitches )
+        {
+            foreach( Witch::FIELDS as $field ){
+                $query  .=  ", `w`.`".$field."` AS `w_".$field."` ";
+            }
+            
+            foreach( range(1, $ww->depth) as $i ){
+                $query  .=  ", `w`.`level_".$i."` AS `w_level_".$i."` ";
+            }
+        }
+
+        $query  .= "FROM ";
+
+        $query  .= "`cauldron` AS `c` ";
+        foreach( Ingredient::DEFAULT_AVAILABLE_INGREDIENT_TYPES_PREFIX as $type => $prefix )
+        {
+            $query  .=  "LEFT JOIN `ingredient__".$type."` AS `".$prefix."` ";
+            $query  .=      "ON `".$prefix."`.`cauldron_fk` = `c`.`id` ";
+        }
+        
+        if( $getWitches )
+        {
+            $query  .= "LEFT JOIN `witch` AS `w` ";
+            $query  .=  "ON `w`.`cauldron` = `c`.`id` ";
+        }
+
+        $parameters =   [];
+        $query      .=  "WHERE ";
+
+        $condition  =   " %s.`id` IN ( ";
+        $separator  =   " ";
+        foreach( $configuration as $conf )
+        {
+            if( ctype_digit(strval($conf)) )
+            {
+                $parameters[ 'c_'.$conf ]    = (int) $conf;
+    
+                $condition  .=  $separator.":c_".$conf." ";
+                $separator  =   ", ";
+
+            }
+        }
+        $condition .=  ") ";
+
+        $query      .=  str_replace(' %s.', ' `c`.', $condition);
+        //$query      .=  "OR ".str_replace(' %s.', " `c_ref`.", $condition);
+        
+//$ww->db->debugQuery($query, $parameters);
         return $ww->db->selectQuery($query, $parameters);
     }
 
