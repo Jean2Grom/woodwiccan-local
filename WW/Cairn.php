@@ -642,8 +642,8 @@ class Cairn
             'name'              => $witch->name,
             'site'              => $witch->site ?? "",
             'description'       => $witch->data,
-            'cauldron'          => $witch->hasCauldron(),
-            'invoke'            => $witch->hasInvoke(),
+            'cauldron'          => $witch->cauldronId,
+            'invoke'            => $witch->invoke,
             'daughters'         => $daughtersTrees,
             'path'              => $path,
         ];
