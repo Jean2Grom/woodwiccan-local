@@ -73,6 +73,20 @@ class User
         // }
     }
     
+    static function factory( Request $request ): self
+    {
+        $user = new self( $request->ww );
+        
+        if( $request->param('action') === 'login' ){
+            $user->init( Handler::login( 
+                $request->ww,
+                $request->param('username'), 
+                $request->param('password')                 
+            ) );
+        }
+
+        return $user;
+    }
     
     function init( array $loginData ): bool
     {

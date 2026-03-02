@@ -14,21 +14,20 @@ class Cairn
 {
     const DEFAULT_WITCH = "url";
     
-    /** @var Witch[] */
-    private $witches;
-
-    /** @var Cauldron[] */
-    private $cauldrons;
-
-    public $invokations;
-    
-    public $configuration;
-    
     /** 
      * Class containing website (app) information and aggreging related objects
      * @var Website 
      */
     public Website $website;
+    
+    /** @var Witch[] */
+    private array $witches      = [];
+
+    /** @var Cauldron[] */
+    private array $cauldrons    = [];
+
+    public array $invokations   = [];
+    public array $configuration = [];
     
     /** 
      * WoodWiccan container class to allow whole access to Kernel
@@ -38,18 +37,39 @@ class Cairn
     
     function __construct( WoodWiccan $ww, array $summoningConfiguration, ?Website $forcedWebsite=null )
     {
-        $this->ww       = $ww;
-        $this->website  = $forcedWebsite ?? $this->ww->website;
-        
-        $this->witches      = [];
-        $this->cauldrons    = [];
-        
-        $this->invokations      = [];
-        $this->configuration    = self::prepareConfiguration($this->website, $summoningConfiguration);
+        $this->ww               = $ww;
+        $this->website          = $forcedWebsite ?? $this->ww->website;
+        $this->configuration    = self::prepareConfiguration(
+            $this->website, 
+            $summoningConfiguration
+        );
     }
     
     function __get( string $witchRef ): ?Witch {
         return $this->witches[ $witchRef ] ?? null; 
+    }
+
+    static function factory( Website $website ): self
+    {
+        $witchesConf = [];
+        foreach( array_reverse($website->heritages) as $section ){
+            foreach( $website->ww->configuration->read($section, "witches") ?? [] as $wName => $wConf ){
+                $witchesConf[ $wName ] = $wConf;
+            }
+        }
+
+        foreach( $website->modules as $moduleName => $moduleConf ){
+            foreach( $moduleConf['witches'] ?? [] as $moduleWitchName => $moduleWitchConf ){
+                if( empty($witchesConf[ $moduleWitchName ]) ){
+                    $witchesConf[ $moduleWitchName ] = array_replace_recursive( 
+                        $moduleWitchConf, 
+                        [ 'module' => $moduleName ] 
+                    );
+                }
+            }
+        }
+
+        return new self( $website->ww, $witchesConf, $website );
     }
 
     static function prepareConfiguration(  Website $website, array $rawConfiguration ): array
@@ -57,32 +77,65 @@ class Cairn
         $arboConf = function ($init, $new) {
             if( is_array($new) )
             {
-                $innerDepth      = 1;
-                $innerCraft = false;
-                if( is_array($init) )
+                if( $new['depth'] === true ){
+                    $depth = 1;
+                }
+                elseif( $new['depth'] === '*' ){
+                    $depth = '*';
+                }
+                else 
                 {
-                    $innerDepth = $init['depth'];
-                    $innerCraft = $init['craft'];
+                    $depth = (int) $new['depth'];
+
+                    if( $depth <= 0 ){
+                        return $init;
+                    }
                 }
 
-                if( $innerDepth === '*' || $new['depth'] === '*' ){
-                    $innerDepth = '*';
+                if( $new['craft'] === true || $new['craft'] === '*' ){
+                    $craft = $depth;
                 }
-                elseif( !empty($new['depth']) && $new['depth'] >= $innerDepth ){
-                    $innerDepth = $new['depth'];
+                else 
+                {
+                    $craft = (int) $new['craft'];
+
+                    if( $craft < 0 ){
+                        $craft = 0;
+                    }
+                    elseif( $depth !== '*' && $craft > $depth ){
+                        $craft = $depth;
+                    }
                 }
 
-                if( $innerCraft === '*' || $new['craft'] === '*' ){
-                    $innerCraft = '*';
+                if( !$init ){
+                    $init = [
+                        'depth' => 0,
+                        'craft' => 0,
+                    ];
                 }
-                elseif( !empty($new['craft']) && $new['craft'] >= $innerCraft ){
-                    $innerCraft = $new['craft'];
+
+                if( $init['depth'] === '*' || $depth === '*' )
+                {
+                    $depth = '*';
+
+                    if( $init['craft'] === '*' || $craft === '*' ){
+                        $craft = '*';
+                    }
+                    elseif( $init['craft'] > $craft ){
+                        $craft = $init['craft'];
+                    }
+                }
+                elseif( $init['depth'] > $depth )
+                {
+                    $depth = $init['depth'];
+                    $craft = $init['craft'];
                 }
 
                 return [
-                    'depth' => $innerDepth,
-                    'craft' => $innerCraft,
+                    'depth' => $depth,
+                    'craft' => $craft,
                 ];
+
             }
             else {
                 return $init;
@@ -104,7 +157,8 @@ class Cairn
                 $match = $website->getUrlSearchParameters();
             }
             elseif( $entryConf['match'] === "user" ){
-                $match = [ 'cauldron' => "user" ];
+                //$match = [ 'cauldron' => "user" ];
+                $match = [ 'cauldron' => $website->ww->user?->cauldron ?? "user" ];
             }
             else 
             {
@@ -153,7 +207,10 @@ class Cairn
 
             $conditions = $entryConf['conditions'] ?? false;
             if( $conditions !== false && $prevConditions !== false ){
-                $conf[ $index ]['conditions'] = array_merge_recursive( ($prevConditions ?? []), $conditions );
+                $conf[ $index ]['conditions'] = array_merge_recursive( 
+                    ($prevConditions ?? []), 
+                    $conditions 
+                );
             }
         }
 
@@ -161,7 +218,7 @@ class Cairn
             if( !empty($confItem['sisters']) && empty($confItem['parents']) ){
                 $conf[ $index ]['parents'] = [
                     "depth" => 1,
-                    "craft" => false
+                    "craft" => 0
                 ];
             }
         }
@@ -247,7 +304,7 @@ class Cairn
                 );
             }
         }
-        
+
         return $cauldronsConf? CauldronHandler::fetch($this->ww, array_unique($cauldronsConf), false): [];
     }
 
@@ -310,11 +367,14 @@ class Cairn
         return $cauldronsConf;
     }
 
-
-
     
     function summon()
     {
+        // $summonResult = WitchDataAccess::summon($this->ww, $this->configuration);
+        // $this->addWitches( $summonResult );
+        // $cauldronResult = $this->getCauldrons();
+        // $this->addCauldrons( $cauldronResult );
+
         $this->addWitches(  WitchDataAccess::summon($this->ww, $this->configuration) );
         $this->addCauldrons( $this->getCauldrons() );
 

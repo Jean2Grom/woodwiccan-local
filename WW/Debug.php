@@ -48,17 +48,16 @@ class Debug
     
     /**
      * To enable / disable the debug
-     * 
-     * @var bool
      */
-    public $enabled;
+    public bool $enabled            = false;
     
-    public $buffer = [];
-    public $resume = [];
-    public $databaseAnalysis = [];
+    public array $buffer            = [];
+    public array $resume            = [];
+    public array $databaseAnalysis  = [];
     
-    private $refNanoTime;
-    private $databaseRefNanoTime;
+    private int $constructNanoTime;
+    private ?int $refNanoTime       = null;
+    private int $databaseRefNanoTime;
     
     /**
      * Bytes value of implementation of class
@@ -80,9 +79,10 @@ class Debug
      */
     function __construct( WoodWiccan $ww )
     {
-        $this->ww           = $ww;
-        $this->enabled      = false;
-        $this->refNanoTime = hrtime(true);
+        $this->ww                   = $ww;
+        $this->enabled              = false;
+        $this->constructNanoTime    = hrtime(true);
+        // $this->refNanoTime          = hrtime(true);
         
         set_error_handler(function($errno, $errstr, $errfile, $errline) {
             $errLevel = "PHP ERROR HANDLED: ";
@@ -263,17 +263,10 @@ class Debug
     {
         $time = hrtime(true);
         
-        if( $display && $this->refNanoTime )
+        if( $display )
         {
-            $nanoSec        =   $time - $this->refNanoTime;
-            $secDiff        =   floor( $nanoSec/1e+9 );
-            $nanoSec        -=  $secDiff * 1e+9;
-            $mSecDiff       =   floor( $nanoSec/1e+6 );
-            $nanoSec        -=  $mSecDiff * 1e+6;
-            $microSecDiff   =   floor( $nanoSec/1e+3 );
-            $nanoSec        -=  $microSecDiff * 1e+3;
-            
-            $this->dump( $secDiff." seconds, ".$mSecDiff." milliseconds and ".$microSecDiff." microseconds", "Time" );
+            $nanoSec        =   $time - ($this->refNanoTime ?? $this->constructNanoTime);
+            $this->dump( self::nanoSecDisplay($nanoSec), "Time" );
         }
         
         $this->refNanoTime = $time;
@@ -281,6 +274,23 @@ class Debug
         return $this->refNanoTime;
     }    
     
+    /**
+     * Make a human readable string from nanosecond amount
+     * @var int $nanoSec 
+     * @return string
+     */
+    private static function nanoSecDisplay( int $nanoSec ): string
+    {
+        $secDiff        =   floor( $nanoSec/1e+9 );
+        $nanoSec        -=  $secDiff * 1e+9;
+        $mSecDiff       =   floor( $nanoSec/1e+6 );
+        $nanoSec        -=  $mSecDiff * 1e+6;
+        $microSecDiff   =   floor( $nanoSec/1e+3 );
+        $nanoSec        -=  $microSecDiff * 1e+3;
+        
+        return $secDiff." seconds, ".$mSecDiff." milliseconds and ".$microSecDiff." microseconds";
+    }
+
     /**
      * 
      * usage :
@@ -349,6 +359,8 @@ class Debug
                 echo "\n".$resumeItem['userPrefix'].' '.trim($resumeItem['callerArray']).' '.$resumeItem['variable'];
             }
             
+            echo "\n\nExecution Time : ".self::nanoSecDisplay( hrtime(true) - $this->constructNanoTime );
+
             $this->buffer[] = ob_get_contents();
             ob_end_clean();
         }
@@ -478,7 +490,7 @@ class Debug
                 'time'      => 0,
             ];
         }
-        
+
         $this->databaseRefNanoTime = hrtime(true);
     }
     
@@ -494,7 +506,7 @@ class Debug
         }
         
         $time = hrtime(true) - $this->databaseRefNanoTime;
-        
+
         $this->databaseAnalysis[ $type ]['requests']++;
         $this->databaseAnalysis[ $type ]['time'] += $time;
     }

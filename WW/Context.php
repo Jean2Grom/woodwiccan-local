@@ -15,6 +15,7 @@ class Context
     const DIR                   = "context";
     const DISPLAY_DIR           = "display/context";
     
+    const ASSETS_SUBFOLDER          = "assets";
     const IMAGES_SUBFOLDER          = "assets/images";
     const JS_SUBFOLDER              = "assets/js";
     const CSS_SUBFOLDER             = "assets/css";
@@ -116,7 +117,7 @@ class Context
      */
     function display( ?string $filename=null )
     {
-        $this->displayFileOnExecution = (bool) $this->displayFile( $filename, false );;
+        $this->displayFileOnExecution = (bool) $this->displayFile( $filename, false );
         return $this->displayFileOnExecution;
     }
     
@@ -268,7 +269,7 @@ class Context
         return;
     }
 
-    function image( string $imageFile ): void 
+    function image( string $imageFile, array $attributes=[] ): void 
     {
         $displayFilePath = $this->ww->website->getFilePath( 
             Website::INCLUDE_DIR."/".self::DOM_FILE_DISPLAY
@@ -287,8 +288,8 @@ class Context
             return;
         }
 
-        $dom        = "img";
-        $attributes = [ 'src' => $imageSrc ];
+        $dom                = "img";
+        $attributes['src']  = $imageSrc;
         
         include $displayFilePath;
         
@@ -396,6 +397,10 @@ class Context
         }        
         
         $this->ww->debug->toResume("Executing file: \"".$this->execFile."\"", 'CONTEXT');
+        
+        foreach( $this->customVars ?? [] as $includedFunctionParamName => $includedFunctionParamValue ){
+            $$includedFunctionParamName = $includedFunctionParamValue;
+        }
         
         include $this->execFile;
         if( $this->displayFileOnExecution ){
