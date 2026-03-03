@@ -370,12 +370,17 @@ class Cairn
     
     function summon()
     {
-        // $summonResult = WitchDataAccess::summon($this->ww, $this->configuration);
-        // $this->addWitches( $summonResult );
+        $witches = WitchDataAccess::summon($this->ww, $this->configuration);
+
+        if( empty($witches[ self::DEFAULT_WITCH ]) ){
+            $witches[ self::DEFAULT_WITCH ] = WitchHandler::instanciate( $this->ww, [ 'name' => "ABSTRACT 404 WITCH", 'invoke' => '404' ] ); 
+        }
+        
+        $this->addWitches( $witches );
+
         // $cauldronResult = $this->getCauldrons();
         // $this->addCauldrons( $cauldronResult );
-
-        $this->addWitches(  WitchDataAccess::summon($this->ww, $this->configuration) );
+        
         $this->addCauldrons( $this->getCauldrons() );
 
         return $this;
