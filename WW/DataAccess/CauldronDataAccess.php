@@ -7,13 +7,7 @@ use WW\Cauldron\Ingredient;
 use WW\Witch;
 
 class CauldronDataAccess
-{    
-    const RELATIONSHIPS_JOINTURE = [
-        'siblings' => "siblingsJointure",
-        'parents'  => "parentsJointure",
-        'children' => "childrenJointure",
-    ];
-
+{
     static function getDepth( WoodWiccan $ww, bool $useCache=true ): int
     {
         if( $useCache ){
@@ -42,21 +36,11 @@ class CauldronDataAccess
         }
 
         // Determine the list of fields in select part of query
-        $query  =   "SELECT DISTINCT `c`.`".implode( "`, `c`.`", Cauldron::FIELDS)."` ";
+        //$query  =   "SELECT DISTINCT `c`.`".implode( "`, `c`.`", Cauldron::FIELDS)."` ";
+        $query  =   "SELECT `c`.`".implode( "`, `c`.`", Cauldron::FIELDS)."` ";
 
         $prefix = "`c`.`level_"; 
         $query  .=  ", ".$prefix.implode("`, ".$prefix, range(1, $ww->cauldronDepth))."` ";
-
-        $excludFields = [
-            'cauldron_fk',
-        ];
-        foreach( Ingredient::DEFAULT_AVAILABLE_INGREDIENT_TYPES_PREFIX as $type => $prefix ){
-            foreach( Ingredient::FIELDS as $field ){
-                if( !in_array($field, $excludFields) ){
-                    $query  .=  ", `".$prefix."`.`".$field."` AS `".$prefix."_".$field."` ";
-                }
-            }
-        }
 
         if( $getWitches )
         {
@@ -69,158 +53,101 @@ class CauldronDataAccess
             }
         }
 
-        
         $query  .= "FROM ";
-
-        // $userConnexionJointure = false;
-        // if( in_array('user', $configuration) && $ww->user->connexion )
-        // {
-        //     $userConnexionJointure = true;
-        //     $query  .= "`ingredient__integer` AS `user_connexion`, ";
-        // }
-        
         $query  .= "`cauldron` AS `c` ";
-        foreach( Ingredient::DEFAULT_AVAILABLE_INGREDIENT_TYPES_PREFIX as $type => $prefix )
+
+        $query  .= "LEFT JOIN `cauldron` AS `c_ref` ";
+        $query  .=  "ON ";
+
+        $jointureConditions = [];
+        for( $i=1; $i <= $ww->cauldronDepth; $i++ )
         {
-            $query  .=  "LEFT JOIN `ingredient__".$type."` AS `".$prefix."` ";
-            $query  .=      "ON `".$prefix."`.`cauldron_fk` = `c`.`id` ";
+            $jointure   =   "( ";
+            $jointure  .=       "( `c_ref`.`level_".$i."` IS NOT NULL ";
+            $jointure  .=       "AND `c`.`level_".$i."` = `c_ref`.`level_".$i."` ) ";
+            $jointure  .=       "OR ( `c_ref`.`level_".$i."` IS NULL ";
+            $jointure  .=       " ) ";
+            $jointure   .=  ") ";
+
+            $jointureConditions[] = $jointure;
         }
-        
+
+        $query  .=  implode( "AND ", $jointureConditions);        
+
         if( $getWitches )
         {
             $query  .= "LEFT JOIN `witch` AS `w` ";
             $query  .=  "ON `w`.`cauldron` = `c`.`id` ";
         }
 
-        $query  .= "LEFT JOIN `cauldron` AS `c_ref` ";
-        $query  .=  "ON ( ";
-        $query  .=  self::childrenJointure( $ww->cauldronDepth, "c_ref", 'c', '*' );
-        $query  .=  ") ";            
-
-        $parameters =   [];
-        $query      .=  "WHERE ";
-
-        $condition  =   " %s.`id` IN ( ";
-        $separator  =   " ";
-        foreach( $configuration as $conf )
-        {
+        $parameters = [];
+        $conditions = [];
+        foreach( $configuration as $conf ){
             if( ctype_digit(strval($conf)) )
             {
-                $parameters[ 'c_'.$conf ]    = (int) $conf;
-    
-                $condition  .=  $separator.":c_".$conf." ";
-                $separator  =   ", ";
-
+                $parameters[ 'c_'.$conf ]   = (int) $conf;
+                $conditions[]               =  ":c_".$conf." ";
             }
         }
-        $condition .=  ") ";
-
-        $query      .=  str_replace(' %s.', ' `c`.', $condition);
-        $query      .=  "OR ".str_replace(' %s.', " `c_ref`.", $condition);
         
-        // if( $userConnexionJointure )
-        // {
-        //     $query      .=  $separator;
-        //     $separator  =   "OR ";
+        $query  .=  "WHERE `c_ref`.`id` ";
+        $query  .=  "IN ( ".implode(", ", $conditions)." ) ";
 
-        //     $query  .=  "( ";
-        //     $query  .=      " `c`.`id` = `user_connexion`.`cauldron_fk` ";
-        //     $query  .=          "OR  `c_user`.`id` = `user_connexion`.`cauldron_fk` ";
-        //     $query  .=  ") ";
+        $orderBy = [];
+        for( $i=1; $i <= $ww->cauldronDepth; $i++ )
+        {
+            $orderBy[] = "`level_".$i."`";
+        }
 
-        //     $query  .=  "AND `user_connexion`.`id` IS NOT NULL ";
-        //     $query  .=  "AND `user_connexion`.`name` = \"user__connexion\" ";
-        //     $query  .=  "AND `user_connexion`.`value` = :user_id ";
-
-        //     $parameters[ 'user_id' ] = (int) $ww->user->id;
-        // }
+        $query .=  "ORDER BY ".implode( ', ', $orderBy );
 
         return $ww->db->selectQuery($query, $parameters);
     }
 
-    private static function childrenJointure( $maxDepth, $mother, $daughter, $depth=1 )
+    static function ingredientsRequest( WoodWiccan $ww, array $configuration )
     {
-        $m = function (int $level) use ($mother): string {
-            return "`".$mother."`.`level_".$level."`";
-        };
-        $d = function (int $level) use  ($daughter): string {
-            return "`".$daughter."`.`level_".$level."`";
-        };
-        
-        $jointure = "( `".$mother."`.`id` <> `".$daughter."`.`id` ) ";
-        
-        $jointure  .=      "AND ( ";
-        $jointure  .=          "( ".$m(1)." IS NOT NULL AND ".$d(1)." = ".$m(1)." ) ";
-        $jointure  .=          "OR ( ".$m(1)." IS NULL AND ".$d(1)." IS NOT NULL ) ";
-        $jointure  .=      ") ";
-        
-        for( $i=2; $i <= $maxDepth; $i++ )
-        {
-            $jointure  .=  "AND ( ";
-            $jointure  .=      "( ".$m($i)." IS NOT NULL AND ".$d($i)." = ".$m($i)." ) ";
-            $jointure  .=      "OR ( ".$m($i)." IS NULL AND ".$m($i-1)." IS NOT NULL AND ".$d($i)." IS NOT NULL ) ";
-            $jointure  .=      "OR (  ".$m($i)." IS NULL AND ".$m($i-1)." IS NULL ";
-            // Apply level
-            if( $depth != '*' && ($depth + $i - 1) <= $maxDepth ){
-                $jointure  .=       "AND ".$d($depth + $i - 1)." IS NULL ";
-            }
-            $jointure  .=      ") ";
-            $jointure  .=  ") ";
+        if( !$configuration ){
+            return [];
         }
-        
-        return $jointure;
-    }
-    
-    private static function parentsJointure( $maxDepth, $daughter, $mother, $depth=1 ){
-        return self::childrenJointure( $maxDepth, $mother, $daughter, $depth );
-    }
 
-    private static function siblingsJointure( $maxDepth, $witch, $sister, $depth=1 )
-    {
-        $w = function (int $level) use ($witch): string {
-            return "`".$witch."`.`level_".$level."`";
-        };
-        $s = function (int $level) use  ($sister): string {
-            return "`".$sister."`.`level_".$level."`";
-        };
+        // Determine the list of fields in select part of query
+        //$query  =   "SELECT DISTINCT `c`.`id` ";
+        $query  =   "SELECT `c`.`id` ";
         
-        $jointure = "( `".$witch."`.`id` <> `".$sister."`.`id` ) ";
-        
-        for( $i=1; $i < $maxDepth; $i++ )
-        {
-            $jointure  .=  "AND ( ";
-            $jointure  .=      "( ".$w($i)." IS NOT NULL AND ".$w($i+1)." IS NOT NULL AND ".$s($i)." = ".$w($i)." ) ";
-            $jointure  .=      "OR ( ".$w($i)." IS NOT NULL AND ".$w($i+1)." IS NULL AND ".$s($i)." IS NOT NULL ) ";
-            
-            if( $i == 1 ){
-                $jointure  .=      "OR ( ".$w($i)." IS NULL AND ".$s($i)." IS NULL ) ";
+        $excludFields = [
+            'cauldron_fk',
+        ];
+        foreach( Ingredient::DEFAULT_AVAILABLE_INGREDIENT_TYPES_PREFIX as $type => $prefix ){
+            foreach( Ingredient::FIELDS as $field ){
+                if( !in_array($field, $excludFields) ){
+                    $query  .=  ", `".$prefix."`.`".$field."` AS `".$prefix."_".$field."` ";
+                }
             }
-            elseif( $depth != '*' && ($i + 1 - $depth) > 0 )
+        }
+
+        $query  .= "FROM `cauldron` AS `c` ";
+        foreach( Ingredient::DEFAULT_AVAILABLE_INGREDIENT_TYPES_PREFIX as $type => $prefix )
+        {
+            $query  .=  "LEFT JOIN `ingredient__".$type."` AS `".$prefix."` ";
+            $query  .=      "ON `".$prefix."`.`cauldron_fk` = `c`.`id` ";
+        }
+        
+        $parameters = [];
+        $conditions = [];
+        foreach( $configuration as $conf ){
+            if( ctype_digit(strval($conf)) )
             {
-                $jointure  .=      "OR ( ".$w($i)." IS NULL AND ".$w($i + 1 - $depth)." IS NULL AND ".$s($i)." IS NULL ) ";
-                $jointure  .=      "OR ( ".$w($i)." IS NULL AND ".$w($i + 1 - $depth)." IS NOT NULL ) ";
-                
+                $parameters[ 'c_'.$conf ]   = (int) $conf;
+                $conditions[]               =  ":c_".$conf." ";
             }
-            else {
-                $jointure  .=      "OR ( ".$w($i)." IS NULL ) ";
-            }
-            
-            $jointure  .=  ") ";
         }
         
-        $jointure  .=      "AND ( ";
-        $jointure  .=          "( ".$w($maxDepth)." IS NOT NULL AND ".$s($maxDepth)." IS NOT NULL ) ";
-        if( $depth != '*' && ($maxDepth + 1 - $depth) > 0 )
-        {
-            $jointure  .=          "OR ( ".$w($maxDepth)." IS NULL AND ".$w($maxDepth + 1 - $depth)." IS NULL AND ".$s($maxDepth)." IS NULL ) ";
-            $jointure  .=          "OR ( ".$w($maxDepth)." IS NULL AND ".$w($maxDepth + 1 - $depth)." IS NOT NULL ) ";
-        }
-        else {
-            $jointure  .=      "OR ( ".$w($maxDepth)." IS NULL ) ";
-        }
-        $jointure  .=      ") ";
-        
-        return $jointure;
+        $query  .=  "WHERE `c`.`id` ";
+        $query  .=  "IN ( ".implode(", ", $conditions)." ) ";
+
+        $query .=  "ORDER BY `c`.`id` ";
+
+        return $ww->db->selectQuery($query, $parameters);
     }
 
     static function addLevel( WoodWiccan $ww ): int

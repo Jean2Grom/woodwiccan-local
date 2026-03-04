@@ -310,4 +310,28 @@ class Configuration
         return true;
     }
 
+
+    function compareAccess( string $access ): array
+    {
+        $haystack           = strtolower( $access );
+        $siteName           = $this->read('system','defaultSite') ?? Request::DEFAULT_SITE;
+        
+        $matchedSiteAccess  = "";
+        $matchDegree        = 0;
+        foreach( $this->getSiteAccessMap() as $siteAccess => $site )
+        {
+            $needle = strtolower( $siteAccess );
+            
+            if( $haystack === $needle
+                || (str_starts_with( $haystack, $needle.'/' ) && strlen( $siteAccess ) > $matchDegree)
+            ){
+                $matchDegree        = strlen($siteAccess);
+                $siteName           = $site;
+                $matchedSiteAccess  = $siteAccess;
+            }
+        }
+        
+        return [ 'siteName' => $siteName, 'matchedSiteAccess' => $matchedSiteAccess ];
+    }
+
 }

@@ -169,7 +169,7 @@ class Module
         return $this->ww->website->context->imageSrc( $filename );
     }
     
-    function image( string $filename ): ?string {
+    function imageSrc( string $filename ): ?string {
         return $this->ww->website->context->imageSrc( $filename );
     }
     

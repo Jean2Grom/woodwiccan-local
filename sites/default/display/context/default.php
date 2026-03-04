@@ -11,16 +11,8 @@ $this->addCssFile('basic.css');
         <title>WoodWiccan</title>
         
         <?=$this->favicon() ?>
-        
-        <?php foreach( $this->getJsLibFiles() as $jsLibFile ): ?>
-            <script src="<?=$jsLibFile?>"></script>
-        <?php endforeach; ?>
-        
-        <?php foreach( $this->getCssFiles() as $cssFile ): ?>
-            <link   rel="stylesheet" 
-                    type="text/css" 
-                    href="<?=$cssFile?>" />
-        <?php endforeach; ?>
+        <?=$this->jsLibs() ?>
+        <?=$this->css() ?>
     </head>
     
     <body>
@@ -28,8 +20,6 @@ $this->addCssFile('basic.css');
             <main><?=$this->witch()->result() ?></main>
         </div>
         
-        <?php foreach( $this->getJsFiles() as $jsFile ): ?>
-            <script src="<?=$jsFile?>"></script>
-        <?php endforeach; ?>
+        <?=$this->js() ?>
     </body>
 </html>

@@ -640,7 +640,7 @@ class Witch
      * relative if no forcedWebsite is passed, full if there is one
      * @param array|null $queryParams
      */
-    function url( ?array $queryParams=null ): ?string
+    function url( ?array $queryParams=null, bool $fullUrl=false ): ?string
     {
         if( is_null($this->url) ){
             return null;
@@ -656,6 +656,10 @@ class Witch
             $method = "getFullUrl";
         }
         
+        if( $fullUrl ){
+            $method = "getFullUrl";
+        }
+
         return call_user_func([$website, $method], $this->url, $queryParams ?? null);
     }
 

@@ -9,13 +9,8 @@ else
     $breadcrumbWitch    = $this->witch("target") ?? $this->witch();
     while( !empty($breadcrumbWitch) )
     {
-        if( empty($breadcrumb) ){
-            $url    = "javascript: location.reload();";
-        }
-        else {
-            $url    = $breadcrumbWitch->url();
-        }
-        
+        $url    = $breadcrumbWitch->url();
+
         if( $url ){
             $breadcrumb[]   = [
                 "name"  => $breadcrumbWitch->name,

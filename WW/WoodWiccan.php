@@ -113,11 +113,11 @@ class WoodWiccan
                 );    
             }
             
-            $this->website          = $this->request->getWebsite();
+            $this->website          = Website::factory( $this->request, $this->configuration );
             $this->debug->addEnableCondition( $this->website->debug );
             
-            $this->user             = $this->request->getUser();
-            $this->cairn            = $this->website->getCairn();
+            $this->user             = User::factory( $this->request );
+            $this->cairn            = Cairn::factory( $this->website );
             
             $this->cairn->summon();
         }

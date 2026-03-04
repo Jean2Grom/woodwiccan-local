@@ -14,7 +14,10 @@
                 "craft": false,
                 "parents": false,
                 "sisters": false,
-                "children": false
+                "children": {
+                    "depth": 1,
+                    "craft": false
+                }
             },
             "arborescence": {
                 "match": 1,

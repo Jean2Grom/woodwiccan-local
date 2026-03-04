@@ -297,8 +297,8 @@ INSERT INTO `witch` (`id`, `name`, `data`, `site`, `url`, `status`, `invoke`, `c
 --
 ALTER TABLE `cauldron`
   ADD PRIMARY KEY (`id`),
+  ADD KEY `IDX_target` (`target`),
   ADD KEY `IDX_level_1` (`level_1`),
-  ADD KEY `target` (`target`),
   ADD KEY `IDX_level_2` (`level_2`),
   ADD KEY `IDX_level_3` (`level_3`),
   ADD KEY `IDX_level_4` (`level_4`);
@@ -375,6 +375,7 @@ ALTER TABLE `user__profile`
 --
 ALTER TABLE `witch`
   ADD PRIMARY KEY (`id`),
+  ADD KEY `IDX_cauldron` (`cauldron`),
   ADD KEY `IDX_level_1` (`level_1`),
   ADD KEY `IDX_level_2` (`level_2`),
   ADD KEY `IDX_level_3` (`level_3`),

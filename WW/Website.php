@@ -14,7 +14,7 @@ class Website
     const DISPLAY_DIR           = "display";
     const INCLUDE_DIR           = "display/include";
 
-    public $name;
+    public string $name;
     public $currentAccess;
     public $site;
     
@@ -41,9 +41,6 @@ class Website
     /** Layout class that handle display */    
     public Context $context;
     
-    /** Class that handles witch summoning and modules invocation */
-    public Cairn $cairn;
-    
     /** WoodWiccan container class to allow whole access to Kernel */
     public WoodWiccan $ww;
     
@@ -64,9 +61,8 @@ class Website
         
         $this->heritages    = $this->ww->configuration->getSiteHeritage( $this->name );
         $this->modules      = $this->ww->configuration->readSiteMergedVar('modules', $this) ?? [];
-        $witchesConf        = $this->ww->configuration->readSiteMergedVar('witches', $this) ?? [];
-        
         $this->debug        = (bool) $this->ww->configuration->readSiteVar('debug', $this);
+        
         $defaultContext     = $this->ww->configuration->readSiteVar('defaultContext', $this);
         if( !empty($defaultContext) ){
             $this->defaultContext = $defaultContext;
@@ -89,19 +85,6 @@ class Website
 
         $this->baseUri  = ($firstSlashPosition !== false)? substr($this->currentAccess, $firstSlashPosition): '';
         $this->urlPath  = Tools::urlCleanupString(substr( $this->ww->request->access, strlen($this->currentAccess) ));
-        
-        foreach( $this->modules as $moduleName => $moduleConf ){
-            foreach( $moduleConf['witches'] ?? [] as $moduleWitchName => $moduleWitchConf ){
-                if( empty($witchesConf[ $moduleWitchName ]) ){
-                    $witchesConf[ $moduleWitchName ] = array_replace_recursive( 
-                        $moduleWitchConf, 
-                        [ 'module' => $moduleName ] 
-                    );
-                }
-            }
-        }
-        
-        $this->cairn    = new Cairn( $this->ww, $witchesConf, $this );
         $this->context  = new Context( $this, $this->defaultContext );
     }
     
@@ -111,6 +94,31 @@ class Website
      */
     public function __toString(): string {
         return $this->name;
+    }
+
+    static function factory( Request $request, Configuration $configuration ): self
+    {
+        // Determinating which site is acceded comparing
+        // Configuration and URI
+        $parsed_url         = parse_url( strtolower($request->uri ?? '/') );
+        $request->access    = $parsed_url["host"].$parsed_url['path'];
+        $compareAccess      = $configuration->compareAccess( $request->access );
+
+        // if no match and access has "www" for subomain, try whithout (considered default subdomain)
+        if( !$compareAccess['matchedSiteAccess'] && str_starts_with($request->access , "www.") )
+        {
+            $request->access   = substr($request->access , 4);
+            $compareAccess  = $configuration->compareAccess( $request->access  );
+        }
+        
+        if( !$compareAccess['matchedSiteAccess']   ){   
+            $request->ww->log->error("Site access is not in configuration file");
+        }
+        else {
+            $request->ww->debug->toResume("Accessing site: \"".$compareAccess['siteName']."\", with site access: \"".$compareAccess['matchedSiteAccess']."\"", 'SITEACCESS');
+        }
+        
+        return new Website( $request->ww, $compareAccess['siteName']  , $compareAccess['matchedSiteAccess'] );
     }
 
 
@@ -133,19 +141,13 @@ class Website
 
         return $this->status ?? [];
     }
-
-    function getCairn(): Cairn {
-        return $this->cairn;
-    }
     
-    function getUrlSearchParameters()
-    {
+    function getUrlSearchParameters(): array {
         return [
             'site'  => $this->site,
             'url'   => $this->urlPath,
         ];
     }
-
     
     function display(): self
     {
@@ -261,11 +263,7 @@ class Website
         $dirContentArray = array_diff( scandir($dir), array('..', '.') );
         
         foreach( $dirContentArray as $dirContent ){
-            if( is_dir($dir.'/'.$dirContent) && $dirContent !== self::DISPLAY_DIR ){
-
-                $modulesList = array_merge( $modulesList, $this->recursiveRead( $dir.'/'.$dirContent, $prefix ) );
-            }
-            else 
+            if( is_file($dir.'/'.$dirContent) )
             {
                 $moduleName = $dir.'/'.$dirContent;
                 if( substr($moduleName, 0, strlen($prefix)) == $prefix ){
@@ -277,6 +275,15 @@ class Website
                 if( $moduleName ){
                     $modulesList[] = $moduleName;
                 }
+            }
+            elseif( !in_array($dirContent, [
+                self::DISPLAY_DIR, 
+                self::INCLUDE_DIR, 
+                Context::DIR, 
+                Context::DISPLAY_DIR, 
+                Context::ASSETS_SUBFOLDER, 
+            ]) ){
+                $modulesList = array_merge( $modulesList, $this->recursiveRead( $dir.'/'.$dirContent, $prefix ) );
             }
         }
 
